@@ -16,7 +16,7 @@ def create_test_dataset() -> List[Dict]:
             "category": "exchange_query",
             "expected_entities": {
                 "product": ["苹果"],
-                "exchange": ["郑州商品交易所"]  # 基于PDF中的信息
+                "exchange": ["郑州商品交易所"]
             },
             "difficulty": "easy"
         },
