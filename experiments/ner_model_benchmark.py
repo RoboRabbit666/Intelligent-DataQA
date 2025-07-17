@@ -244,7 +244,7 @@ def recommend_configuration(results):
     
     # 综合推荐
     print(f"\n💡 综合推荐:")
-    print(f"   对于您的DataQA项目，建议使用exclude参数:")
+    print(f"   建议使用exclude参数:")
     print(f"   📈 高准确率需求: zh_core_web_trf exclude=['parser', 'lemmatizer', 'attribute_ruler']")
     print(f"   ⚡ 高速度需求: zh_core_web_trf exclude=['parser', 'tagger', 'lemmatizer', 'attribute_ruler']")
     print(f"   💾 平衡选择: zh_core_web_md (完整配置，74MB，NER F-score: 0.70)")
