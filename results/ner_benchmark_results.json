@@ -1,4 +1,140 @@
 {
+  "sm_full": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型完整配置 (46MB)",
+    "excluded_components": [],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "parser",
+      "attribute_ruler",
+      "ner"
+    ],
+    "load_time": 0.4669921398162842,
+    "total_processing_time": 0.20250988006591797,
+    "avg_time_per_text": 0.002978086471557617,
+    "median_time_per_text": 0.0024950504302978516,
+    "p95_time_per_text": 0.005139827728271484,
+    "texts_per_second": 335.786085981907,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.0017857551574707031,
+      "max_time": 0.01061391830444336,
+      "std_time": 0.0017398901307351731
+    }
+  },
+  "sm_ner_pos": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型NER+词性 (46MB)",
+    "excluded_components": [
+      "parser",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "ner"
+    ],
+    "load_time": 0.4828338623046875,
+    "total_processing_time": 0.19376277923583984,
+    "avg_time_per_text": 0.002849452635821174,
+    "median_time_per_text": 0.002227306365966797,
+    "p95_time_per_text": 0.008601188659667969,
+    "texts_per_second": 350.94459456133876,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.0016369819641113281,
+      "max_time": 0.017589092254638672,
+      "std_time": 0.0022970968821309713
+    }
+  },
+  "sm_ner_only": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型仅NER (46MB)",
+    "excluded_components": [
+      "parser",
+      "tagger",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "ner"
+    ],
+    "load_time": 0.4821000099182129,
+    "total_processing_time": 0.2051842212677002,
+    "avg_time_per_text": 0.0030174150186426498,
+    "median_time_per_text": 0.0022439956665039062,
+    "p95_time_per_text": 0.008609771728515625,
+    "texts_per_second": 331.409499131425,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.001605987548828125,
+      "max_time": 0.01596212387084961,
+      "std_time": 0.0021752052538612323
+    }
+  },
   "md_full": {
     "model": "zh_core_web_md",
     "description": "中型模型完整配置 (74MB)",
@@ -10,12 +146,12 @@
       "attribute_ruler",
       "ner"
     ],
-    "load_time": 0.6873579025268555,
-    "total_processing_time": 0.21864986419677734,
-    "avg_time_per_text": 0.003215439179364373,
-    "median_time_per_text": 0.0026497840881347656,
-    "p95_time_per_text": 0.005448818206787109,
-    "texts_per_second": 310.9995071334796,
+    "load_time": 0.7128410339355469,
+    "total_processing_time": 0.22182798385620117,
+    "avg_time_per_text": 0.003262176233179429,
+    "median_time_per_text": 0.0027170181274414062,
+    "p95_time_per_text": 0.0054280757904052734,
+    "texts_per_second": 306.54383102575844,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -42,9 +178,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.0018949508666992188,
-      "max_time": 0.011996030807495117,
-      "std_time": 0.0019698612625889496
+      "min_time": 0.0019211769104003906,
+      "max_time": 0.011599063873291016,
+      "std_time": 0.0019040270327962705
     }
   },
   "md_ner_pos": {
@@ -60,12 +196,12 @@
       "tagger",
       "ner"
     ],
-    "load_time": 0.6905999183654785,
-    "total_processing_time": 0.20453095436096191,
-    "avg_time_per_text": 0.003007808152367087,
-    "median_time_per_text": 0.002424955368041992,
-    "p95_time_per_text": 0.009629964828491211,
-    "texts_per_second": 332.46801303235355,
+    "load_time": 0.708899736404419,
+    "total_processing_time": 0.20453906059265137,
+    "avg_time_per_text": 0.003007927361656638,
+    "median_time_per_text": 0.0023488998413085938,
+    "p95_time_per_text": 0.009371042251586914,
+    "texts_per_second": 332.45483675817314,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -92,9 +228,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.001728057861328125,
-      "max_time": 0.014960289001464844,
-      "std_time": 0.0021659699308544454
+      "min_time": 0.0017788410186767578,
+      "max_time": 0.014549970626831055,
+      "std_time": 0.0021108519287214413
     }
   },
   "md_ner_only": {
@@ -110,12 +246,12 @@
       "tok2vec",
       "ner"
     ],
-    "load_time": 0.6681499481201172,
-    "total_processing_time": 0.20417094230651855,
-    "avg_time_per_text": 0.003002513857448802,
-    "median_time_per_text": 0.002371072769165039,
-    "p95_time_per_text": 0.009371042251586914,
-    "texts_per_second": 333.0542496978473,
+    "load_time": 0.6910388469696045,
+    "total_processing_time": 0.2203061580657959,
+    "avg_time_per_text": 0.003239796442144057,
+    "median_time_per_text": 0.0023772716522216797,
+    "p95_time_per_text": 0.009924173355102539,
+    "texts_per_second": 308.66136742165577,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -142,9 +278,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.0016989707946777344,
-      "max_time": 0.014754056930541992,
-      "std_time": 0.0021365076891815176
+      "min_time": 0.001802206039428711,
+      "max_time": 0.01762700080871582,
+      "std_time": 0.002812037032758864
     }
   },
   "trf_full": {
@@ -158,12 +294,12 @@
       "attribute_ruler",
       "ner"
     ],
-    "load_time": 1.2783401012420654,
-    "total_processing_time": 1.8782439231872559,
-    "avg_time_per_text": 0.02762123416451847,
-    "median_time_per_text": 0.025753021240234375,
-    "p95_time_per_text": 0.044904232025146484,
-    "texts_per_second": 36.20403035012007,
+    "load_time": 1.145108938217163,
+    "total_processing_time": 1.9661760330200195,
+    "avg_time_per_text": 0.02891435342676499,
+    "median_time_per_text": 0.027326107025146484,
+    "p95_time_per_text": 0.040471792221069336,
+    "texts_per_second": 34.58489924503501,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -189,9 +325,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.021236896514892578,
-      "max_time": 0.08442115783691406,
-      "std_time": 0.008840546890896386
+      "min_time": 0.02210402488708496,
+      "max_time": 0.08731293678283691,
+      "std_time": 0.00879681742202893
     }
   },
   "trf_ner_pos": {
@@ -207,12 +343,12 @@
       "tagger",
       "ner"
     ],
-    "load_time": 1.0339713096618652,
-    "total_processing_time": 1.8942809104919434,
-    "avg_time_per_text": 0.027857072213116812,
-    "median_time_per_text": 0.025406837463378906,
-    "p95_time_per_text": 0.03846597671508789,
-    "texts_per_second": 35.897526931388676,
+    "load_time": 1.029167890548706,
+    "total_processing_time": 1.7148511409759521,
+    "avg_time_per_text": 0.025218399131999296,
+    "median_time_per_text": 0.02420496940612793,
+    "p95_time_per_text": 0.028688907623291016,
+    "texts_per_second": 39.653587635192636,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -238,9 +374,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.02048206329345703,
-      "max_time": 0.09430980682373047,
-      "std_time": 0.010076528846486112
+      "min_time": 0.020229339599609375,
+      "max_time": 0.07952404022216797,
+      "std_time": 0.00816292970730738
     }
   },
   "trf_ner_only": {
@@ -256,12 +392,12 @@
       "transformer",
       "ner"
     ],
-    "load_time": 1.300757884979248,
-    "total_processing_time": 1.639714002609253,
-    "avg_time_per_text": 0.024113441214841956,
-    "median_time_per_text": 0.021524906158447266,
-    "p95_time_per_text": 0.04827880859375,
-    "texts_per_second": 41.470646644349316,
+    "load_time": 1.011441707611084,
+    "total_processing_time": 1.8154981136322021,
+    "avg_time_per_text": 0.026698501671061796,
+    "median_time_per_text": 0.02549123764038086,
+    "p95_time_per_text": 0.02949666976928711,
+    "texts_per_second": 37.45528540591807,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -287,9 +423,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.01882004737854004,
-      "max_time": 0.08568286895751953,
-      "std_time": 0.009549051872656946
+      "min_time": 0.020167827606201172,
+      "max_time": 0.08384108543395996,
+      "std_time": 0.00856919644392635
     }
   }
 }
