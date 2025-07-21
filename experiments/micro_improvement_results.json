@@ -1,0 +1,132 @@
+{
+  "original_method": {
+    "description": "原始RegEx方法",
+    "total_time": 0.001970052719116211,
+    "avg_time_per_text": 3.283421198527018e-05,
+    "texts_per_second": 30456.037758683287,
+    "overall_metrics": {
+      "overall": {
+        "precision": 0.7291666666666666,
+        "recall": 0.9210526315789473,
+        "f1": 0.8139534883720931,
+        "tp": 35,
+        "fp": 13,
+        "fn": 3,
+        "total_true": 131,
+        "total_pred": 216
+      },
+      "by_entity_type": {
+        "PRODUCT": {
+          "precision": 0.45454545454545453,
+          "recall": 1.0,
+          "f1": 0.625,
+          "tp": 10,
+          "fp": 12,
+          "fn": 0,
+          "support": 10
+        },
+        "EXCHANGE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "support": 4
+        },
+        "FUTURES_COMPANY": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "support": 10
+        },
+        "CONTRACT_CODE": {
+          "precision": 1.0,
+          "recall": 0.7692307692307693,
+          "f1": 0.8695652173913044,
+          "tp": 10,
+          "fp": 0,
+          "fn": 3,
+          "support": 13
+        },
+        "TIME": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "tp": 1,
+          "fp": 1,
+          "fn": 0,
+          "support": 1
+        }
+      }
+    }
+  },
+  "micro_improved": {
+    "description": "微改进RegEx方法",
+    "total_time": 0.003139972686767578,
+    "avg_time_per_text": 5.233287811279297e-05,
+    "texts_per_second": 19108.44646924829,
+    "overall_metrics": {
+      "overall": {
+        "precision": 0.813953488372093,
+        "recall": 0.9210526315789473,
+        "f1": 0.8641975308641974,
+        "tp": 35,
+        "fp": 8,
+        "fn": 3,
+        "total_true": 131,
+        "total_pred": 139
+      },
+      "by_entity_type": {
+        "PRODUCT": {
+          "precision": 0.5882352941176471,
+          "recall": 1.0,
+          "f1": 0.7407407407407407,
+          "tp": 10,
+          "fp": 7,
+          "fn": 0,
+          "support": 10
+        },
+        "EXCHANGE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "support": 4
+        },
+        "FUTURES_COMPANY": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "support": 10
+        },
+        "CONTRACT_CODE": {
+          "precision": 1.0,
+          "recall": 0.7692307692307693,
+          "f1": 0.8695652173913044,
+          "tp": 10,
+          "fp": 0,
+          "fn": 3,
+          "support": 13
+        },
+        "TIME": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "tp": 1,
+          "fp": 1,
+          "fn": 0,
+          "support": 1
+        }
+      }
+    }
+  }
+}

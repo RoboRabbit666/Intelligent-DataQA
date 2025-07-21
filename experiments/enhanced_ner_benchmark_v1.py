@@ -335,7 +335,7 @@ class MicroImprovedRegexNER:
             # 主要对PRODUCT类型进行过滤
             if entity_type == 'PRODUCT':
                 # 获取上下文
-                context_window = 15
+                context_window = 30 # 上下文窗口大小
                 context_start = max(0, start_pos - context_window)
                 context_end = min(len(text), end_pos + context_window)
                 context = text[context_start:context_end]
