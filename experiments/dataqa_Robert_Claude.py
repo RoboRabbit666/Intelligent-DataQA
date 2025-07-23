@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys
-sys.path.append(str(Path.cwd().parent))
+sys.path.append(str(Path.cwd().parent.parent))
 
 from typing import List, Optional, Dict, Tuple, Set
 import re
@@ -27,7 +27,7 @@ from resources import (
     USER_DICT_PATH,
     SYNONYM_DICT_PATH,
     STOP_WORDS_PATH,
-    NER_PATTERNS_PATH,
+    NER_PATTERNs_PATH,
 )
 from app.models import (
     ChatCompletionChoice,
@@ -343,7 +343,7 @@ class DataQaWorkflow:
         
         # 新增：初始化增强的合约代码识别器
         try:
-            self.enhanced_contract_ner = EnhancedContractCodeNER(NER_PATTERNS_PATH)
+            self.enhanced_contract_ner = EnhancedContractCodeNER(NER_PATTERNs_PATH)
             logger.info("Enhanced Contract Code NER initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Enhanced Contract Code NER: {e}")
@@ -451,7 +451,7 @@ class DataQaWorkflow:
                 user_dict_path=USER_DICT_PATH, 
                 syn_dict_path=SYNONYM_DICT_PATH, 
                 stop_words_path=STOP_WORDS_PATH,
-                patterns_path=NER_PATTERNS_PATH  # 保持与原始dataqa.py一致
+                patterns_path=NER_PATTERNs_PATH  # 保持与原始dataqa.py一致
             )
             
             basic_entities = tokenizer.recognize(query)
@@ -546,7 +546,7 @@ class DataQaWorkflow:
                     user_dict_path=USER_DICT_PATH, 
                     syn_dict_path=SYNONYM_DICT_PATH, 
                     stop_words_path=STOP_WORDS_PATH,
-                    patterns_path=NER_PATTERNS_PATH
+                    patterns_path=NER_PATTERNs_PATH
                 )
                 entity_list = tokenizer.recognize(query)
                 result_query = query
