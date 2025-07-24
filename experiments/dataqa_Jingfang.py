@@ -63,19 +63,21 @@ class EnhancedContractCodeNER:
         self.contract_code_patterns = [
             # 标准格式：AP2501, CU2405, SR2412 等
             r'(?<![A-Za-z])([A-Z]{1,3})(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',      # 大写：AP2501
-            r'(?![A-Za-z0-9])([a-z]{1,3})(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',      # 小写：ap2501
+            r'(?<![A-Za-z])([a-z]{1,3})(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',      # 小写：ap2501
             
-            # 变体格式：支持各种分隔符 (-, _, ., /, 空格, 括号)
-            r'(?<![A-Za-z])([A-Z]{1,3})\s*[-_./]\s*(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # AP-2501, AP_2501, AP.2501, AP/2501
-            r'(?<![A-Za-z])([a-z]{1,3})\s*[-_./]\s*(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # ap-2501, ap_2501, ap.2501, ap/2501
-            r'(?<![A-Za-z])([A-Z]{1,3})\s+(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',           # AP 2501（空格分隔）
-            r'(?<![A-Za-z])([a-z]{1,3})\s+(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',           # ap 2501（空格分隔）
-            r'(?<![A-Za-z])([A-Z]{1,3})\s*\(\s*(([0-9]{2})(0[1-9]|1[0-2]))\s*\)(?![A-Za-z0-9])', # AP(2501)（括号格式）
-            r'(?<![A-Za-z])([a-z]{1,3})\s*\(\s*(([0-9]{2})(0[1-9]|1[0-2]))\s*\)(?![A-Za-z0-9])', # ap(2501)（括号格式）
+            # 变体格式：支持各种分隔符
+            r'(?<![A-Za-z])([A-Z]{1,3})(?:\s*[-_./]\s*)(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # AP-2501
+            r'(?<![A-Za-z])([a-z]{1,3})(?:\s*[-_./]\s*)(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # ap-2501
+
+            r'(?<![A-Za-z])([A-Z]{1,3})(?:\s+)(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',           # AP 2501
+            r'(?<![A-Za-z])([a-z]{1,3})(?:\s+)(([0-9]{2})(0[1-9]|1[0-2]))(?![A-Za-z0-9])',           # ap 2501
             
-            # 年月分离格式：AP24-01, CU25/03 等
-            r'(?<![A-Za-z])([A-Z]{1,3})\s*([0-9]{2})\s*[-_./]\s*(0[1-9]|1[0-2])(?![A-Za-z0-9])',  # AP24-01
-            r'(?<![A-Za-z])([a-z]{1,3})\s*([0-9]{2})\s*[-_./]\s*(0[1-9]|1[0-2])(?![A-Za-z0-9])',  # ap24-01
+            r'(?<![A-Za-z])([A-Z]{1,3})(?:\s*\(\s*)(([0-9]{2})(0[1-9]|1[0-2]))(?:\s*\))(?![A-Za-z0-9])', # AP(2501)
+            r'(?<![A-Za-z])([a-z]{1,3})(?:\s*\(\s*)(([0-9]{2})(0[1-9]|1[0-2]))(?:\s*\))(?![A-Za-z0-9])', # ap(2501)
+            
+            # 年月分离格式:
+            r'(?<![A-Za-z])([A-Z]{1,3})(?:\s*)(([0-9]{2})(?:\s*[-_./]\s*)(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # AP24-01
+            r'(?<![A-Za-z])([a-z]{1,3})(?:\s*)(([0-9]{2})(?:\s*[-_./]\s*)(0[1-9]|1[0-2]))(?![A-Za-z0-9])',  # ap24-01
         ]
         
         # 编译正则表达式以提高运行时性能
@@ -119,13 +121,6 @@ class EnhancedContractCodeNER:
                         
                         # 只处理"品种"类型的实体
                         if pattern_entry.get('label') == '品种':
-                            # 从ID字段提取品种前缀
-                            entity_id = pattern_entry.get('id', '')
-                            if entity_id:
-                                # 提取可能的合约代码前缀
-                                # 例如：从"铜"提取"CU"，从"苹果"提取"AP"
-                                contract_prefixes.add(entity_id.upper())
-                            
                             # 从pattern字段提取
                             pattern_value = pattern_entry.get('pattern')
                             if isinstance(pattern_value, str):
@@ -151,7 +146,7 @@ class EnhancedContractCodeNER:
                 # 郑商所主要品种
                 'AP', 'CF', 'CY', 'FG', 'JR', 'LR', 'MA', 'OI', 'PK', 'PM', 
                 'RI', 'RM', 'RS', 'SF', 'SM', 'SR', 'TA', 'UR', 'WH', 'ZC',
-                'CJ', 'SA', 'PF', 'SH',
+                'CJ', 'SA', 'PF', 'SH', 'PX', 'PL',
                 
                 # 上期所主要品种
                 'CU', 'AL', 'ZN', 'PB', 'NI', 'SN', 'AU', 'AG', 'RB', 'WR',
@@ -159,17 +154,17 @@ class EnhancedContractCodeNER:
                 
                 # 大商所主要品种
                 'A', 'B', 'C', 'CS', 'M', 'Y', 'P', 'FB', 'BB', 'JD', 'LH',
-                'L', 'V', 'PP', 'J', 'JM', 'I', 'EG', 'EB', 'PG', 'LM', 'BE',
+                'L', 'V', 'PP', 'J', 'JM', 'I', 'EG', 'EB', 'PG',
                 
                 # 中金所主要品种
                 'IF', 'IC', 'IH', 'IM', 'TS', 'TF', 'T', 'TL',
                 
                 # 广期所主要品种
-                'SI', 'LC', 'XS'
+                'SI', 'LC', 'PS'
             }
             contract_prefixes.update(common_prefixes)
             
-            logger.info(f"Loaded {len(contract_prefixes)} contract prefixes from {patterns_file_path}")
+            logger.info(f"Loaded {len(contract_prefixes)} contract prefixes from configuration file and manually added common prefixes")
             return contract_prefixes
             
         except Exception as e:
