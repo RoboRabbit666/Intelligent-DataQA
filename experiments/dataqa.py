@@ -76,7 +76,7 @@ class DataQaWorkflow:
         """
         
         try:
-            tokenizer = NLPToolkit(user_dict_path=USER_DICT_PATH, syn_dict_path=SYNONYM_DICT_PATH, stop_words_path=STOP_WORDS_PATH, pattetns_path=NER_PATTERNs_PATH)
+            tokenizer = NLPToolkit(user_dict_path=USER_DICT_PATH, syn_dict_path=SYNONYM_DICT_PATH, stop_words_path=STOP_WORDS_PATH, patterns_path=NER_PATTERNs_PATH)
             entity_list = tokenizer.recognize(query)
             for entity in entity_list:
                 if entity['id'] != '':
