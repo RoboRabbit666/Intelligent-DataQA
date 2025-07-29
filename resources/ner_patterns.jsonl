@@ -436,3 +436,527 @@
 {"label": "合约代码", "id": "硅铁合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
 {"label": "合约代码", "id": "硅铁合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
 {"label": "合约代码", "id": "硅铁合约-点号", "pattern": [{"TEXT": {"REGEX": "(SI|si)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "不锈钢合约", "pattern":[{"TEXT": {"REGEX": "(SS|ss)\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-空格", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-点号", "pattern": [{"TEXT": {"REGEX": "(SS|ss)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "燃料油合约", "pattern":[{"TEXT": {"REGEX": "(FU|fu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-空格", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-点号", "pattern": [{"TEXT": {"REGEX": "(FU|fu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "石油沥青合约", "pattern":[{"TEXT": {"REGEX": "(BU|bu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-空格", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-点号", "pattern": [{"TEXT": {"REGEX": "(BU|bu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "天然橡胶合约", "pattern":[{"TEXT": {"REGEX": "(RU|ru)\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(RU|ru)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "20号胶合约", "pattern":[{"TEXT": {"REGEX": "(NR|nr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(NR|nr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "丁二烯橡胶合约", "pattern":[{"TEXT": {"REGEX": "(BR|br)\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(BR|br)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纸浆合约", "pattern":[{"TEXT": {"REGEX": "(SP|sp)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-空格", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-点号", "pattern": [{"TEXT": {"REGEX": "(SP|sp)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "氧化铝合约", "pattern":[{"TEXT": {"REGEX": "(AO|ao)\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-连字符", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-空格", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-下划线", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-点号", "pattern": [{"TEXT": {"REGEX": "(AO|ao)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "原油合约", "pattern":[{"TEXT": {"REGEX": "(SC|sc)\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-空格", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-点号", "pattern": [{"TEXT": {"REGEX": "(SC|sc)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "低硫燃料油合约", "pattern":[{"TEXT": {"REGEX": "(LU|lu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-空格", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-点号", "pattern": [{"TEXT": {"REGEX": "(LU|lu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "国际铜合约", "pattern":[{"TEXT": {"REGEX": "(BC|bc)\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-空格", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-点号", "pattern": [{"TEXT": {"REGEX": "(BC|bc)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "欧线集运合约", "pattern":[{"TEXT": {"REGEX": "(EC|ec)\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-空格", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-点号", "pattern": [{"TEXT": {"REGEX": "(EC|ec)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "鸡蛋合约", "pattern":[{"TEXT": {"REGEX": "(JD|jd)\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-连字符", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-空格", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-下划线", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-点号", "pattern": [{"TEXT": {"REGEX": "(JD|jd)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "生猪合约", "pattern":[{"TEXT": {"REGEX": "(LH|lh)\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-空格", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-点号", "pattern": [{"TEXT": {"REGEX": "(LH|lh)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纤维板合约", "pattern":[{"TEXT": {"REGEX": "(FB|fb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-连字符", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-空格", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-下划线", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-点号", "pattern": [{"TEXT": {"REGEX": "(FB|fb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "胶合板合约", "pattern":[{"TEXT": {"REGEX": "(BB|bb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-空格", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-点号", "pattern": [{"TEXT": {"REGEX": "(BB|bb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "聚乙烯合约", "pattern":[{"TEXT": {"REGEX": "(L|l)\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(L|l)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "聚丙烯合约", "pattern":[{"TEXT": {"REGEX": "(PP|pp)\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(PP|pp)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "乙二醇合约", "pattern":[{"TEXT": {"REGEX": "(EG|eg)\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-空格", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-点号", "pattern": [{"TEXT": {"REGEX": "(EG|eg)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "苯乙烯合约", "pattern":[{"TEXT": {"REGEX": "(EB|eb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(EB|eb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "液化石油气合约", "pattern":[{"TEXT": {"REGEX": "(PG|pg)\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-空格", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-点号", "pattern": [{"TEXT": {"REGEX": "(PG|pg)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纯苯合约", "pattern":[{"TEXT": {"REGEX": "(BE|be)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-空格", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-点号", "pattern": [{"TEXT": {"REGEX": "(BE|be)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "原木合约", "pattern":[{"TEXT": {"REGEX": "(LM|lm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-空格", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-点号", "pattern": [{"TEXT": {"REGEX": "(LM|lm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "强麦合约", "pattern":[{"TEXT": {"REGEX": "(WH|wh)\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-连字符", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-空格", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-下划线", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-点号", "pattern": [{"TEXT": {"REGEX": "(WH|wh)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "普麦合约", "pattern":[{"TEXT": {"REGEX": "(PM|pm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-空格", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-点号", "pattern": [{"TEXT": {"REGEX": "(PM|pm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "早籼稻合约", "pattern":[{"TEXT": {"REGEX": "(RI|ri)\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(RI|ri)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "晚籼稻合约", "pattern":[{"TEXT": {"REGEX": "(LR|lr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(LR|lr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "粳稻合约", "pattern":[{"TEXT": {"REGEX": "(JR|jr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(JR|jr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "棉纱合约", "pattern":[{"TEXT": {"REGEX": "(CY|cy)\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-连字符", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-空格", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-下划线", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-点号", "pattern": [{"TEXT": {"REGEX": "(CY|cy)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "菜籽粕合约", "pattern":[{"TEXT": {"REGEX": "(RM|rm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-空格", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-点号", "pattern": [{"TEXT": {"REGEX": "(RM|rm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "红枣合约", "pattern":[{"TEXT": {"REGEX": "(CJ|cj)\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-连字符", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-空格", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-下划线", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-点号", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "花生合约", "pattern":[{"TEXT": {"REGEX": "(PK|pk)\\d{4}$"}}]}
+{"label": "合约代码", "id": "花生合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "花生合约-空格", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "花生合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "花生合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "花生合约-点号", "pattern": [{"TEXT": {"REGEX": "(PK|pk)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纯碱合约", "pattern":[{"TEXT": {"REGEX": "(SA|sa)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯碱合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯碱合约-空格", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯碱合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯碱合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯碱合约-点号", "pattern": [{"TEXT": {"REGEX": "(SA|sa)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "尿素合约", "pattern":[{"TEXT": {"REGEX": "(UR|ur)\\d{4}$"}}]}
+{"label": "合约代码", "id": "尿素合约-连字符", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "尿素合约-空格", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "尿素合约-下划线", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "尿素合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "尿素合约-点号", "pattern": [{"TEXT": {"REGEX": "(UR|ur)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "短纤合约", "pattern":[{"TEXT": {"REGEX": "(PF|pf)\\d{4}$"}}]}
+{"label": "合约代码", "id": "短纤合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "短纤合约-空格", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "短纤合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "短纤合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "短纤合约-点号", "pattern": [{"TEXT": {"REGEX": "(PF|pf)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "烧碱合约", "pattern":[{"TEXT": {"REGEX": "(SH|sh)\\d{4}$"}}]}
+{"label": "合约代码", "id": "烧碱合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "烧碱合约-空格", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "烧碱合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "烧碱合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "烧碱合约-点号", "pattern": [{"TEXT": {"REGEX": "(SH|sh)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "对二甲苯合约", "pattern":[{"TEXT": {"REGEX": "(PX|px)\\d{4}$"}}]}
+{"label": "合约代码", "id": "对二甲苯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "对二甲苯合约-空格", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "对二甲苯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "对二甲苯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "对二甲苯合约-点号", "pattern": [{"TEXT": {"REGEX": "(PX|px)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "沪深300合约", "pattern":[{"TEXT": {"REGEX": "(IF|if)\\d{4}$"}}]}
+{"label": "合约代码", "id": "沪深300合约-连字符", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "沪深300合约-空格", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "沪深300合约-下划线", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "沪深300合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "沪深300合约-点号", "pattern": [{"TEXT": {"REGEX": "(IF|if)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "上证50合约", "pattern":[{"TEXT": {"REGEX": "(IH|ih)\\d{4}$"}}]}
+{"label": "合约代码", "id": "上证50合约-连字符", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "上证50合约-空格", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "上证50合约-下划线", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "上证50合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "上证50合约-点号", "pattern": [{"TEXT": {"REGEX": "(IH|ih)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "中证500合约", "pattern":[{"TEXT": {"REGEX": "(IC|ic)\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证500合约-连字符", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证500合约-空格", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证500合约-下划线", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证500合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证500合约-点号", "pattern": [{"TEXT": {"REGEX": "(IC|ic)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "中证1000合约", "pattern":[{"TEXT": {"REGEX": "(IM|im)\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证1000合约-连字符", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证1000合约-空格", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证1000合约-下划线", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证1000合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "中证1000合约-点号", "pattern": [{"TEXT": {"REGEX": "(IM|im)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "2年期国债合约", "pattern":[{"TEXT": {"REGEX": "(TS|ts)\\d{4}$"}}]}
+{"label": "合约代码", "id": "2年期国债合约-连字符", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "2年期国债合约-空格", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "2年期国债合约-下划线", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "2年期国债合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "2年期国债合约-点号", "pattern": [{"TEXT": {"REGEX": "(TS|ts)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "5年期国债合约", "pattern":[{"TEXT": {"REGEX": "(TF|tf)\\d{4}$"}}]}
+{"label": "合约代码", "id": "5年期国债合约-连字符", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "5年期国债合约-空格", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "5年期国债合约-下划线", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "5年期国债合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "5年期国债合约-点号", "pattern": [{"TEXT": {"REGEX": "(TF|tf)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "10年期国债合约", "pattern":[{"TEXT": {"REGEX": "(TN|tn)\\d{4}$"}}]}
+{"label": "合约代码", "id": "10年期国债合约-连字符", "pattern": [{"TEXT": {"REGEX": "(TN|tn)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "10年期国债合约-空格", "pattern": [{"TEXT": {"REGEX": "(TN|tn)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "10年期国债合约-下划线", "pattern": [{"TEXT": {"REGEX": "(TN|tn)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "10年期国债合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(TN|tn)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "10年期国债合约-点号", "pattern": [{"TEXT": {"REGEX": "(TN|tn)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "不锈钢合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-空格", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "不锈钢合约-点号", "pattern": [{"TEXT": {"REGEX": "(SS|ss)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "燃料油合约", "pattern":[{"TEXT": {"REGEX": "(FU|fu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-空格", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "燃料油合约-点号", "pattern": [{"TEXT": {"REGEX": "(FU|fu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "石油沥青合约", "pattern":[{"TEXT": {"REGEX": "(BU|bu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-空格", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "石油沥青合约-点号", "pattern": [{"TEXT": {"REGEX": "(BU|bu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "天然橡胶合约", "pattern":[{"TEXT": {"REGEX": "(RU|ru)\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "天然橡胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(RU|ru)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "20号胶合约", "pattern":[{"TEXT": {"REGEX": "(NR|nr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "20号胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(NR|nr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "丁二烯橡胶合约", "pattern":[{"TEXT": {"REGEX": "(BR|br)\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-空格", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "丁二烯橡胶合约-点号", "pattern": [{"TEXT": {"REGEX": "(BR|br)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纸浆合约", "pattern":[{"TEXT": {"REGEX": "(SP|sp)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-空格", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纸浆合约-点号", "pattern": [{"TEXT": {"REGEX": "(SP|sp)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "氧化铝合约", "pattern":[{"TEXT": {"REGEX": "(AO|ao)\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-连字符", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-空格", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-下划线", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "氧化铝合约-点号", "pattern": [{"TEXT": {"REGEX": "(AO|ao)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "原油合约", "pattern":[{"TEXT": {"REGEX": "(SC|sc)\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-空格", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原油合约-点号", "pattern": [{"TEXT": {"REGEX": "(SC|sc)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "低硫燃料油合约", "pattern":[{"TEXT": {"REGEX": "(LU|lu)\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-空格", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "低硫燃料油合约-点号", "pattern": [{"TEXT": {"REGEX": "(LU|lu)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "国际铜合约", "pattern":[{"TEXT": {"REGEX": "(BC|bc)\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-空格", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "国际铜合约-点号", "pattern": [{"TEXT": {"REGEX": "(BC|bc)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "欧线集运合约", "pattern":[{"TEXT": {"REGEX": "(EC|ec)\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-空格", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "欧线集运合约-点号", "pattern": [{"TEXT": {"REGEX": "(EC|ec)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "鸡蛋合约", "pattern":[{"TEXT": {"REGEX": "(JD|jd)\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-连字符", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-空格", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-下划线", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "鸡蛋合约-点号", "pattern": [{"TEXT": {"REGEX": "(JD|jd)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "生猪合约", "pattern":[{"TEXT": {"REGEX": "(LH|lh)\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-空格", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "生猪合约-点号", "pattern": [{"TEXT": {"REGEX": "(LH|lh)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纤维板合约", "pattern":[{"TEXT": {"REGEX": "(FB|fb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-连字符", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-空格", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-下划线", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纤维板合约-点号", "pattern": [{"TEXT": {"REGEX": "(FB|fb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "胶合板合约", "pattern":[{"TEXT": {"REGEX": "(BB|bb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-空格", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "胶合板合约-点号", "pattern": [{"TEXT": {"REGEX": "(BB|bb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "聚乙烯合约", "pattern":[{"TEXT": {"REGEX": "(L|l)\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚乙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(L|l)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "聚丙烯合约", "pattern":[{"TEXT": {"REGEX": "(PP|pp)\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "聚丙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(PP|pp)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "乙二醇合约", "pattern":[{"TEXT": {"REGEX": "(EG|eg)\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-空格", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "乙二醇合约-点号", "pattern": [{"TEXT": {"REGEX": "(EG|eg)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "苯乙烯合约", "pattern":[{"TEXT": {"REGEX": "(EB|eb)\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-空格", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "苯乙烯合约-点号", "pattern": [{"TEXT": {"REGEX": "(EB|eb)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "液化石油气合约", "pattern":[{"TEXT": {"REGEX": "(PG|pg)\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-空格", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "液化石油气合约-点号", "pattern": [{"TEXT": {"REGEX": "(PG|pg)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "纯苯合约", "pattern":[{"TEXT": {"REGEX": "(BE|be)\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-连字符", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-空格", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-下划线", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "纯苯合约-点号", "pattern": [{"TEXT": {"REGEX": "(BE|be)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "原木合约", "pattern":[{"TEXT": {"REGEX": "(LM|lm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-空格", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "原木合约-点号", "pattern": [{"TEXT": {"REGEX": "(LM|lm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "强麦合约", "pattern":[{"TEXT": {"REGEX": "(WH|wh)\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-连字符", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-空格", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-下划线", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "强麦合约-点号", "pattern": [{"TEXT": {"REGEX": "(WH|wh)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "普麦合约", "pattern":[{"TEXT": {"REGEX": "(PM|pm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-连字符", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-空格", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-下划线", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "普麦合约-点号", "pattern": [{"TEXT": {"REGEX": "(PM|pm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "早籼稻合约", "pattern":[{"TEXT": {"REGEX": "(RI|ri)\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "早籼稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(RI|ri)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "晚籼稻合约", "pattern":[{"TEXT": {"REGEX": "(LR|lr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "晚籼稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(LR|lr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "粳稻合约", "pattern":[{"TEXT": {"REGEX": "(JR|jr)\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-连字符", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-空格", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-下划线", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "粳稻合约-点号", "pattern": [{"TEXT": {"REGEX": "(JR|jr)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "棉纱合约", "pattern":[{"TEXT": {"REGEX": "(CY|cy)\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-连字符", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-空格", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-下划线", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "棉纱合约-点号", "pattern": [{"TEXT": {"REGEX": "(CY|cy)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "菜籽粕合约", "pattern":[{"TEXT": {"REGEX": "(RM|rm)\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-连字符", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-空格", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-下划线", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "菜籽粕合约-点号", "pattern": [{"TEXT": {"REGEX": "(RM|rm)\\.\\d{4}$"}}]}
+
+{"label": "合约代码", "id": "红枣合约", "pattern":[{"TEXT": {"REGEX": "(CJ|cj)\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-连字符", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-空格", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-下划线", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-斜杠", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约代码", "id": "红枣合约-点号", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)\\.\\d{4}$"}}]}
