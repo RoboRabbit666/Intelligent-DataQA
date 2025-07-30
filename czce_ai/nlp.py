@@ -120,26 +120,22 @@ class NLPToolkit:
         """
         seg_list = self.tokenize(line, for_search, True)
 
-    def syn_extension_v1(self, seg_list: List[str], max_size: int = 4) -> List[List[str]]:
-        """直接添加同义词
+        def syn_extension_v1(self, seg_list: List[str], max_size: int = 4) -> List[List[str]]:
+            """直接添加同义词
 
-        Args:
-            seg_list (List[str]): 分词后的question
-            max_size (int, optional): 支持的最大同义词替换次数. Defaults to 8.
+            Args:
+                seg_list (List[str]): 分词后的question
+                max_size (int, optional): 支持的最大同义词替换次数. Defaults to 8.
 
-        Returns:
-            List[List[str]]: _description_
-        """
-        result = [seg_list]
-        for word in seg_list:
-            for seg in self._syn_dictionary.get(word, []):
-                result.extend(self.tokenize(word))
-        return result
-
-# Nota del reconstructor: La siguiente línea de código se encontró entre las definiciones
-# de las funciones `syn_extension_v1` y `add_entities`. Ha sido comentada
-# para permitir que el script se ejecute, ya que de otro modo causaría un error de sintaxis.
-# return syn_extension_v1(seg_list)
+            Returns:
+                List[List[str]]: _description_
+            """
+            result = [seg_list]
+            for word in seg_list:
+                for seg in self._syn_dictionary.get(word, []):
+                    result.extend(self.tokenize(word))
+            return result
+        return syn_extension_v1(seg_list)
 
     def add_entities(self, entities: List[Dict[str, str]]):
         """
