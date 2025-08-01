@@ -90,10 +90,10 @@ class DataQaWorkflow:
             
             for entity in entity_list:
                 if entity['id'] != '' and entity['text'] in enhanced_query:
-                    if entity['label'] == '合约代码':
+                    if entity['label'] == '合约':
                         # 合约代码标准化
                         normalized_code = re.sub(r'[-_\.\s/]+', '', entity['text'].upper())
-                        substring = f"{normalized_code}(合约代码)"
+                        substring = f"{normalized_code}(合约)"
                     else:
                         # 其他实体正确格式化
                         substring = f"{entity['id']}({entity['label']})"
