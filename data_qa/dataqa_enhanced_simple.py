@@ -10,7 +10,7 @@ import spacy
 from spacy.pipeline import EntityRuler
 
 from czce_ai.knowledge import SearchType, SQLSchemaKnowledge
-from czce_ai.nlp import NLPToolkit
+from czce_ai.nlp.nlp.nlp import NLPToolkit
 from czce_ai.llm.message import Message as ChatMessage
 from czce_ai.llm.chat import LLMChat as LLMModel
 from app.core.components import (
