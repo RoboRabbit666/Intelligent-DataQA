@@ -1,0 +1,187 @@
+问题:郑商所的指定交割仓库有哪些
+SELECT WH_NAME, WH_ABBR
+FROM dataga.wh_base_info_tab
+WHERE EXCH_CODE = 'CZCE'
+and stas_dt = '2025-07-02';
+
+问题:查询所有仓库的基本信息
+SELECT wh_name, wh_abbr, dlv_wh_code, ttl_wh_cpy, dlv_wh_cpy, wh_own, prvc, city
+FROM dataga.wh_base_info_tab
+where stas_dt = '2025-07-02';
+
+问题:查询“北京中糖物流有限公司”仓库的完整信息
+SELECT *
+FROM dataga.wh_base_info_tab
+WHERE wh_name = '北京中糖物流有限公司'
+and stas_dt = '2025-07-02';
+
+问题:交割仓库代码”0335”对应的仓库名称和简称是什么
+SELECT WH_NAME, WH_ABBR
+FROM dataga.wh_base_info_tab
+WHERE DLV_WH_CODE = '0335'
+and stas_dt = '2025-07-02';
+
+问题:检查是否存在仓库代码重复但名称不同的情况
+SELECT DLV_WH_CODE, COUNT(DISTINCT WH_NAME) as name_count
+FROM dataga.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY DLV_WH_CODE
+HAVING COUNT(DISTINCT WH_NAME) > 1;
+
+问题:查询仓库的总库容或交割库容最大10个仓库?
+-- 总库容最大的仓库
+SELECT WH_NAME, WH_ABBR, TTL_WH_CPY
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+ORDER BY TTL_WH_CPY DESC
+LIMIT 10;
+
+-- 交割库容最大的仓库
+SELECT WH_NAME, WH_ABBR, DLV_WH_CPY
+FROM dataga.wh_base_info_tab
+where stas_dt = '2025-07-02'
+ORDER BY DLV_WH_CPY DESC
+LIMIT 10;
+
+问题:查询交割库容大于特定值的仓库
+SELECT wh_name, dlv_wh_cpy
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+AND dlv_wh_cpy > 5000;
+
+问题:按照仓库性质区分,查询各种性质的仓库的数量
+SELECT WH_OWN, COUNT(*) as count
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY WH_OWN
+order by count;
+
+问题:查询特定性质的仓库(如合资企业)
+SELECT wh_name, wh_own
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and wh_own = '合资';
+
+问题:统计各省级区域的总交割库容是多少?
+SELECT PRVC, SUM(DLV_WH_CPY) as total_dlv_capacity
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY PRVC
+order by total_dlv_capacity;
+
+问题:哪些省份的仓库数量多,但平均交割库容较小?
+SELECT PRVC, COUNT(*) as warehouse_count, AVG(DLV_WH_CPY) as avg_dlv_capacity
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY PRVC
+ORDER BY warehouse_count DESC, avg_dlv_capacity ASC;
+
+问题:分析不同仓库性质的交割库容分布情况
+SELECT WH_OWN,
+MIN(DLV_WH_CPY) as min_capacity,
+AVG(DLV_WH_CPY) as avg_capacity,
+MAX(DLV_WH_CPY) as max_capacity,
+SUM(DLV_WH_CPY) as total_capacity
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY WH_OWN;
+
+问题:展示交割库容占比高的前5个仓库信息
+SELECT WH_NAME, WH_ABBR, DLV_WH_CPY,
+DLV_WH_CPY / TTL_WH_CPY as dlv_ratio
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+ORDER BY dlv_ratio DESC
+LIMIT 5;
+
+问题:查询仓库“凯欣粮油有限公司”的仓库资产和注册资本?
+SELECT WH_NAME, WH_ABBR, AST, REG_CAPI
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and WH_NAME = '凯欣粮油有限公司';
+
+问题:长达国际仓库的法人代表姓名?
+SELECT LEGAL_REP
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and WH_NAME LIKE '%长达国际%';
+
+问题:有哪些仓库未填写主管或操作员名称?
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and (EXCTVS_NAME IS NULL OR OPERR_NAME IS NULL);
+
+问题:哪个省份的交割仓库数量最多?
+SELECT PRVC, COUNT(*) as warehouse_count
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+GROUP BY PRVC
+ORDER BY warehouse_count DESC
+LIMIT 1;
+
+问题:哪些仓库临近火车站或码头,便于运输?
+SELECT WH_NAME, WH_ABBR, TRN_STATION, DOCK
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and ((trn_station IS NOT NULL AND trn_station != '') OR (DOCK IS NOT NULL AND DOCK != ''));
+
+问题:查询有铁路站点的仓库
+SELECT wh_name, trn_station
+FROM dataqa.wh_base_info_tab
+WHERE trn_station IS NOT NULL AND trn_station != ''
+and stas_dt = '2025-07-02';
+
+问题:查询有码头的仓库
+SELECT wh_name, dock
+FROM dataqa.wh_base_info_tab
+WHERE dock IS NOT NULL AND dock != ''
+and stas_dt = '2025-07-02';
+
+问题:查询北京省份的所有仓库
+SELECT wh_name, prvc, city
+FROM dataqa.wh_base_info_tab
+WHERE prvc = '北京市'
+and stas_dt = '2025-07-02';
+
+问题:查询位于北京市且库容大于5000吨的仓库
+SELECT wh_name, prvc, ttl_wh_cpy
+FROM dataqa.wh_base_info_tab
+WHERE prvc = '北京市' AND ttl_wh_cpy > 5000
+and stas_dt = '2025-07-02';
+
+问题:查询仓库性质为合资且在河南省的仓库
+SELECT wh_name, wh_own, prvc, city
+FROM dataqa.wh_base_info_tab
+WHERE wh_own = '合资' AND prvc like '河南%'
+and stas_dt = '2025-07-02';
+
+问题:查询白水盛隆仓库的详细地址
+SELECT DTL_ADDR
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and WH_NAME LIKE '%白水盛隆%';
+
+问题:找出位于徐州火车站附近的仓库
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and TRN_STATION LIKE '%徐州%';
+
+问题:白水盛隆的联系电话和传真号码是啥?
+SELECT CTC_MODE, FAX
+FROM dataga.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and WH_NAME LIKE '%白水盛隆%';
+
+问题:查询北京省北京市特定地区的仓库联系方式
+SELECT wh_name, ctc_mode, dtl_addr
+FROM dataqa.wh_base_info_tab
+WHERE prvc = '北京市' AND city = '北京市'
+and stas_dt = '2025-07-02';
+
+问题:有哪些仓库的联系方式或传真信息是缺失的?
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_base_info_tab
+where stas_dt = '2025-07-02'
+and (CTC_MODE IS NULL OR FAX IS NULL);

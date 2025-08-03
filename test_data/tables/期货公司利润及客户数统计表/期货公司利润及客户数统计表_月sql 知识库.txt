@@ -1,0 +1,216 @@
+问题:查询2025年7月所有期货公司的利润和客户数据
+SELECT
+stas_mon,
+fut_corp_id,
+fut_corp_name,
+cmsn_fee_and_coms_net_incm_ttl,
+intr_net_incm_ttl,
+inv_prof_ttl,
+biz_incm_ttl,
+biz_exp_ttl,
+biz_prof_ttl,
+prof_total_ttl,
+net_prof,
+area,
+clit_qty_ttl,
+dort_act_ttl,
+actv_act_ttl
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507';
+
+问题:查询”红塔期货“在近一年的利润及客户数据
+WITH current_date AS (
+SELECT
+MAX(stas_mon) AS latest_month
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+)
+SELECT
+m.stas_mon,
+m.fut_corp_id,
+m.fut_corp_name,
+m.cmsn_fee_and_coms_net_incm_ttl AS 手续费及佣金净收入,
+m.intr_net_incm_ttl AS 利息净收入,
+m.inv_prof_ttl AS 投资收益,
+m.biz_incm_ttl AS 营业收入,
+m.biz_exp_ttl AS 营业支出,
+m.biz_prof_ttl AS 营业利润,
+m.prof_total_ttl AS 利润总额,
+m.net_prof AS 净利润,
+m.area AS 辖区,
+m.clit_qty_ttl AS 客户数量,
+m.dort_act_ttl AS 休眠账户数,
+m.actv_act_ttl AS 活跃账户数
+FROM dataga.fut_corp_prof_clit_stas_tab_mon m
+CROSS JOIN current_date c
+WHERE
+m.fut_corp_name = '红塔期货'
+AND m.stas_mon >= TO_CHAR(TO_DATE(c.latest_month, 'YYYYMM') - INTERVAL '11 months', 'YYYYMM')
+ORDER BY m.stas_mon DESC;
+
+问题:按净利润排名期货公司,查询2025年7月份的净利润前10名的期货公司
+SELECT
+fut_corp_name,
+net_prof
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+ORDER BY net_prof DESC
+LIMIT 10;
+
+问题:按客户数量排名期货公司,查询2025年7月份的客户数量前10名的期货公司
+SELECT
+fut_corp_name,
+clit_qty_ttl
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+ORDER BY clit_qty_ttl DESC
+LIMIT 10;
+
+问题:按活跃账户比例排名期货公司,查询2025年7月份的活跃账户比例前10名的期货公司
+SELECT
+fut_corp_name,
+clit_qty_ttl,
+actv_act_ttl,
+ROUND(actv_act_ttl::numeric / clit_qty_ttl * 100, 2) AS active_percentage
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507' AND clit_qty_ttl > 0
+ORDER BY active_percentage DESC
+LIMIT 10;
+
+问题:按辖区统计总净利润,查询2025年7月份的各辖区的净利润
+SELECT
+area,
+SUM(net_prof) AS total_net_profit
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+GROUP BY area
+ORDER BY total_net_profit DESC;
+
+问题:按辖区统计客户数量,查询2025年7月份的各辖区的客户数量
+SELECT
+area,
+sum(clit_qty_ttl) AS total_clit_qty
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+GROUP BY area
+ORDER BY total_clit_qty DESC;
+
+问题:查询”红塔期货”的近一年的月度净利润
+WITH current_date AS (
+SELECT
+MAX(stas_mon) AS latest_month
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+where fut_corp_name = '红塔期货'
+)
+SELECT
+m.stas_mon,
+m.fut_corp_name,
+m.net_prof AS 净利润
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon m
+CROSS JOIN current_date c
+WHERE
+m.fut_corp_name = '红塔期货'
+AND m.stas_mon >= TO_CHAR(TO_DATE(c.latest_month, 'YYYYMM') - INTERVAL '11 months', 'YYYYMM')
+ORDER BY m.stas_mon DESC;
+
+问题:查询近一年期货公司全行业月度总净利润
+WITH current_date AS (
+SELECT
+MAX(stas_mon) AS latest_month
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+)
+SELECT
+m.stas_mon,
+sum(m.net_prof) AS 总净利润
+FROM dataga.fut_corp_prof_clit_stas_tab_mon m
+CROSS JOIN current_date c
+WHERE
+m.stas_mon >= TO_CHAR(TO_DATE(c.latest_month, 'YYYYMM') - INTERVAL '11 months', 'YYYYMM')
+group by m.stas_mon
+ORDER BY m.stas_mon DESC;
+
+问题:统计当前月份各期货公司的营业利润率(营业利润/营业收入),并按照营业利润率的降序排列
+SELECT
+stas_mon,
+fut_corp_name,
+biz_prof_ttl,
+biz_incm_ttl,
+ROUND(biz_prof_ttl::numeric / biz_incm_ttl * 100, 2) AS operating_margin_percentage
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507' AND biz_incm_ttl > 0
+ORDER BY operating_margin_percentage DESC;
+
+问题:统计当前月份各期货公司的净利润率(净利润/营业收入),并按照净利润率的降序排列计算
+SELECT
+fut_corp_name,
+net_prof,
+biz_incm_ttl,
+ROUND(net_prof::numeric / biz_incm_ttl * 100, 2) AS net_margin_percentage
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507' AND biz_incm_ttl > 0
+ORDER BY net_margin_percentage DESC;
+
+问题:查询客户数量增长最快的10个期货公司(比较两个月份)
+WITH current_month AS (
+SELECT
+fut_corp_id,
+clit_qty_ttl
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+),
+previous_month AS (
+SELECT
+fut_corp_id,
+clit_qty_ttl
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202506'
+)
+SELECT
+c.fut_corp_id,
+m.fut_corp_name,
+p.clit_qty_ttl AS prev_month_clients,
+c.clit_qty_ttl AS curr_month_clients,
+c.clit_qty_ttl - p.clit_qty_ttl AS client_growth,
+ROUND((c.clit_qty_ttl - p.clit_qty_ttl)::numeric / p.clit_qty_ttl * 100, 2) AS growth_percentage
+FROM current_month c
+JOIN previous_month p ON c.fut_corp_id = p.fut_corp_id
+JOIN dataqa.fut_corp_prof_clit_stas_tab_mon m ON c.fut_corp_id = m.fut_corp_id AND m.stas_mon = '202507'
+WHERE p.clit_qty_ttl > 0
+ORDER BY growth_percentage DESC
+LIMIT 10;
+
+问题:按休眠账户比例统计,查询当前月份休眠账户比例高的前10个期货公司
+SELECT
+fut_corp_name,
+clit_qty_ttl,
+dort_act_ttl,
+ROUND(dort_act_ttl::numeric / clit_qty_ttl * 100, 2) AS dormant_percentage
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507' AND clit_qty_ttl > 0
+ORDER BY dormant_percentage DESC
+LIMIT 10;
+
+问题:查询当前月份各期货公司各类收入来源占比
+WITH current_month AS (
+SELECT
+fut_corp_name,
+sum(cmsn_fee_and_coms_net_incm_ttl) + sum(intr_net_incm_ttl) + sum(inv_prof_ttl) + sum(other_biz_incm_ttl) as total_num
+FROM dataga.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+group by fut_corp_name
+order by fut_corp_name
+)
+SELECT
+m.fut_corp_name,
+m.cmsn_fee_and_coms_net_incm_ttl as 手续费及佣金净收入,
+m.intr_net_incm_ttl as 利息净收入,
+m.inv_prof_ttl as 投资收益,
+m.other_biz_incm_ttl as 其它业务收入,
+ROUND(m.cmsn_fee_and_coms_net_incm_ttl::numeric / n.total_num * 100, 2) AS 手续费及佣金净收入占比,
+ROUND(m.intr_net_incm_ttl::numeric / n.total_num * 100, 2) AS 利息净收入占比,
+ROUND(m.inv_prof_ttl::numeric / n.total_num * 100, 2) AS 投资收益占比,
+ROUND(m.other_biz_incm_ttl::numeric / n.total_num * 100, 2) AS 其它业务收入占比
+FROM dataga.fut_corp_prof_clit_stas_tab_mon m
+inner join current_month n
+on m.fut_corp_name = n.fut_corp_name
+WHERE m.stas_mon = '202507'
+ORDER BY fut_corp_name;
