@@ -27,7 +27,7 @@ from resources import (
     USER_DICT_PATH,
     SYNONYM_DICT_PATH,
     STOP_WORDS_PATH,
-    NER_PATTERNS_PATH,
+    NER_PATTERNs_PATH,
 )
 from app.models import (
     ChatCompletionChoice,
@@ -150,7 +150,7 @@ class DataQaWorkflow:
                 user_dict_path=USER_DICT_PATH, 
                 syn_dict_path=SYNONYM_DICT_PATH,
                 stop_words_path=STOP_WORDS_PATH,
-                patterns_path=NER_PATTERNS_PATH
+                patterns_path=NER_PATTERNs_PATH
             )
             entity_list = tokenizer.recognize(query)
             
