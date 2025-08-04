@@ -276,10 +276,7 @@ class DataQaWorkflow:
 
         # Step 3: 语义搜索FAQ
         faq_results = self.semantic_search_faq(entitled_query, top_k=3)
-        
-        # 记录步骤
-        step_list = [step1, step2]
-        
+                
         # 如果找到高相似度的FAQ，直接使用
         if faq_results and faq_results[0]['similarity'] >= 0.85:
             step3 = ChatStep(
@@ -289,7 +286,6 @@ class DataQaWorkflow:
                 prompt=f"找到高相似度FAQ，相似度：{faq_results[0]['similarity']:.3f}",
                 finished=True,
             )
-            step_list.append(step3)
             
             # 构造FAQ响应
             best_faq = faq_results[0]
@@ -341,7 +337,6 @@ class DataQaWorkflow:
                     prompt="未找到相关FAQ",
                     finished=True,
                 )
-            step_list.append(step3)
             
             # Step 4: 定位表格
             located_table = self.locate_table(optimized_input_messages.rewritten_query)
@@ -352,7 +347,6 @@ class DataQaWorkflow:
                 prompt=located_table,
                 finished=True,
             )
-            step_list.append(step4)
 
             # Step 5: 生成单表提示词
             single_table_prompt = self.generate_single_table_prompt(located_table[0]['chunk_uuid'])
@@ -368,7 +362,6 @@ class DataQaWorkflow:
                 prompt=single_table_prompt,
                 finished=True,
             )
-            step_list.append(step5)
 
             # Step 6: 生成SQL
             response = self.generate_sql_code(single_table_prompt, optimized_input_messages, thinking)
@@ -379,7 +372,6 @@ class DataQaWorkflow:
                 prompt=response,
                 finished=True,
             )
-            step_list.append(step6)
 
         # 构造最终响应
         usage = ChatUsage(
@@ -409,5 +401,5 @@ class DataQaWorkflow:
             created=response.created,
             choices=choices,
             usage=usage,
-            steps=step_list,
+            steps=[step1, step2, step3, step4, step5, step6],
         )
