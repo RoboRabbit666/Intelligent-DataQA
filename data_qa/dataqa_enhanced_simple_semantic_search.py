@@ -3,7 +3,7 @@ import sys
 sys.path.append(str(Path.cwd().parent))
 
 from typing import List, Optional, Dict, Tuple
-import re
+import re as regex_module
 import copy
 import traceback
 import numpy as np
@@ -70,7 +70,13 @@ class DataQaWorkflow:
 
     def _load_faqs(self):
         """加载所有SQL知识库文件"""
-        tables_dir = Path("test_data/tables")
+        # Get path relative to the module file, not the current working directory
+        current_file_dir = Path(__file__).parent
+        tables_dir = current_file_dir.parent / "test_data" / "tables"
+        
+        if not tables_dir.exists():
+            logger.warning(f"Tables directory not found: {tables_dir}")
+            return
         
         for table_dir in tables_dir.iterdir():
             if not table_dir.is_dir():
@@ -85,8 +91,8 @@ class DataQaWorkflow:
                 
                 # 解析Q&A对
                 pattern = r'问题[:：](.*?)\n(SELECT.*?);'
-                matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
-                
+                matches = regex_module.findall(pattern, content, regex_module.DOTALL | regex_module.IGNORECASE)
+
                 for question, sql in matches:
                     question = question.strip()
                     sql = sql.strip()
@@ -157,7 +163,7 @@ class DataQaWorkflow:
             for entity in entity_list:
                 if entity['id'] != '' and entity['text'] in enhanced_query:
                     if entity['label'] == '合约':
-                        normalized_code = re.sub(r'[-_\.\s/]+', '', entity['text'].upper())
+                        normalized_code = regex_module.sub(r'[-_\.\s/]+', '', entity['text'].upper())
                         substring = f"{normalized_code}(合约)"
                     else:
                         substring = f"{entity['id']}({entity['label']})"
@@ -218,7 +224,7 @@ class DataQaWorkflow:
 
     def extract_info(self, text:str, pattern:str):
         """使用正则表达式提取信息"""
-        extract_pattern = re.compile(pattern,re.DOTALL)
+        extract_pattern = regex_module.compile(pattern,regex_module.DOTALL)
         match = extract_pattern.search(text)
         if match:
             return match.group(1)
