@@ -90,14 +90,14 @@ class DataQaWorkflow:
                     content = f.read()
                 
                 # 解析Q&A对
-                pattern = r'问题[:：](.*?)\n(SELECT.*?);'
+                pattern = r'问题[:：](.*?)\n(?:--.*?\n)*((?:WITH|SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER).*?);'
                 matches = regex_module.findall(pattern, content, regex_module.DOTALL | regex_module.IGNORECASE)
 
                 for question, sql in matches:
                     question = question.strip()
                     sql = sql.strip()
                     
-                    # 对问题进行实体识别增强后计算嵌入
+                    # 对问题进行实体识别增强并计算嵌入
                     enhanced_question = self.entity_recognition(question)
                     embedding = embedder.get_embedding(enhanced_question)
                     
@@ -110,38 +110,85 @@ class DataQaWorkflow:
         
         logger.info(f"加载了{len(self.faq_data)}个FAQ")
 
-    def semantic_search_faq(self, query: str, top_k: int = 5) -> List[Dict]:
-        """语义搜索FAQ"""
+    def semantic_search_faq(self, query: str, top_k: int = 3) -> List[Dict]:
+        """
+        语义搜索FAQ函数
+        
+        功能：在FAQ知识库中找到与用户查询最相似的问题和对应的SQL语句
+        
+        Args:
+            query: 用户输入的查询问题
+            top_k: 返回最相似的前K个结果，默认3个
+            
+        Returns:
+            List[Dict]: 包含相似FAQ的列表，每个字典包含问题、SQL、表名和相似度
+        """
+        
+        # 1. 检查FAQ数据是否存在
         if not self.faq_data:
-            return []
+            return []  # 如果没有加载任何FAQ数据，直接返回空列表
         
-        # 对查询进行实体识别增强
+        # 2. 查询预处理 - 实体识别增强
         enhanced_query = self.entity_recognition(query)
-        query_embedding = np.array(embedder.get_embedding(enhanced_query))
+        # 例如："查询FG2509成交量" -> "查询FG2509(合约)成交量"
         
-        # 计算相似度
-        similarities = []
+        # 3. 将增强后的查询转换为向量
+        query_embedding = np.array(embedder.get_embedding(enhanced_query))
+        # 得到一个高维向量表示，例如：[0.1, 0.2, 0.3, ..., 0.9]
+        
+        # 4. 计算查询与所有FAQ的相似度
+        similarities = []  # 存储相似度分数
+        
         for faq in self.faq_data:
-            # 余弦相似度
+            # 计算余弦相似度公式：cos(θ) = (A·B) / (|A|×|B|)
+            # A·B：两个向量的点积
+            # |A|、|B|：两个向量的模长（范数）
             similarity = np.dot(query_embedding, faq['embedding']) / (
                 np.linalg.norm(query_embedding) * np.linalg.norm(faq['embedding'])
             )
             similarities.append(similarity)
+            # 相似度范围：-1到1，越接近1越相似
         
-        # 获取Top-K
+        # 5. 获取相似度最高的Top-K个索引
+        # np.argsort()：返回排序后的索引数组（从小到大）
+        # [-top_k:]：取最后K个（即最大的K个）
+        # [::-1]：反转数组（从大到小排列）
         top_indices = np.argsort(similarities)[-top_k:][::-1]
         
+        # 举例：如果similarities = [0.2, 0.8, 0.1, 0.9, 0.3]，top_k=3
+        # argsort() -> [2, 0, 4, 1, 3]  (索引按相似度从小到大)
+        # [-3:] -> [4, 1, 3]            (取最后3个)
+        # [::-1] -> [3, 1, 4]           (反转，变成从大到小)
+        
+        # 6. 构建结果列表
         results = []
         for idx in top_indices:
-            if similarities[idx] > 0.3:  # 基本阈值
+            # 只返回相似度大于0.5的结果（基本阈值过滤）
+            if similarities[idx] > 0.5:
                 results.append({
-                    'question': self.faq_data[idx]['question'],
-                    'sql': self.faq_data[idx]['sql'],
-                    'table': self.faq_data[idx]['table'],
-                    'similarity': float(similarities[idx])
+                    'question': self.faq_data[idx]['question'],    # 原始问题
+                    'sql': self.faq_data[idx]['sql'],              # 对应SQL语句
+                    'table': self.faq_data[idx]['table'],          # 来源表名
+                    'similarity': float(similarities[idx])         # 相似度分数
                 })
         
+        # 7. 返回结果
         return results
+        # 返回格式示例：
+        # [
+        #     {
+        #         'question': '查询FG2509的成交额',
+        #         'sql': 'SELECT trd_amt FROM ... WHERE comd_code = "FG2509"',
+        #         'table': '郑商所合约信息统计表',
+        #         'similarity': 0.92
+        #     },
+        #     {
+        #         'question': '统计期货成交量',
+        #         'sql': 'SELECT SUM(trd_qty) FROM ...',
+        #         'table': '期货交易统计表',
+        #         'similarity': 0.76
+        #     }
+        # ]
 
     def sql_knowledge(self):
         sql_kl = SQLSchemaKnowledge(tokenizer, embedder, self.url, mxbai_reranker)
