@@ -53,7 +53,8 @@ class DataQaWorkflow:
         reranking_threshold: float = 0.2,
         knowledge_id: Optional[str] = "3cc33ed2-21fb-4452-9e10-528867bd5f99",
         bucket_name: Optional[str] = "czce-ai-dev",
-        collection: Optional[str] = "hybrid_sql"
+        collection: Optional[str] = "hybrid_sql",
+        use_cache: bool = True  # 新增参数：是否使用缓存
     ):
         self.knowledge_id = knowledge_id
         self.bucket_name = bucket_name
@@ -67,13 +68,17 @@ class DataQaWorkflow:
         
         # FAQ相关属性
         self.faq_data = []  # 存储FAQ的问题、SQL和嵌入向量
-        
-        # 初始化时加载FAQ
+        self.use_cache = use_cache # 是否使用缓存
+
+        # 缓存文件路径
+        self.cache_file = Path(__file__).parent.parent / "test_data" / "tables" / "faq_cache.pkl"
+
+        # 初始化时加载FAQ (优先从缓存加载，如果缓存不存在则从文件加载)
         self._load_faqs()
 
     def _load_faqs(self):
         """
-        加载所有SQL知识库文件
+        加载所有SQL知识库文件 - 优先从缓存加载，如果缓存不存在则直接重新计算
         功能：从指定目录加载SQL知识库文件，解析问题和SQL语句，并计算嵌入向量. 通过embedder计算每个FAQ问题的嵌入向量，并存储在faq_data中
 
         Args:
@@ -81,6 +86,22 @@ class DataQaWorkflow:
         Returns:
             None
         """
+        # 尝试从缓存加载
+        if self.use_cache and self.cache_file.exists():
+            try:
+                with open(self.cache_file, 'rb') as f:
+                    cache_data = pickle.load(f)
+                    self.faq_data = cache_data['faq_data']
+                    cache_time = cache_data.get('created_at', 'unknown')
+                    logger.info(f"从缓存加载了{len(self.faq_data)}个FAQ (创建时间: {cache_time})")
+                    return  # 成功加载缓存，直接返回
+            except Exception as e:
+                logger.warning(f"加载缓存失败: {e}，将重新计算")
+        
+        # 缓存不存在或加载失败，重新计算
+        logger.info("开始计算FAQ嵌入向量...")
+        start_time = datetime.now()
+
         # Get path relative to the module file, not the current working directory
         current_file_dir = Path(__file__).parent
         tables_dir = current_file_dir.parent / "test_data" / "tables"
@@ -119,7 +140,43 @@ class DataQaWorkflow:
                         'embedding': np.array(embedding)
                     })
         
-        logger.info(f"加载了{len(self.faq_data)}个FAQ")
+        # === 计算完成，保存到缓存 ===
+        elapsed_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"加载了{len(self.faq_data)}个FAQ，耗时{elapsed_time:.2f}秒")
+        
+        # 保存缓存
+        if self.use_cache:
+            self._save_cache()
+
+    def _save_cache(self):
+        """保存FAQ缓存"""
+        try:
+            cache_data = {
+                'faq_data': self.faq_data,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            with open(self.cache_file, 'wb') as f:
+                pickle.dump(cache_data, f)
+            logger.info(f"FAQ缓存已保存到: {self.cache_file}")
+        except Exception as e:
+            logger.error(f"保存缓存失败: {e}")
+    
+    def refresh_faq_cache(self):
+        """手动刷新缓存"""
+        logger.info("开始刷新FAQ缓存...")
+        
+        # 删除旧缓存文件
+        if self.cache_file.exists():
+            os.remove(self.cache_file)
+            logger.info("已删除旧缓存")
+        
+        # 清空当前数据
+        self.faq_data = []
+        
+        # 重新加载（会自动创建新缓存）
+        self._load_faqs()
+        logger.info("FAQ缓存刷新完成")
+
 
     def semantic_search_faq(self, query: str, top_k: int = 3) -> List[Dict]:
         """
@@ -340,19 +397,26 @@ class DataQaWorkflow:
 
         # Step 3: 语义搜索FAQ
         faq_results = self.semantic_search_faq(entitled_query, top_k=3)
+        # 调用语义搜索函数，在FAQ知识库中寻找与用户查询最相似的3个问题
+        # entitled_query: 经过实体识别增强的查询，如"查询FG2509(合约)成交量"
+        # 返回格式：[{'question': '...', 'sql': '...', 'table': '...', 'similarity': 0.92}, ...]
+
                 
-        # 如果找到高相似度的FAQ，直接使用
+        # 如果找到高相似度的FAQ，直接使用（快速响应路径）
         if faq_results and faq_results[0]['similarity'] >= 0.85:
+            # 条件检查：
+            # 1. faq_results不为空（找到了FAQ）
+            # 2. 第一个结果的相似度 >= 0.85（非常高的相似度，可以直接使用）
             step3 = ChatStep(
                 key="semantic_search_faq",
-                name="语义搜索(直接命中)",
+                name="语义搜索(直接命中)", # 标记为直接命中
                 number=3,
                 prompt=f"找到高相似度FAQ，相似度：{faq_results[0]['similarity']:.3f}",
                 finished=True,
             )
             
             # 构造FAQ响应
-            best_faq = faq_results[0]
+            best_faq = faq_results[0] # 取相似度最高的FAQ
             response_content = f"""基于知识库最佳匹配（相似度：{best_faq['similarity']:.3f}）：
 
 ```sql
@@ -362,12 +426,21 @@ class DataQaWorkflow:
 来源：{best_faq['table']}知识库
 匹配问题：{best_faq['question']}"""
             
+            # 响应格式：展示相似度、SQL代码块、来源表、匹配的原问题
+            # 创建模拟的LLM响应对象（因为没有调用真正的LLM）
+            # 使用Python的type()动态创建类来模拟响应结构
+            # 这里模拟了一个响应对象，实际使用中应替换为真实的LLM响应
+            # 注意：这里的response_content是模拟的内容，实际使用中应从LLM响应中获取
+            # 例如：response = self.ans_client.invoke(messages=[system_msg] + input_messages[:])
+            # 这里的response_content是直接构造的字符串，实际使用中应从LLM响应中获取内容
             # 创建简单的响应对象
-            response = type('Response', (), {
+            response = type('Response', (), {  # 创建Response类
                 'id': 'faq_response',
-                'model': 'semantic_search',
+                'model': 'semantic_search',    # 标记为语义搜索模型
                 'created': 0,
-                'usage': type('Usage', (), {
+                'usage': type('Usage', (), {    # 创建Usage类
+                    # 模拟使用情况，实际使用中应从LLM响应中获取
+                    # 这里的值都是0，因为这是模拟的响应，没有实际调用LLM
                     'prompt_tokens': 0,
                     'completion_tokens': 0,
                     'total_tokens': 0
@@ -382,10 +455,12 @@ class DataQaWorkflow:
                     })()
                 })()]
             })()
+            # 模拟的响应对象，实际使用中应替换为真实的LLM响应，这个复杂的对象结构是为了模拟真实的LLM响应格式
             
         else:
-            # FAQ相似度不够高，继续原流程
+            # FAQ相似度不够高（< 0.85），继续原流程（表格定位+LLM生成SQL）
             if faq_results:
+                # 找到了FAQ但相似度不够高（< 0.85）
                 step3 = ChatStep(
                     key="semantic_search_faq",
                     name="语义搜索",
@@ -394,6 +469,7 @@ class DataQaWorkflow:
                     finished=True,
                 )
             else:
+                # 没有找到任何FAQ
                 step3 = ChatStep(
                     key="semantic_search_faq",
                     name="语义搜索",
@@ -402,7 +478,7 @@ class DataQaWorkflow:
                     finished=True,
                 )
             
-            # Step 4: 定位表格
+            # Step 4: 定位表格（继续原有的向量搜索流程）
             located_table = self.locate_table(optimized_input_messages.rewritten_query)
             step4 = ChatStep(
                 key="locate_table",
@@ -415,8 +491,9 @@ class DataQaWorkflow:
             # Step 5: 生成单表提示词
             single_table_prompt = self.generate_single_table_prompt(located_table[0]['chunk_uuid'])
             
-            # 如果有相关FAQ，添加参考
+            # 如果有中等相似度的FAQ，作为参考添加到prompt中
             if faq_results and faq_results[0]['similarity'] >= 0.7:
+                # 相似度在0.7-0.85之间，作为参考而不是直接答案
                 single_table_prompt += f"\n\n参考FAQ：\n问题：{faq_results[0]['question']}\nSQL：{faq_results[0]['sql']}\n"
             
             step5 = ChatStep(
@@ -427,7 +504,7 @@ class DataQaWorkflow:
                 finished=True,
             )
 
-            # Step 6: 生成SQL
+            # Step 6: 生成SQL（调用LLM）
             response = self.generate_sql_code(single_table_prompt, optimized_input_messages, thinking)
             step6 = ChatStep(
                 key="generate_sql",
