@@ -105,11 +105,12 @@ class DataQaWorkflow:
                     question = question.strip()
                     sql = sql.strip()
                     
-                    # 对FAQ问题计算嵌入向量
-                    embedding = embedder.get_embedding(question)
+                    # 对FAQ问题进行实体识别增强并计算嵌入向量
+                    enhanced_question = self.entity_recognition(question)
+                    embedding = embedder.get_embedding(enhanced_question)
                     
                     self.faq_data.append({
-                        'question': question,
+                        'question': enhanced_question,
                         'sql': sql,
                         'table': table_name,
                         'embedding': np.array(embedding)
@@ -135,12 +136,12 @@ class DataQaWorkflow:
         if not self.faq_data:
             return []  # 如果没有加载任何FAQ数据，直接返回空列表
         
-        # 2. 查询预处理 - 实体识别增强
-        enhanced_query = self.entity_recognition(query)
-        # 例如："查询FG2509成交量" -> "查询FG2509(合约)成交量"
+        # # 2. 查询预处理 - 实体识别增强
+        # enhanced_query = self.entity_recognition(query)
+        # # 例如："查询FG2509成交量" -> "查询FG2509(合约)成交量"
         
-        # 3. 将增强后的查询转换为向量
-        query_embedding = np.array(embedder.get_embedding(enhanced_query))
+        # 3. 将用户查询（注：此处的查询应该是实体识别增强后的查询）转换为嵌入向量
+        query_embedding = np.array(embedder.get_embedding(query))
         # 得到一个高维向量表示，例如：[0.1, 0.2, 0.3, ..., 0.9]
         
         # 4. 计算查询与所有FAQ的相似度
