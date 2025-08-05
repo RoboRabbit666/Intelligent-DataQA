@@ -105,9 +105,8 @@ class DataQaWorkflow:
                     question = question.strip()
                     sql = sql.strip()
                     
-                    # 对问题进行实体识别增强并计算嵌入
-                    enhanced_question = self.entity_recognition(question)
-                    embedding = embedder.get_embedding(enhanced_question)
+                    # 对FAQ问题计算嵌入向量
+                    embedding = embedder.get_embedding(question)
                     
                     self.faq_data.append({
                         'question': question,
