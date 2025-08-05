@@ -69,7 +69,15 @@ class DataQaWorkflow:
         self._load_faqs()
 
     def _load_faqs(self):
-        """加载所有SQL知识库文件"""
+        """
+        加载所有SQL知识库文件
+        功能：从指定目录加载SQL知识库文件，解析问题和SQL语句，并计算嵌入向量. 通过embedder计算每个FAQ问题的嵌入向量，并存储在faq_data中
+
+        Args:
+            None
+        Returns:
+            None
+        """
         # Get path relative to the module file, not the current working directory
         current_file_dir = Path(__file__).parent
         tables_dir = current_file_dir.parent / "test_data" / "tables"
