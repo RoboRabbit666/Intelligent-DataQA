@@ -9,7 +9,7 @@ import re
 
 from app.core.components import mxbai_reranker, sql_kb, tokenizer, minio, embedder, document_kb
 from app.config.config import settings
-from czce_ai.embedder import BgeM3Embedder
+from czce_ai.embedder.bgem3 import BgeM3Embedder
 from app.core.components.query_optimizer import (
     DataQAOptimizedQuery,
     QueryOptimizationType,

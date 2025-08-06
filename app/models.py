@@ -103,18 +103,18 @@ class ChatCompletionResponse(BaseModel):
         None, description="生成回复过程中涉及的步骤信息列表"
     )
 
-# # --- DataQA Specific Models (reconstructed from workflow.py) ---
+# --- DataQA Specific Models (reconstructed from workflow.py) ---
 
-# class RerankerInfo(BaseModel):
-#     """重排器信息"""
-#     provider: Optional[str] = None
-#     model: Optional[str] = None
+class RerankerInfo(BaseModel):
+    """重排器信息"""
+    provider: Optional[str] = None
+    model: Optional[str] = None
 
-# class DataQACompletionRequest(KnogCompletionRequest):
-#     """数据问答请求"""
-#     follow_up_num: int = Field(default=0, description="当前追问轮数")
+class DataQACompletionRequest(KnogCompletionRequest):
+    """数据问答请求"""
+    follow_up_num: int = Field(default=0, description="当前追问轮数")
 
 
-# class DataQAChatCompletionResponse(ChatCompletionResponse):
-#     """数据问答响应"""
-#     follow_up_num: Optional[int] = Field(None, description="追问轮数")
+class DataQAChatCompletionResponse(ChatCompletionResponse):
+    """数据问答响应"""
+    follow_up_num: Optional[int] = Field(None, description="追问轮数")
