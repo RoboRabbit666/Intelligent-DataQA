@@ -15,6 +15,7 @@ class NLPToolkit:
     """
     user_dict_path: Optional[Path] = None
     syn_dict_path: Optional[Path] = None
+    stop_words_path: Optional[Path] = None  # 停用词词典路径
     patterns_path: Optional[Path] = None # patterns.jsonl 路径
 
     _syn_dictionary: Dict[str, List[str]] = field(default_factory=dict, init=False)
