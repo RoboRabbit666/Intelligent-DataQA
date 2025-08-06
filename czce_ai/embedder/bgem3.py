@@ -5,8 +5,8 @@ from openai import OpenAI as OpenAIClient
 from openai.types.create_embedding_response import CreateEmbeddingResponse
 from typing_extensions import Literal
 
-from czce.ai.embedder.base import Embedder
-from czce.ai.utils.log import logger
+from czce_ai.embedder.base import Embedder
+from czce_ai.utils.log import logger
 
 
 @dataclass
