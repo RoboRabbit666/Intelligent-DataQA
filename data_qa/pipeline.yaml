@@ -1,0 +1,141 @@
+# 数据智能问答流程的分层YAML表示
+flow_name: "数据智能问答 (Data Intelligence Q&A)"
+entry_point: "QueryInput"
+
+# 定义流程中的所有组件
+components:
+  # 流程起点
+  - id: "QueryInput"
+    name: "query"
+    type: "Input"
+    description: "用户输入的初始查询"
+    next: "QueryRewrite"
+
+  # 处理步骤
+  - id: "QueryRewrite"
+    name: "基于历史运行问答重写"
+    type: "Process"
+    description: "根据历史问答对查询进行重写"
+    uses:
+      - "Prompt1"
+    next: "EntityRecognition"
+
+  - id: "EntityRecognition"
+    name: "实体识别"
+    type: "Process"
+    description: "对查询进行命名实体识别"
+    uses:
+      - "ner_patterns"
+    next: "SupplementDefinition"
+
+  - id: "SupplementDefinition"
+    name: "补充指标定义"
+    type: "Process"
+    description: "结合领域定义来补充查询中的指标"
+    uses:
+      - "DomainDefinitions"
+    produces: "New Query"
+    next: "LocateTable"
+
+  - id: "LocateTable"
+    name: "Locate_table_LLM"
+    type: "LLM_Step"
+    description: "使用LLM根据元数据定位相关数据表"
+    inputs:
+      - from: "SupplementDefinition"
+        description: "接收 'New Query'"
+      - from: "Prompt2"
+      - data: "MetaData"
+    produces: "table_info"
+    next: "SQLGeneration"
+
+  - id: "SQLGeneration"
+    name: "sql_generation_LLM"
+    type: "LLM_Step"
+    description: "根据表信息生成SQL脚本"
+    inputs:
+      - from: "LocateTable"
+        description: "接收 'table_info'"
+      - from: "Prompt3"
+      - from: "SupplementInfo"
+        description: "从补充信息步骤接收反馈"
+    next: "SupplementCheck"
+
+  - id: "SupplementInfo"
+    name: "Supplement_info_LLM"
+    type: "LLM_Step"
+    description: "当信息不足时（如缺少地名），进行信息补充"
+    inputs:
+      - from: "Prompt4"
+    next: "SQLGeneration" # 形成反馈闭环
+
+  # 决策点
+  - id: "SupplementCheck"
+    name: "判断是否缺少答案"
+    type: "Decision"
+    description: "判断生成的结果是否缺少信息（如需要补充地名）"
+    branches:
+      - condition: "是"
+        goto: "SupplementInfo"
+      - condition: "否"
+        produces: "SQL Script"
+        goto: "ExecutionCheck"
+
+  - id: "ExecutionCheck"
+    name: "代码是否可执行"
+    type: "Decision"
+    description: "检查生成的SQL脚本是否可在数据库上执行"
+    input: "SQL Script"
+    on: "Database"
+    branches:
+      - condition: "是"
+        produces: "Result Data"
+        goto: "PresentResults"
+      - condition: "否"
+        goto: "SQLGeneration"
+
+  # 结果呈现
+  - id: "PresentResults"
+    name: "结果数据处理"
+    type: "Process"
+    description: "处理查询结果以供显示"
+    input: "Result Data"
+    next: "GUI"
+
+  # 流程终点
+  - id: "GUI"
+    name: "GUI"
+    type: "Output"
+    description: "将最终结果呈现给用户的图形界面"
+
+# 定义流程所需的外部资源
+resources:
+  # 数据存储
+  - id: "Milvus"
+    name: "Milvus"
+    type: "Vector_Database"
+    provides: "MetaData"
+
+  - id: "MetaData"
+    name: "MetaData"
+    type: "Data"
+
+  - id: "Database"
+    name: "DS"
+    type: "SQL_Database"
+    contains: "数据表 (Data Tables)"
+
+  # 输入参数
+  - id: "Prompt1"
+    type: "Parameter"
+  - id: "ner_patterns"
+    type: "Parameter"
+  - id: "DomainDefinitions"
+    name: "领域定义"
+    type: "Parameter"
+  - id: "Prompt2"
+    type: "Parameter"
+  - id: "Prompt3"
+    type: "Parameter"
+  - id: "Prompt4"
+    type: "Parameter"
