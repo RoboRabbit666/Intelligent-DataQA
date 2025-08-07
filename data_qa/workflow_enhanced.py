@@ -1,0 +1,548 @@
+# coding: utf-8
+"""
+最简集成版 - 仅集成核心改进到导师的workflow.py
+改动原则：
+1. 保持原有代码结构不变
+2. 只在必要位置插入增强代码
+3. 所有改动都用注释标记
+"""
+import copy
+import traceback
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import re
+
+# ========== 新增导入 ==========
+import pickle
+import os
+from datetime import datetime
+from pathlib import Path
+# ==============================
+
+from app.core.components import mxbai_reranker, sql_kb, tokenizer, minio, embedder, document_kb
+from app.config.config import settings
+from czce_ai.embedder.bgem3 import BgeM3Embedder
+from app.core.components.query_optimizer import (
+    DataQAOptimizedQuery,
+    QueryOptimizationType,
+    QueryOptimizer,
+)
+from app.models import (
+    ChatCompletionChoice,
+    ChatReference,
+    ChatStep,
+    ChatUsage,
+    DataQAChatCompletionResponse,
+    DataQACompletionRequest,
+    RerankerInfo,
+)
+
+from czce_ai.llm.chat import LLMChat as LLMModel
+from czce_ai.llm.message import Message as ChatMessage
+from czce_ai.utils.log import logger
+
+# ========== 新增导入NLP工具 ==========
+from czce_ai.nlp import NLPToolkit
+from resources import (
+    USER_DICT_PATH,
+    SYNONYM_DICT_PATH,
+    STOP_WORDS_PATH,
+    NER_PATTERNs_PATH,
+)
+# =====================================
+
+from .entities import WorkflowStepType
+from .prompt import dataga_prompt
+
+def cosine_similarity(a, b):
+    dot_product = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    return dot_product / (norm_a * norm_b)
+
+@dataclass
+class WorkflowConfig:
+    """工作流配置类-统一管理参数、魔法数字等"""
+    history_round: int = 1
+    follow_up_round: int = 1
+    reranking_threshold: float = 0.2
+    collection: Optional[str] = "hybrid_sql"
+    domain_collection: Optional[str] = 'domain_kl'
+    max_table_results: int = 3
+    enable_entity_recognition: bool = True
+    enable_reranker: bool = True
+
+    def __post_init__(self):
+        if self.history_round < self.follow_up_round:
+            raise ValueError(
+                f"history_round({self.history_round}) must be >= follow_up_round({self.follow_up_round})"
+            )
+
+class DataQaWorkflow:
+    def __init__(
+        self,
+        ans_llm: LLMModel,
+        ans_thinking_llm: LLMModel,
+        query_llm: LLMModel,
+        config: Optional[WorkflowConfig] = None,
+    ):
+        self.ans_client = ans_llm
+        self.ans_thinking_client = ans_thinking_llm
+        self.query_optimizer = QueryOptimizer(query_llm)
+        self.config = config or WorkflowConfig()
+        
+        # ========== 新增：初始化FAQ数据 ==========
+        self.faq_data = []
+        self.cache_file = Path(__file__).parent.parent / "cache" / "faq_cache.pkl"
+        self._load_faqs()
+        # ==========================================
+
+    def _create_step(
+        self, step_type: WorkflowStepType, number: int, prompt: Any
+    ) -> ChatStep:
+        """创建工作流步骤"""
+        step_names = {
+            WorkflowStepType.FOLLOW_UP: "问题追问",
+            WorkflowStepType.MODIFY_QUERY: "问题改写",
+            WorkflowStepType.ENTITY_RECOGNITION: "问题实体识别",
+            # ========== 新增：FAQ语义搜索步骤 ==========
+            WorkflowStepType.SEMANTIC_SEARCH_FAQ: "语义搜索FAQ",
+            # =========================================
+            WorkflowStepType.LOCATE_TABLE: "表格定位",
+            WorkflowStepType.GENERATE_PROMPT: "上下文工程",
+            WorkflowStepType.GENERATE_SQL: "SQL生成",
+        }
+        return ChatStep(
+            key=step_type.value,
+            name=step_names[step_type],
+            number=number,
+            prompt=prompt,
+            finished=True,
+        )
+
+    def _extract_input_messages(
+        self, request: DataQACompletionRequest
+    ) -> List[ChatMessage]:
+        """提取输入信息列表"""
+        return request.messages[-self.config.history_round * 2:]
+
+    def entity_recognition(self, query: str):
+        """
+        ========== 增强版实体识别（替换原函数） ==========
+        修复：合约代码识别问题
+        """
+        if not self.config.enable_entity_recognition:
+            return query
+        try:
+            enhanced_query = query
+            
+            # 使用增强的NLPToolkit
+            nlp_tokenizer = NLPToolkit(
+                user_dict_path=USER_DICT_PATH, 
+                syn_dict_path=SYNONYM_DICT_PATH,
+                stop_words_path=STOP_WORDS_PATH,
+                patterns_path=NER_PATTERNs_PATH
+            )
+            entity_list = nlp_tokenizer.recognize(query)
+            
+            for entity in entity_list:
+                if entity['id'] != '' and entity['text'] in enhanced_query:
+                    # 特殊处理合约代码
+                    if entity['label'] == '合约':
+                        normalized_code = re.sub(r'[-_\.\s/]+', '', entity['text'].upper())
+                        substring = f"{normalized_code}(合约)"
+                    else:
+                        substring = f"{entity['id']}({entity['label']})"
+                    
+                    enhanced_query = enhanced_query.replace(entity['text'], substring, 1)
+            
+            return enhanced_query
+        except Exception as e:
+            logger.error(f"Entity recognition Error: {e}")
+            return query
+
+    # ========== 新增：FAQ相关方法（3个） ==========
+    def _load_faqs(self):
+        """加载FAQ知识库"""
+        # 尝试从缓存加载
+        if self.cache_file.exists():
+            try:
+                with open(self.cache_file, 'rb') as f:
+                    cache_data = pickle.load(f)
+                    self.faq_data = cache_data['faq_data']
+                    logger.info(f"从缓存加载了{len(self.faq_data)}个FAQ")
+                    return
+            except Exception as e:
+                logger.warning(f"加载缓存失败: {e}")
+        
+        # 从文件加载
+        self.cache_file.parent.mkdir(parents=True, exist_ok=True)
+        faq_path = Path(__file__).parent.parent / "test_data" / "tables"
+        
+        for file_path in faq_path.glob("*.txt"):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                table_name = file_path.stem
+                
+                pattern = r'问题：(.*?)\nSQL：(.*?)(?=问题：|$)'
+                matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
+                
+                for question, sql in matches:
+                    question = question.strip()
+                    sql = sql.strip()
+                    
+                    # 对FAQ问题进行实体识别增强
+                    enhanced_question = self.entity_recognition(question)
+                    embedding = embedder.get_embedding(enhanced_question)
+                    
+                    self.faq_data.append({
+                        'question': enhanced_question,
+                        'sql': sql,
+                        'table': table_name,
+                        'embedding': np.array(embedding)
+                    })
+        
+        # 保存缓存
+        try:
+            cache_data = {'faq_data': self.faq_data}
+            with open(self.cache_file, 'wb') as f:
+                pickle.dump(cache_data, f)
+        except Exception as e:
+            logger.error(f"保存缓存失败: {e}")
+
+    def semantic_search_faq(self, query: str, top_k: int = 3) -> List[Dict]:
+        """语义搜索FAQ"""
+        if not self.faq_data:
+            return []
+        
+        query_embedding = np.array(embedder.get_embedding(query))
+        similarities = []
+        
+        for faq in self.faq_data:
+            similarity = cosine_similarity(query_embedding, faq['embedding'])
+            similarities.append(similarity)
+        
+        similarities = np.array(similarities)
+        top_indices = np.argsort(similarities)[::-1][:top_k]
+        
+        results = []
+        for idx in top_indices:
+            if similarities[idx] > 0.5:
+                results.append({
+                    'question': self.faq_data[idx]['question'],
+                    'sql': self.faq_data[idx]['sql'],
+                    'table': self.faq_data[idx]['table'],
+                    'similarity': float(similarities[idx])
+                })
+        
+        return results
+    # ================================================
+
+    def modify_query(
+        self,
+        input_messages: List[ChatMessage],
+        enable_follow_up: bool,
+    ) -> DataQAOptimizedQuery:
+        """问题改写（保持不变）"""
+        try:
+            input_messages_copy = copy.deepcopy(input_messages)
+            optimization_type = (
+                QueryOptimizationType.FOLLOWUP
+                if enable_follow_up
+                else QueryOptimizationType.DATAQA
+            )
+            optimized_query = self.query_optimizer.generate_optimized_query(
+                query=input_messages_copy[-1].content,
+                chat_history=input_messages_copy[:-1],
+                optimization_type=optimization_type,
+            )
+            return optimized_query
+        except Exception as e:
+            logger.error(f"Modify query Error:{e}")
+            traceback.print_exc()
+            raise e
+
+    def domain_knowledge_search(
+        self, query: str, document_id: Optional[str] = None
+    ) -> str:
+        """搜索领域知识（保持不变）"""
+        try:
+            embedder = BgeM3Embedder(base_url=settings.embedder.base_url, api_key=settings.embedder.api_key)
+            query_embedding = embedder.get_embedding(query)
+            domain_doc = document_kb.get_by_ids(collection=self.config.domain_collection, doc_id=document_id)
+            domains = domain_doc[0].data.content
+            sentences = [s.strip() for s in domains.split("\n") if s.strip()]
+            sentence_embeddings = [embedder.get_embedding(s) for s in sentences]
+            similarities = [cosine_similarity(query_embedding, sent_emb) for sent_emb in sentence_embeddings]
+            most_similar_idx = np.argmax(similarities)
+            most_similar_sentence = sentences[most_similar_idx]
+            similarity_score = similarities[most_similar_idx]
+            return most_similar_sentence, similarity_score
+        except Exception as e:
+            logger.error(f"Domain knowledge search Error:{e}")
+            traceback.print_exc()
+            raise e
+
+    def locate_table(
+        self, query: str, knowledge_base_ids: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """定位表格（保持不变）"""
+        try:
+            ranked_tables = sql_kb.search(
+                self.config.collection,
+                query,
+                knowledge_ids=knowledge_base_ids,
+                top_k=self.config.max_table_results,
+                use_reranker=self.config.enable_reranker,
+            )
+            tables = [
+                {
+                    "chunk_uuid": table.chunk_id,
+                    "table_name": table.data.table_name,
+                    "table_info": table.data.table_info,
+                    "score": table.reranking_score,
+                }
+                for table in ranked_tables
+            ]
+            return tables
+        except Exception as e:
+            logger.error(f"Locate table Error: {e}")
+            return []
+
+    def generate_single_table_prompt(self, tables: List[Dict[str, Any]]) -> str:
+        """生成单表查询的prompt（保持不变）"""
+        table_info = tables[0].get("table_info", "")
+        table_prompt = f"已知如下数据表信息:\n{table_info}\n"
+        return table_prompt
+
+    def generate_sql(
+        self,
+        table_schema: str,
+        input_messages: List[ChatMessage],
+        thinking: Optional[bool] = False,
+    ):
+        """生成SQL（保持不变）"""
+        query = input_messages[-1].content
+        content = dataga_prompt.format(table_schema=table_schema, question=query)
+        system_msg = ChatMessage(
+            role="system",
+            content=content,
+        )
+        if thinking:
+            response = self.ans_thinking_client.invoke(
+                messages=[system_msg] + input_messages[:]
+            )
+        else:
+            response = self.ans_client.invoke(messages=[system_msg] + input_messages[:])
+        return response
+
+    def _handle_follow_up(
+        self,
+        optimized_query: DataQAOptimizedQuery,
+        request: DataQACompletionRequest,
+    ) -> Tuple[Optional[DataQAChatCompletionResponse], DataQAOptimizedQuery]:
+        """处理追问逻辑（保持不变）"""
+        follow_up_num = (
+            request.follow_up_num + 1 if not optimized_query.is_sufficient else 0
+        )
+        if (
+            not optimized_query.is_sufficient
+            and follow_up_num <= self.config.follow_up_round
+        ):
+            step = self._create_step(
+                step_type=WorkflowStepType.FOLLOW_UP,
+                number=0,
+                prompt=optimized_query.rewritten_query,
+            )
+            choices = [
+                ChatCompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=ChatMessage(
+                        role="assistant",
+                        content=optimized_query.rewritten_query,
+                        reasoning_content=None,
+                        is_follow_up=True,
+                    ),
+                )
+            ]
+            return (
+                DataQAChatCompletionResponse(
+                    choices=choices,
+                    steps=[step],
+                    follow_up_num=follow_up_num,
+                ),
+                optimized_query,
+            )
+        elif follow_up_num > self.config.follow_up_round:
+            input_messages = self._extract_input_messages(request)
+            recent_messages = input_messages[-self.config.follow_up_round * 2:]
+            manual_query = " ".join(
+                [msg.content for msg in recent_messages if msg.role == "user"]
+            )
+            return None, DataQAOptimizedQuery(
+                original_query=optimized_query.original_query,
+                rewritten_query=manual_query or optimized_query.rewritten_query,
+                is_sufficient=True,
+            )
+        return None, optimized_query
+
+    def do_generate(
+        self,
+        request: DataQACompletionRequest,
+        enable_follow_up: bool = True,
+        knowledge_base_ids: Optional[List[str]] = None,
+        thinking: Optional[bool] = False,
+    ) -> DataQAChatCompletionResponse:
+        """
+        生成回答
+        ========== 最小化改动：仅在实体识别后插入FAQ搜索 ==========
+        """
+        # 提取输入信息
+        input_messages = self._extract_input_messages(request)
+        
+        # Step1: modify_query
+        optimized_query = self.modify_query(
+            input_messages=input_messages,
+            enable_follow_up=enable_follow_up,
+        )
+        
+        # 处理追问逻辑
+        if enable_follow_up:
+            follow_up_response, optimized_query = self._handle_follow_up(
+                optimized_query=optimized_query, request=request
+            )
+            if follow_up_response:
+                return follow_up_response
+        
+        step1 = self._create_step(
+            WorkflowStepType.MODIFY_QUERY, 1, optimized_query.rewritten_query
+        )
+        
+        # Step2: query entity recognition
+        query = optimized_query.rewritten_query
+        entity_enriched_query = self.entity_recognition(query)
+        step2 = self._create_step(
+            WorkflowStepType.ENTITY_RECOGNITION, 2, entity_enriched_query
+        )
+        
+        # Step3: semantic_search_faq（新增步骤）
+        # 使用增强的实体识别查询进行FAQ语义搜索
+        # 注意：这里的entity_enriched_query是经过实体识别增强的查询
+        #       这一步骤在原有流程中是没有的
+        #       目的是在查询表格之前，先尝试匹配FAQ
+        #       如果FAQ匹配成功，则直接返回结果，避免不必要的表格查询
+        #       如果没有匹配成功，则继续原有流程
+        #       这样可以提高查询效率，减少不必要的计算
+        # ========== 新增：FAQ快速路径 ==========
+        faq_results = self.semantic_search_faq(entity_enriched_query, top_k=1)
+        if faq_results and faq_results[0]['similarity'] >= 0.85:
+            # Step3: semantic_search_faq（FAQ语义搜索）
+            step3 = self._create_step(
+                WorkflowStepType.SEMANTIC_SEARCH_FAQ, 3, f"找到高相似度FAQ：{faq_results[0]['question']}，相似度：{faq_results[0]['similarity']:.2f}"
+            )
+            # 直接返回FAQ结果，不再进行后续步骤
+            # FAQ直接命中，快速返回
+            best_faq = faq_results[0]
+            response_content = f"""基于知识库匹配（相似度：{best_faq['similarity']:.2f}）：
+
+```sql
+{best_faq['sql']}
+```
+
+来源表：{best_faq['table']}"""
+            
+            choices = [
+                ChatCompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=ChatMessage(
+                        role="assistant",
+                        content=response_content,
+                        reasoning_content=None,
+                        is_follow_up=False,
+                    ),
+                )
+            ]
+            
+            return DataQAChatCompletionResponse(
+                id=f"faq-{int(datetime.now().timestamp())}",
+                model="faq",
+                created=int(datetime.now().timestamp()),
+                choices=choices,
+                usage=ChatUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
+                steps=[step1, step2],
+            )
+
+        # ========================================
+        else:
+            # 如果没有FAQ匹配成功，则继续原有流程
+            if faq_results:
+                step3 = self._create_step(
+                    WorkflowStepType.SEMANTIC_SEARCH_FAQ,
+                    3,
+                    f"找到FAQ：{faq_results[0]['question']}，相似度：{faq_results[0]['similarity']:.2f}，但不满足阈值"
+                )
+            else:
+                step3 = self._create_step(
+                    WorkflowStepType.SEMANTIC_SEARCH_FAQ,
+                    3,
+                    "没有找到相关FAQ"
+                )
+
+            # Step4: locate table（继续原流程）
+            located_table = self.locate_table(entity_enriched_query, knowledge_base_ids)
+            step4 = self._create_step(WorkflowStepType.LOCATE_TABLE, 4, located_table)
+
+            # Step5: generate single table prompt
+            single_table_prompt = self.generate_single_table_prompt(located_table)
+            
+            # ========== 新增：如果有FAQ且大于等于0.7，添加到prompt参考 ==========
+            if faq_results and faq_results[0]['similarity'] >= 0.7:
+                single_table_prompt += f"\n参考示例:\n问题：{faq_results[0]['question']}\nSQL：{faq_results[0]['sql']}\n"
+            # ========================================================
+
+            step5 = self._create_step(
+                WorkflowStepType.GENERATE_PROMPT, 5, single_table_prompt
+            )
+            
+            # Step6: generate_sql
+            response = self.generate_sql(
+                table_schema=single_table_prompt,
+                input_messages=input_messages,
+                thinking=thinking,
+            )
+            step6 = self._create_step(WorkflowStepType.GENERATE_SQL, 6, response)
+
+        usage = ChatUsage(
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
+            total_tokens=response.usage.total_tokens,
+        )
+        
+        choices = list(
+            map(
+                lambda x: ChatCompletionChoice(
+                    finish_reason=x.finish_reason,
+                    index=x.index,
+                    message=ChatMessage(
+                        role=x.message.role,
+                        content=x.message.content,
+                        reasoning_content=x.message.reasoning_content,
+                        is_follow_up=False,
+                    ),
+                ),
+                response.choices,
+            )
+        )
+        
+        return DataQAChatCompletionResponse(
+            id=response.id,
+            model=response.model,
+            created=response.created,
+            choices=choices,
+            usage=usage,
+            steps=[step1, step2, step3, step4, step5, step6],
+        )
