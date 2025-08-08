@@ -112,11 +112,33 @@ class RerankerInfo(BaseModel):
     provider: Optional[str] = None
     model: Optional[str] = None
 
-class DataQACompletionRequest(KnogCompletionRequest):
-    """数据问答请求"""
-    follow_up_num: int = Field(default=0, description="当前追问轮数")
+class DataQaCompletionChoice(BaseModel):
+    """DataQA 工作流中的回复选项（通常不直接使用）"""
+    index: int = Field(..., description="回复选项的索引")
+    message: ChatMessage = Field(..., description="回复消息")
+    finish_reason: Optional[str] = Field(None, description="回复结束的原因")
+
+class DataQACompletionRequest(BaseModel):
+    """DataQA 工作流的补全请求（包含追问计数）"""
+    messages: List[ChatMessage]
+    model: str = "QWen3"
+    stream: Optional[bool] = False
+    thinking: Optional[bool] = True
+    # 用于控制和记录追问轮次
+    follow_up_num: int = 0
 
 
-class DataQAChatCompletionResponse(ChatCompletionResponse):
-    """数据问答响应"""
-    follow_up_num: Optional[int] = Field(None, description="追问轮数")
+class DataQAChatCompletionResponse(BaseModel):
+    """DataQA 工作流响应（包含追问计数）"""
+    id: str = Field(default_factory=lambda: f"chatcmpl-{uuid.uuid4()}")
+    object: str = "chat.completion"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    model: str = Field(..., description="使用的模型名称")
+    # 为兼容当前实现，复用 ChatCompletionChoice
+    choices: List[ChatCompletionChoice] = Field(..., description="回复选项列表")
+    usage: Optional[ChatUsage] = Field(None, description="使用情况统计")
+    steps: Optional[List[ChatStep]] = Field(
+        None, description="生成回复过程中涉及的步骤信息列表"
+    )
+    # 便于前端和测试读取追问次数
+    follow_up_num: int = 0
