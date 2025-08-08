@@ -86,6 +86,8 @@ class ChatStep(BaseModel):
     )
     prompt: Optional[Any] = Field(None, description="步骤中的提示信息")
     finished: Optional[bool] = Field(False, description="步骤是否完成")
+    object: str = Field("chat.completion.step", description="对象类型")
+    created: int = Field(default_factory=lambda: int(time.time()), description="创建时间戳")
 
 class ChatCompletionChoice(BaseModel):
     index: int = Field(..., description="回复选项的索引")

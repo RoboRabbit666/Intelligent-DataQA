@@ -12,49 +12,30 @@ import re as regex_module
 import copy
 import traceback
 import numpy as np
-import pickle
-import os
 from datetime import datetime
-
-import numpy as np
-import re
 
 # ========== 新增导入 ==========
 import pickle
 import os
-from datetime import datetime
 from pathlib import Path
 import sys
 sys.path.append(str(Path.cwd().parent))
-
-from pathlib import Path
-import sys
-sys.path.append(str(Path.cwd().parent))
-
-from typing import List, Optional, Dict, Tuple
-import re as regex_module
-import copy
-import traceback
-import numpy as np
-import pickle
-import os
-from datetime import datetime
 
 from czce_ai.knowledge import SearchType, SQLSchemaKnowledge
-from czce_ai.nlp import NLPToolkit
-from czce_ai.llm.message import Message as ChatMessage
-from czce_ai.llm.chat import LLMChat as LLMModel
 from app.core.components import (
     mxbai_reranker,
     embedder,
     tokenizer,
+    qwen3_llm,
+    qwen3_thinking_llm,
 )
 from app.core.components.query_optimizer import (
     OptimizedQuery,
     QueryOptimizationType,
     QueryOptimizer,
+    DataQAOptimizedQuery,
 )
-from app.core.components import qwen3_llm, qwen3_thinking_llm
+
 from resources import (
     USER_DICT_PATH,
     SYNONYM_DICT_PATH,
@@ -69,17 +50,12 @@ from app.models import (
     ChatUsage,
 )
 from data_qa.prompt import dataqa_prompt
-from czce_ai.utils.log import logger
 # ==============================
 
 from app.core.components import mxbai_reranker, sql_kb, tokenizer, minio, embedder, document_kb
 from app.config.config import settings
 from czce_ai.embedder.bgem3 import BgeM3Embedder
-from app.core.components.query_optimizer import (
-    DataQAOptimizedQuery,
-    QueryOptimizationType,
-    QueryOptimizer,
-)
+
 from app.models import (
     ChatCompletionChoice,
     ChatReference,
@@ -105,9 +81,12 @@ from resources import (
 # =====================================
 
 from .entities import WorkflowStepType
-from .prompt import dataga_prompt
+from .prompt import dataqa_prompt
 
 def cosine_similarity(a, b):
+    # 计算余弦相似度公式：cos(θ) = (A·B) / (|A|×|B|)
+    # A·B：两个向量的点积
+    # |A|、|B|：两个向量的模长（范数）
     dot_product = np.dot(a, b)
     norm_a = np.linalg.norm(a)
     norm_b = np.linalg.norm(b)
@@ -138,6 +117,7 @@ class DataQaWorkflow:
         ans_thinking_llm: LLMModel,
         query_llm: LLMModel,
         config: Optional[WorkflowConfig] = None,
+        use_cache: bool = True
     ):
         self.ans_client = ans_llm
         self.ans_thinking_client = ans_thinking_llm
@@ -146,6 +126,7 @@ class DataQaWorkflow:
         
         # ========== 新增：初始化FAQ数据 ==========
         self.faq_data = []
+        self.use_cache = use_cache
         self.cache_file = Path(__file__).parent.parent / "test_data" / "tables" / "faq_cache.pkl"
         self._load_faqs()
         # ==========================================
@@ -179,6 +160,7 @@ class DataQaWorkflow:
         """提取输入信息列表"""
         return request.messages[-self.config.history_round * 2:]
 
+    # ========== 增强版实体识别（替换原函数） ==========
     def entity_recognition(self, query: str):
         """
         ========== 增强版实体识别（替换原函数） ==========
@@ -202,7 +184,7 @@ class DataQaWorkflow:
                 if entity['id'] != '' and entity['text'] in enhanced_query:
                     # 特殊处理合约代码
                     if entity['label'] == '合约':
-                        normalized_code = re.sub(r'[-_\.\s/]+', '', entity['text'].upper())
+                        normalized_code = regex_module.sub(r'[-_\.\s/]+', '', entity['text'].upper())
                         substring = f"{normalized_code}(合约)"
                     else:
                         substring = f"{entity['id']}({entity['label']})"
@@ -213,38 +195,63 @@ class DataQaWorkflow:
         except Exception as e:
             logger.error(f"Entity recognition Error: {e}")
             return query
+    # ==================================================
 
-    # ========== 新增：FAQ相关方法（3个） ==========
+    # ========== 新增：FAQ相关方法（4个） ==========
     def _load_faqs(self):
-        """加载FAQ知识库"""
+        """
+        加载所有SQL知识库文件 - 优先从缓存加载，如果缓存不存在则直接重新计算
+        功能：从指定目录加载SQL知识库文件，解析问题和SQL语句，并计算嵌入向量. 通过embedder计算每个FAQ问题的嵌入向量，并存储在faq_data中
+
+        Args:
+            None
+        Returns:
+            None
+        """
         # 尝试从缓存加载
-        if self.cache_file.exists():
+        if self.use_cache and self.cache_file.exists():
             try:
                 with open(self.cache_file, 'rb') as f:
                     cache_data = pickle.load(f)
                     self.faq_data = cache_data['faq_data']
-                    logger.info(f"从缓存加载了{len(self.faq_data)}个FAQ")
-                    return
+                    cache_time = cache_data.get('created_at', 'unknown')
+                    logger.info(f"从缓存加载了{len(self.faq_data)}个FAQ (创建时间: {cache_time})")
+                    return  # 成功加载缓存，直接返回
             except Exception as e:
-                logger.warning(f"加载缓存失败: {e}")
+                logger.warning(f"加载缓存失败: {e}，将重新计算")
         
-        # 从文件加载
-        self.cache_file.parent.mkdir(parents=True, exist_ok=True)
-        faq_path = Path(__file__).parent.parent / "test_data" / "tables"
+        # 缓存不存在或加载失败，重新计算
+        logger.info("开始计算FAQ嵌入向量...")
+        start_time = datetime.now()
+
+        # Get path relative to the module file, not the current working directory
+        current_file_dir = Path(__file__).parent
+        tables_dir = current_file_dir.parent / "test_data" / "tables"
         
-        for file_path in faq_path.glob("*sql*知识库.txt"):
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                table_name = file_path.stem
+        if not tables_dir.exists():
+            logger.warning(f"Tables directory not found: {tables_dir}")
+            return
+        
+        for table_dir in tables_dir.iterdir():
+            if not table_dir.is_dir():
+                continue
                 
-                pattern = r'问题：(.*?)\nSQL：(.*?)(?=问题：|$)'
-                matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
+            # 查找SQL知识库文件
+            for file_path in table_dir.glob("*sql*知识库.txt"):
+                table_name = table_dir.name
                 
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # 解析Q&A对
+                pattern = r'问题[:：](.*?)\n(?:--.*?\n)*((?:WITH|SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER).*?);'
+                matches = regex_module.findall(pattern, content, regex_module.DOTALL | regex_module.IGNORECASE)
+
                 for question, sql in matches:
                     question = question.strip()
                     sql = sql.strip()
                     
-                    # 对FAQ问题进行实体识别增强
+                    # 对FAQ问题进行实体识别增强并计算嵌入向量
                     enhanced_question = self.entity_recognition(question)
                     embedding = embedder.get_embedding(enhanced_question)
                     
@@ -255,40 +262,118 @@ class DataQaWorkflow:
                         'embedding': np.array(embedding)
                     })
         
+        # === 计算完成，保存到缓存 ===
+        elapsed_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"加载了{len(self.faq_data)}个FAQ，耗时{elapsed_time:.2f}秒")
+        
         # 保存缓存
+        if self.use_cache:
+            self._save_cache()
+
+    def _save_cache(self):
+        """保存FAQ缓存"""
         try:
-            cache_data = {'faq_data': self.faq_data}
+            cache_data = {
+                'faq_data': self.faq_data,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
             with open(self.cache_file, 'wb') as f:
                 pickle.dump(cache_data, f)
+            logger.info(f"FAQ缓存已保存到: {self.cache_file}")
         except Exception as e:
             logger.error(f"保存缓存失败: {e}")
+    
+    def refresh_faq_cache(self):
+        """手动刷新缓存"""
+        logger.info("开始刷新FAQ缓存...")
+        
+        # 删除旧缓存文件
+        if self.cache_file.exists():
+            os.remove(self.cache_file)
+            logger.info("已删除旧缓存")
+        
+        # 清空当前数据
+        self.faq_data = []
+        
+        # 重新加载（会自动创建新缓存）
+        self._load_faqs()
+        logger.info("FAQ缓存刷新完成")
+
 
     def semantic_search_faq(self, query: str, top_k: int = 3) -> List[Dict]:
-        """语义搜索FAQ"""
-        if not self.faq_data:
-            return []
+        """
+        语义搜索FAQ函数
         
+        功能：在FAQ知识库中找到与用户查询最相似的问题和对应的SQL语句
+        
+        Args:
+            query: 用户输入的查询问题
+            top_k: 返回最相似的前K个结果，默认3个
+            
+        Returns:
+            List[Dict]: 包含相似FAQ的列表，每个字典包含问题、SQL、表名和相似度
+        """
+        
+        # 1. 检查FAQ数据是否存在
+        if not self.faq_data:
+            return []  # 如果没有加载任何FAQ数据，直接返回空列表
+        
+        # # 2. 查询预处理 - 实体识别增强
+        # enhanced_query = self.entity_recognition(query)
+        # # 例如："查询FG2509成交量" -> "查询FG2509(合约)成交量"
+        
+        # 3. 将用户查询（注：此处的查询应该是实体识别增强后的查询）转换为嵌入向量
         query_embedding = np.array(embedder.get_embedding(query))
-        similarities = []
+        # 得到一个高维向量表示，例如：[0.1, 0.2, 0.3, ..., 0.9]
+        
+        # 4. 计算查询与所有FAQ的相似度
+        similarities = []  # 存储相似度分数
         
         for faq in self.faq_data:
-            similarity = cosine_similarity(query_embedding, faq['embedding'])
-            similarities.append(similarity)
+            similarities.append(cosine_similarity(query_embedding, faq['embedding']))
+            # 相似度范围：-1到1，越接近1越相似
         
-        similarities = np.array(similarities)
-        top_indices = np.argsort(similarities)[::-1][:top_k]
+        # 5. 获取相似度最高的Top-K个索引
+        # np.argsort()：返回排序后的索引数组（从小到大）
+        # [-top_k:]：取最后K个（即最大的K个）
+        # [::-1]：反转数组（从大到小排列）
+        top_indices = np.argsort(similarities)[-top_k:][::-1]
         
+        # 举例：如果similarities = [0.2, 0.8, 0.1, 0.9, 0.3]，top_k=3
+        # argsort() -> [2, 0, 4, 1, 3]  (索引按相似度从小到大)
+        # [-3:] -> [4, 1, 3]            (取最后3个)
+        # [::-1] -> [3, 1, 4]           (反转，变成从大到小)
+        
+        # 6. 构建结果列表
         results = []
         for idx in top_indices:
+            # 只返回相似度大于0.5的结果（基本阈值过滤）
             if similarities[idx] > 0.5:
                 results.append({
-                    'question': self.faq_data[idx]['question'],
-                    'sql': self.faq_data[idx]['sql'],
-                    'table': self.faq_data[idx]['table'],
-                    'similarity': float(similarities[idx])
+                    'question': self.faq_data[idx]['question'],    # 原始问题
+                    'sql': self.faq_data[idx]['sql'],              # 对应SQL语句
+                    'table': self.faq_data[idx]['table'],          # 来源表名
+                    'similarity': float(similarities[idx])         # 相似度分数
                 })
         
+        # 7. 返回结果
         return results
+        # 返回格式示例：
+        # [
+        #     {
+        #         'question': '查询FG2509的成交额',
+        #         'sql': 'SELECT trd_amt FROM ... WHERE comd_code = "FG2509"',
+        #         'table': '郑商所合约信息统计表',
+        #         'similarity': 0.92
+        #     },
+        #     {
+        #         'question': '统计期货成交量',
+        #         'sql': 'SELECT SUM(trd_qty) FROM ...',
+        #         'table': '期货交易统计表',
+        #         'similarity': 0.76
+        #     }
+        # ]
+
     # ================================================
 
     def modify_query(
@@ -376,7 +461,7 @@ class DataQaWorkflow:
     ):
         """生成SQL（保持不变）"""
         query = input_messages[-1].content
-        content = dataga_prompt.format(table_schema=table_schema, question=query)
+        content = dataqa_prompt.format(table_schema=table_schema, question=query)
         system_msg = ChatMessage(
             role="system",
             content=content,
@@ -524,7 +609,7 @@ class DataQaWorkflow:
                 created=int(datetime.now().timestamp()),
                 choices=choices,
                 usage=ChatUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
-                steps=[step1, step2],
+                steps=[step1, step2, step3],
             )
 
         # ========================================
