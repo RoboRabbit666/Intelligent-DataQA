@@ -1,15 +1,20 @@
 # coding: utf-8
 """
-最简集成版 - 仅集成核心改进到导师的workflow.py
-改动原则：
-1. 保持原有代码结构不变
-2. 只在必要位置插入增强代码
-3. 所有改动都用注释标记
+工作流增强版
 """
 import copy
 import traceback
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
+
+from typing import List, Optional, Dict, Tuple
+import re as regex_module
+import copy
+import traceback
+import numpy as np
+import pickle
+import os
+from datetime import datetime
 
 import numpy as np
 import re
@@ -19,6 +24,52 @@ import pickle
 import os
 from datetime import datetime
 from pathlib import Path
+import sys
+sys.path.append(str(Path.cwd().parent))
+
+from pathlib import Path
+import sys
+sys.path.append(str(Path.cwd().parent))
+
+from typing import List, Optional, Dict, Tuple
+import re as regex_module
+import copy
+import traceback
+import numpy as np
+import pickle
+import os
+from datetime import datetime
+
+from czce_ai.knowledge import SearchType, SQLSchemaKnowledge
+from czce_ai.nlp import NLPToolkit
+from czce_ai.llm.message import Message as ChatMessage
+from czce_ai.llm.chat import LLMChat as LLMModel
+from app.core.components import (
+    mxbai_reranker,
+    embedder,
+    tokenizer,
+)
+from app.core.components.query_optimizer import (
+    OptimizedQuery,
+    QueryOptimizationType,
+    QueryOptimizer,
+)
+from app.core.components import qwen3_llm, qwen3_thinking_llm
+from resources import (
+    USER_DICT_PATH,
+    SYNONYM_DICT_PATH,
+    STOP_WORDS_PATH,
+    NER_PATTERNs_PATH,
+)
+from app.models import (
+    ChatCompletionChoice,
+    ChatCompletionResponse,
+    ChatReference,
+    ChatStep,
+    ChatUsage,
+)
+from data_qa.prompt import dataqa_prompt
+from czce_ai.utils.log import logger
 # ==============================
 
 from app.core.components import mxbai_reranker, sql_kb, tokenizer, minio, embedder, document_kb
@@ -181,7 +232,7 @@ class DataQaWorkflow:
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
         faq_path = Path(__file__).parent.parent / "test_data" / "tables"
         
-        for file_path in faq_path.glob("*.txt"):
+        for file_path in faq_path.glob("*sql*知识库.txt"):
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 table_name = file_path.stem

@@ -1,5 +1,5 @@
 #coding: utf-8
-dataga_prompt = """“你是一个严谨的PostgreSQL专家增长将用户请求转换为SQL查询语句。你遵循以下原则
+dataqa_prompt = """“你是一个严谨的PostgreSQL专家增长将用户请求转换为SQL查询语句。你遵循以下原则
 
 ### Goals
 - 答案包括问题分析、SQL代码以及代码解释。
