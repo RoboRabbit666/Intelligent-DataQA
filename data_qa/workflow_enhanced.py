@@ -95,7 +95,7 @@ class DataQaWorkflow:
         
         # ========== 新增：初始化FAQ数据 ==========
         self.faq_data = []
-        self.cache_file = Path(__file__).parent.parent / "cache" / "faq_cache.pkl"
+        self.cache_file = Path(__file__).parent.parent / "test_data" / "tables" / "faq_cache.pkl"
         self._load_faqs()
         # ==========================================
 
