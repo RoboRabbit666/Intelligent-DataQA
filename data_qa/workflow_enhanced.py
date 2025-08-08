@@ -116,11 +116,22 @@ class DataQaWorkflow:
         ans_llm: LLMModel,
         ans_thinking_llm: LLMModel,
         query_llm: LLMModel,
+        history_round: int = 1,
+        reranking_threshold: float = 0.2,
         config: Optional[WorkflowConfig] = None,
+        knowledge_id: Optional[str] = "3cc33ed2-21fb-4452-9e10-528867bd5f99",
+        bucket_name: Optional[str] = "czce-ai-dev",
+        collection: Optional[str] = "hybrid_sql",
         use_cache: bool = True
     ):
+        self.knowledge_id = knowledge_id
+        self.bucket_name = bucket_name
+        self.url = 'http://10.251.146.131:19530'
+        self.reranking_threshold = reranking_threshold
+        self.history_round = history_round
         self.ans_client = ans_llm
         self.ans_thinking_client = ans_thinking_llm
+        self.collection = collection
         self.query_optimizer = QueryOptimizer(query_llm)
         self.config = config or WorkflowConfig()
         
