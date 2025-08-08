@@ -8,6 +8,7 @@ class QueryOptimizationType(str, Enum):
     NORMAL = "normal"
     DECOMPOSE = "decompose"
     DATAQA = "dataqa"
+    FOLLOWUP = "followup"
 
 # 用于Query优化的自定义模型
 class OptimizedQuery(BaseModel):
