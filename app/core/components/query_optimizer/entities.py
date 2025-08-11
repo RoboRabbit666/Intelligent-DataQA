@@ -15,6 +15,7 @@ class OptimizedQuery(BaseModel):
     step_back_query: Optional[str] = None
     sub_queries: Optional[List[str]] = None
     rewritten_query: str
+    is_sufficient: bool = False
 
 
 class DataQAOptimizedQuery(BaseModel):
