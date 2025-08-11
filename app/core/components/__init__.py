@@ -1,6 +1,8 @@
 from .components import (
     document_kb,
     embedder,
+    get_llm,
+    get_llm_doc_inspect,
     minio,
     mxbai_reranker,
     qwen3_llm,
@@ -9,7 +11,7 @@ from .components import (
     sql_kb,
     tokenizer,
 )
-from .query_optimizer import QueryOptimizer
+from .query_optimizer import QueryOptimizer, QueryOptimizationType
 
 __all__ = [
     "document_kb",
@@ -22,4 +24,7 @@ __all__ = [
     "sql_kb",
     "tokenizer",
     "QueryOptimizer",
+    "QueryOptimizationType",
+    "get_llm",
+    "get_llm_doc_inspect",
 ]
