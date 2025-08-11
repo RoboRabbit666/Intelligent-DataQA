@@ -1,9 +1,10 @@
-from .entities import QueryOptimizationType, OptimizedQuery, DataQAOptimizedQuery
+from .entities import QueryOptimizationType, BaseOptimizedQuery, DataQAOptimizedQuery, RAGOptimizedQuery
 from .query_optimizer import QueryOptimizer
 
 __all__ = [
     "QueryOptimizer",
     "QueryOptimizationType",
-    "OptimizedQuery",
+    "BaseOptimizedQuery",
     "DataQAOptimizedQuery",
+    "RAGOptimizedQuery",
 ]
