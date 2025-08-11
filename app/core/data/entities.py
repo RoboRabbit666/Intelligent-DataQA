@@ -1,7 +1,11 @@
-from enum import Enum, __all__
+# coding=utf-8
+from enum import Enum
 
-class WorkflowStepType(Enum):
-    """DataQA 工作流步骤类型"""
+
+class WorkflowStepType(str, Enum):
+    """
+    工作流步骤类型枚举类
+    """
     FOLLOW_UP = "follow_up"
     MODIFY_QUERY = "modify_query"
     ENTITY_RECOGNITION = "entity_recognition"
@@ -9,5 +13,3 @@ class WorkflowStepType(Enum):
     LOCATE_TABLE = "locate_table"
     GENERATE_PROMPT = "generate_single_table_prompt"
     GENERATE_SQL = "generate_sql"
-
-__all__ = ["WorkflowStepType"]
