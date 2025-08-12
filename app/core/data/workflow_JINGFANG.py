@@ -124,6 +124,20 @@ class DataQaWorkflow:
             WorkflowStepType.GENERATE_PROMPT:"上下文工程",
             WorkflowStepType.GENERATE_SQL:"SQL生成",
         }
+        #---------------------------新增-------------------
+        # 如果步骤类型不在预定义的名称中,则使用默认名称
+        # 转换prompt为字符串（如果不是字符串的话）
+        if not isinstance(prompt, str):
+            if isinstance(prompt, list):
+                # 对于列表，转换为JSON字符串
+                prompt = json.dumps(prompt, ensure_ascii=False, indent=2)
+            elif isinstance(prompt, dict):
+                # 对于字典，转换为JSON字符串
+                prompt = json.dumps(prompt, ensure_ascii=False, indent=2)
+            else:
+                # 其他类型，直接转换为字符串
+                prompt = str(prompt)
+
         return ChatStep(
             key=step_type.value,
             name=step_names[step_type],
@@ -557,13 +571,14 @@ class DataQaWorkflow:
                 WorkflowStepType.GENERATE_PROMPT, 5, single_table_prompt
             )
             #Step6: generate_sql
-            # TODO 未修改
+            # 修改
             response = self.generate_sql(
-                query=entity_enriched_query,
-                located_table=located_table,
+                table_schema=located_table, #[0]['table_info'] if located_table else "",
+                input_messages=entity_enriched_query,
                 thinking=thinking,
             )
             step6 = self._create_step(WorkflowStepType.GENERATE_SQL, 6, response)
+            
             # 构造最终响应
             usage = ChatUsage(
                 prompt_tokens=response.usage.prompt_tokens,
