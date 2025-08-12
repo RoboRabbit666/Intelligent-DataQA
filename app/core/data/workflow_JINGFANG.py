@@ -53,10 +53,6 @@ from resources import (
 )
 #-----------------------------------
 
-
-
-
-
 #-------新增:余弦相似度函数-----------------
 def cosine_similarity(a, b):
     dot_product = np.dot(a, b)
@@ -76,6 +72,14 @@ class WorkflowConfig:
     max_table_results: int = 3
     enable_entity_recognition: bool = True
     enable_reranker: bool = True
+
+    #--------------新增相关配置-------------------
+    knowledge_id: str = "3cc33ed2-21fb-4452-9e10-528867bd5f99"
+    bucket_name: str = "czce-ai-dev"
+    use_cache: bool = True # 是否使用FAQ缓存
+    cache_file: Path = Path.cwd().parent / "test_data" / "tables" / "faq_cache.pkl" #缓存FAQ文件路径
+    #----------------------------------------------------------------------------------
+
     def __post_init__(self):
         if self.history_round < self.follow_up_round:
             raise ValueError(
@@ -89,25 +93,17 @@ class DataQaWorkflow:
         ans_thinking_llm: LLMModel,
         query_llm: LLMModel,
         config: Optional[WorkflowConfig] = None,
-        #-------------------新增--------------------
-        history_round= 1,
-        follow_up_round= 1,
-        reranking_threshold=0.2,
-        knowledge_id= "3cc33ed2-21fb-4452-9e10-528867bd5f99",
-        bucket_name= "czce-ai-dev",
-        collection= "hybrid_sql",
-        use_cache=True #新增FAQ缓存参数:是否使用FAQ缓存
-        #-------------------新增--------------------
     ):
         self.ans_client = ans_llm
         self.ans_thinking_client = ans_thinking_llm
         self.query_optimizer = QueryOptimizer(query_llm)
         self.config = config or WorkflowConfig()
-        #---------------------------FAQ相关属性-新增-----------------
+
+        #---------------------------新增FAQ相关属性------------------
         self.faq_data = [] #存储FAQ的问题、SQL和嵌入向量
-        self.use_cache = use_cache
-        #缓存FAQ文件路径
-        self.cache_file = Path.cwd().parent / "test_data" / "tables" / "faq_cache.pkl"
+        self.use_cache = self.config.use_cache #是否使用FAQ缓存
+        # 缓存FAQ文件路径
+        self.cache_file = self.config.cache_file
         # 初始化时加载FAQ(优先从缓存加载)
         self._load_faqs()
         #------------------------------------------------------------------------
