@@ -1,0 +1,688 @@
+{"label": "交易所", "id": "上海期货交易所", "pattern": [{"LOWER": "shfe"}]}
+{"label": "交易所", "id": "上海期货交易所", "pattern": "上期所"}
+{"label": "交易所", "id": "上海期货交易所", "pattern": [{"LOWER": "shf"}]}
+{"label": "交易所", "id": "上海期货交易所", "pattern": "上海期货交易所"}
+{"label": "交易所", "id": "郑州商品交易所", "pattern": [{"LOWER": "czce"}]}
+{"label": "交易所", "id": "郑州商品交易所", "pattern": "郑商所"}
+{"label": "交易所", "id": "郑州商品交易所", "pattern": [{"LOWER": "czc"}]}
+{"label": "交易所", "id": "郑州商品交易所", "pattern": "郑州商品交易所"}
+{"label": "交易所", "id": "大连商品交易所", "pattern": [{"LOWER": "dce"}]}
+{"label": "交易所", "id": "大连商品交易所", "pattern": "大商所"}
+{"label": "交易所", "id": "大连商品交易所", "pattern": "大连商品交易所"}
+{"label": "交易所", "id": "中国金融期货交易所", "pattern": [{"LOWER": "cffex"}]}
+{"label": "交易所", "id": "中国金融期货交易所", "pattern": "中金所"}
+{"label": "交易所", "id": "中国金融期货交易所", "pattern": [{"LOWER": "cfe"}]}
+{"label": "交易所", "id": "中国金融期货交易所", "pattern": "中国金融期货交易所"}
+{"label": "交易所", "id": "上海国际能源交易中心", "pattern": [{"LOWER": "ine"}]}
+{"label": "交易所", "id": "上海国际能源交易中心", "pattern": "上期能源"}
+{"label": "交易所", "id": "上海国际能源交易中心", "pattern": "上海国际能源交易中心"}
+{"label": "交易所", "id": "广州期货交易所", "pattern": [{"LOWER": "gfex"}]}
+{"label": "交易所", "id": "广州期货交易所", "pattern": "广期所"}
+{"label": "交易所", "id": "广州期货交易所", "pattern": [{"LOWER": "gfe"}]}
+{"label": "交易所", "id": "广州期货交易所", "pattern": "广州期货交易所"}
+
+
+{"label": "品种", "id": "铜", "pattern": [{"LOWER": "cu"}]}
+{"label": "品种", "id": "铜", "pattern": "铜"}
+{"label": "品种", "id": "铝", "pattern": [{"LOWER": "al"}]}
+{"label": "品种", "id": "铝", "pattern": "铝"}
+{"label": "品种", "id": "锌", "pattern": [{"LOWER": "zn"}]}
+{"label": "品种", "id": "锌", "pattern": "锌"}
+{"label": "品种", "id": "铅", "pattern": [{"LOWER": "pb"}]}
+{"label": "品种", "id": "铅", "pattern": "铅"}
+{"label": "品种", "id": "锡", "pattern": [{"LOWER": "sn"}]}
+{"label": "品种", "id": "锡", "pattern": "锡"}
+{"label": "品种", "id": "镍", "pattern": [{"LOWER": "ni"}]}
+{"label": "品种", "id": "镍", "pattern": "镍"}
+{"label": "品种", "id": "黄金", "pattern": [{"LOWER": "au"}]}
+{"label": "品种", "id": "黄金", "pattern": "黄金"}
+{"label": "品种", "id": "黄金", "pattern": "金"}
+{"label": "品种", "id": "白银", "pattern": [{"LOWER": "ag"}]}
+{"label": "品种", "id": "白银", "pattern": "白银"}
+{"label": "品种", "id": "白银", "pattern": "银"}
+{"label": "品种", "id": "螺纹钢", "pattern": [{"LOWER": "rb"}]}
+{"label": "品种", "id": "螺纹钢", "pattern": "螺纹钢"}
+{"label": "品种", "id": "热轧卷板", "pattern": [{"LOWER": "hc"}]}
+{"label": "品种", "id": "热轧卷板", "pattern": "热轧卷板"}
+{"label": "品种", "id": "不锈钢", "pattern": [{"LOWER": "ss"}]}
+{"label": "品种", "id": "不锈钢", "pattern": "不锈钢"}
+{"label": "品种", "id": "燃料油", "pattern": [{"LOWER": "fu"}]}
+{"label": "品种", "id": "燃料油", "pattern": "燃料油"}
+{"label": "品种", "id": "石油沥青", "pattern": [{"LOWER": "bu"}]}
+{"label": "品种", "id": "石油沥青", "pattern": "石油沥青"}
+{"label": "品种", "id": "石油沥青", "pattern": "沥青"}
+{"label": "品种", "id": "天然橡胶", "pattern": [{"LOWER": "ru"}]}
+{"label": "品种", "id": "天然橡胶", "pattern": "天然橡胶"}
+{"label": "品种", "id": "天然橡胶", "pattern": "橡胶"}
+{"label": "品种", "id": "20号胶", "pattern": [{"LOWER": "nr"}]}
+{"label": "品种", "id": "20号胶", "pattern": "20号胶"}
+{"label": "品种", "id": "丁二烯橡胶", "pattern": [{"LOWER": "br"}]}
+{"label": "品种", "id": "丁二烯橡胶", "pattern": "丁二烯橡胶"}
+{"label": "品种", "id": "纸浆", "pattern": [{"LOWER": "sp"}]}
+{"label": "品种", "id": "纸浆", "pattern": "纸浆"}
+{"label": "品种", "id": "氧化铝", "pattern": [{"LOWER": "ao"}]}
+{"label": "品种", "id": "氧化铝", "pattern": "氧化铝"}
+{"label": "品种", "id": "原油", "pattern": [{"LOWER": "sc"}]}
+{"label": "品种", "id": "原油", "pattern": "原油"}
+{"label": "品种", "id": "低硫燃料油", "pattern": [{"LOWER": "lu"}]}
+{"label": "品种", "id": "低硫燃料油", "pattern": "低硫燃料油"}
+{"label": "品种", "id": "国际铜", "pattern": [{"LOWER": "bc"}]}
+{"label": "品种", "id": "国际铜", "pattern": "国际铜"}
+{"label": "品种", "id": "欧线集运", "pattern": [{"LOWER": "ec"}]}
+{"label": "品种", "id": "欧线集运", "pattern": "欧线集运"}
+{"label": "品种", "id": "豆一", "pattern": [{"LOWER": "a"}]}
+{"label": "品种", "id": "豆一", "pattern": "豆一"}
+{"label": "品种", "id": "豆一", "pattern": "大豆一号"}
+{"label": "品种", "id": "豆二", "pattern": [{"LOWER": "b"}]}
+{"label": "品种", "id": "豆二", "pattern": "豆二"}
+{"label": "品种", "id": "豆二", "pattern": "大豆二号"}
+{"label": "品种", "id": "豆粕", "pattern": [{"LOWER": "m"}]}
+{"label": "品种", "id": "豆粕", "pattern": "豆粕"}
+{"label": "品种", "id": "豆油", "pattern": [{"LOWER": "y"}]}
+{"label": "品种", "id": "豆油", "pattern": "豆油"}
+{"label": "品种", "id": "棕榈油", "pattern": [{"LOWER": "p"}]}
+{"label": "品种", "id": "棕榈油", "pattern": "棕榈油"}
+{"label": "品种", "id": "玉米", "pattern": [{"LOWER": "c"}]}
+{"label": "品种", "id": "玉米", "pattern": "玉米"}
+{"label": "品种", "id": "玉米淀粉", "pattern": [{"LOWER": "cs"}]}
+{"label": "品种", "id": "玉米淀粉", "pattern": "玉米淀粉"}
+{"label": "品种", "id": "玉米淀粉", "pattern": "淀粉"}
+{"label": "品种", "id": "鸡蛋", "pattern": [{"LOWER": "jd"}]}
+{"label": "品种", "id": "鸡蛋", "pattern": "鸡蛋"}
+{"label": "品种", "id": "生猪", "pattern": [{"LOWER": "lh"}]}
+{"label": "品种", "id": "生猪", "pattern": "生猪"}
+{"label": "品种", "id": "纤维板", "pattern": [{"LOWER": "fb"}]}
+{"label": "品种", "id": "纤维板", "pattern": "纤维板"}
+{"label": "品种", "id": "胶合板", "pattern": [{"LOWER": "bb"}]}
+{"label": "品种", "id": "胶合板", "pattern": "胶合板"}
+{"label": "品种", "id": "聚乙烯", "pattern": [{"LOWER": "l"}]}
+{"label": "品种", "id": "聚乙烯", "pattern": "聚乙烯"}
+{"label": "品种", "id": "聚氯乙烯", "pattern": [{"LOWER": "v"}]}
+{"label": "品种", "id": "聚氯乙烯", "pattern": "聚氯乙烯"}
+{"label": "品种", "id": "聚氯乙烯", "pattern": "PVC"}
+{"label": "品种", "id": "聚丙烯", "pattern": [{"LOWER": "pp"}]}
+{"label": "品种", "id": "聚丙烯", "pattern": "聚丙烯"}
+{"label": "品种", "id": "乙二醇", "pattern": [{"LOWER": "eg"}]}
+{"label": "品种", "id": "乙二醇", "pattern": "乙二醇"}
+{"label": "品种", "id": "苯乙烯", "pattern": [{"LOWER": "eb"}]}
+{"label": "品种", "id": "苯乙烯", "pattern": "苯乙烯"}
+{"label": "品种", "id": "液化石油气", "pattern": [{"LOWER": "pg"}]}
+{"label": "品种", "id": "液化石油气", "pattern": "液化石油气"}
+{"label": "品种", "id": "液化石油气", "pattern": "LPG"}
+{"label": "品种", "id": "纯苯", "pattern": [{"LOWER": "be"}]}
+{"label": "品种", "id": "纯苯", "pattern": "纯苯"}
+{"label": "品种", "id": "铁矿石", "pattern": [{"LOWER": "i"}]}
+{"label": "品种", "id": "铁矿石", "pattern": "铁矿石"}
+{"label": "品种", "id": "焦炭", "pattern": [{"LOWER": "j"}]}
+{"label": "品种", "id": "焦炭", "pattern": "焦炭"}
+{"label": "品种", "id": "焦煤", "pattern": [{"LOWER": "jm"}]}
+{"label": "品种", "id": "焦煤", "pattern": "焦煤"}
+{"label": "品种", "id": "原木", "pattern": [{"LOWER": "lm"}]}
+{"label": "品种", "id": "原木", "pattern": "原木"}
+{"label": "品种", "id": "强麦", "pattern": [{"LOWER": "wh"}]}
+{"label": "品种", "id": "强麦", "pattern": "强麦"}
+{"label": "品种", "id": "强麦", "pattern": "强筋小麦"}
+{"label": "品种", "id": "普麦", "pattern": [{"LOWER": "pm"}]}
+{"label": "品种", "id": "普麦", "pattern": "普麦"}
+{"label": "品种", "id": "普麦", "pattern": "普通小麦"}
+{"label": "品种", "id": "早籼稻", "pattern": [{"LOWER": "ri"}]}
+{"label": "品种", "id": "早籼稻", "pattern": "早籼稻"}
+{"label": "品种", "id": "晚籼稻", "pattern": [{"LOWER": "lr"}]}
+{"label": "品种", "id": "晚籼稻", "pattern": "晚籼稻"}
+{"label": "品种", "id": "粳稻", "pattern": [{"LOWER": "jr"}]}
+{"label": "品种", "id": "粳稻", "pattern": "粳稻"}
+{"label": "品种", "id": "棉花", "pattern": [{"LOWER": "cf"}]}
+{"label": "品种", "id": "棉花", "pattern": "棉花"}
+{"label": "品种", "id": "棉纱", "pattern": [{"LOWER": "cy"}]}
+{"label": "品种", "id": "棉纱", "pattern": "棉纱"}
+{"label": "品种", "id": "白糖", "pattern": [{"LOWER": "sr"}]}
+{"label": "品种", "id": "白糖", "pattern": "白糖"}
+{"label": "品种", "id": "油菜籽", "pattern": [{"LOWER": "rs"}]}
+{"label": "品种", "id": "油菜籽", "pattern": "油菜籽"}
+{"label": "品种", "id": "菜籽油", "pattern": [{"LOWER": "oi"}]}
+{"label": "品种", "id": "菜籽油", "pattern": "菜籽油"}
+{"label": "品种", "id": "菜籽油", "pattern": "菜油"}
+{"label": "品种", "id": "菜籽粕", "pattern": [{"LOWER": "rm"}]}
+{"label": "品种", "id": "菜籽粕", "pattern": "菜籽粕"}
+{"label": "品种", "id": "菜籽粕", "pattern": "菜粕"}
+{"label": "品种", "id": "苹果", "pattern": [{"LOWER": "ap"}]}
+{"label": "品种", "id": "苹果", "pattern": "苹果"}
+{"label": "品种", "id": "红枣", "pattern": [{"LOWER": "cj"}]}
+{"label": "品种", "id": "红枣", "pattern": "红枣"}
+{"label": "品种", "id": "花生", "pattern": [{"LOWER": "pk"}]}
+{"label": "品种", "id": "花生", "pattern": "花生"}
+{"label": "品种", "id": "动力煤", "pattern": [{"LOWER": "zc"}]}
+{"label": "品种", "id": "动力煤", "pattern": "动力煤"}
+{"label": "品种", "id": "动力煤", "pattern": "煤"}
+{"label": "品种", "id": "玻璃", "pattern": [{"LOWER": "fg"}]}
+{"label": "品种", "id": "玻璃", "pattern": "玻璃"}
+{"label": "品种", "id": "纯碱", "pattern": [{"LOWER": "sa"}]}
+{"label": "品种", "id": "纯碱", "pattern": "纯碱"}
+{"label": "品种", "id": "甲醇", "pattern": [{"LOWER": "ma"}]}
+{"label": "品种", "id": "甲醇", "pattern": "甲醇"}
+{"label": "品种", "id": "PTA", "pattern": [{"LOWER": "ta"}]}
+{"label": "品种", "id": "PTA", "pattern": "PTA"}
+{"label": "品种", "id": "PTA", "pattern": "精对苯二甲酸"}
+{"label": "品种", "id": "尿素", "pattern": [{"LOWER": "ur"}]}
+{"label": "品种", "id": "尿素", "pattern": "尿素"}
+{"label": "品种", "id": "锰硅", "pattern": [{"LOWER": "sm"}]}
+{"label": "品种", "id": "锰硅", "pattern": "锰硅"}
+{"label": "品种", "id": "硅铁", "pattern": [{"LOWER": "sf"}]}
+{"label": "品种", "id": "硅铁", "pattern": "硅铁"}
+{"label": "品种", "id": "短纤", "pattern": [{"LOWER": "pf"}]}
+{"label": "品种", "id": "短纤", "pattern": "短纤"}
+{"label": "品种", "id": "短纤", "pattern": "短纤维"}
+{"label": "品种", "id": "烧碱", "pattern": [{"LOWER": "sh"}]}
+{"label": "品种", "id": "烧碱", "pattern": "烧碱"}
+{"label": "品种", "id": "对二甲苯", "pattern": [{"LOWER": "px"}]}
+{"label": "品种", "id": "对二甲苯", "pattern": "对二甲苯"}
+{"label": "品种", "id": "瓶片", "pattern": [{"LOWER": "pb"}]}
+{"label": "品种", "id": "瓶片", "pattern": "瓶片"}
+{"label": "品种", "id": "沪深300", "pattern": [{"LOWER": "if"}]}
+{"label": "品种", "id": "沪深300", "pattern": "沪深300"}
+{"label": "品种", "id": "上证50", "pattern": [{"LOWER": "ih"}]}
+{"label": "品种", "id": "上证50", "pattern": "上证50"}
+{"label": "品种", "id": "中证500", "pattern": [{"LOWER": "ic"}]}
+{"label": "品种", "id": "中证500", "pattern": "中证500"}
+{"label": "品种", "id": "中证1000", "pattern": [{"LOWER": "im"}]}
+{"label": "品种", "id": "中证1000", "pattern": "中证1000"}
+{"label": "品种", "id": "2年期国债", "pattern": [{"LOWER": "ts"}]}
+{"label": "品种", "id": "2年期国债", "pattern": "2年期国债"}
+{"label": "品种", "id": "2年期国债", "pattern": "2年国债"}
+{"label": "品种", "id": "5年期国债", "pattern": [{"LOWER": "tf"}]}
+{"label": "品种", "id": "5年期国债", "pattern": "5年期国债"}
+{"label": "品种", "id": "5年期国债", "pattern": "5年国债"}
+{"label": "品种", "id": "10年期国债", "pattern": [{"LOWER": "t"}]}
+{"label": "品种", "id": "10年期国债", "pattern": "10年期国债"}
+{"label": "品种", "id": "10年期国债", "pattern": "10年国债"}
+{"label": "品种", "id": "30年期国债", "pattern": [{"LOWER": "tl"}]}
+{"label": "品种", "id": "30年期国债", "pattern": "30年期国债"}
+{"label": "品种", "id": "30年期国债", "pattern": "30年国债"}
+{"label": "品种", "id": "工业硅", "pattern": [{"LOWER": "si"}]}
+{"label": "品种", "id": "工业硅", "pattern": "工业硅"}
+{"label": "品种", "id": "碳酸锂", "pattern": [{"LOWER": "lc"}]}
+{"label": "品种", "id": "碳酸锂", "pattern": "碳酸锂"}
+{"label": "品种", "id": "多晶硅", "pattern": [{"LOWER": "ps"}]}
+{"label": "品种", "id": "多晶硅", "pattern": "多晶硅"}
+
+
+{"label": "合约", "id": "cu", "pattern":[{"TEXT": {"REGEX": "(CU|cu)\\d{4}$"}}]}
+{"label": "合约", "id": "cu", "pattern": [{"TEXT": {"REGEX": "(CU|cu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cu", "pattern": [{"TEXT": {"REGEX": "(CU|cu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cu", "pattern": [{"TEXT": {"REGEX": "(CU|cu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cu", "pattern": [{"TEXT": {"REGEX": "(CU|cu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cu", "pattern": [{"TEXT": {"REGEX": "(CU|cu)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern":[{"TEXT": {"REGEX": "(AL|al)\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern": [{"TEXT": {"REGEX": "(AL|al)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern": [{"TEXT": {"REGEX": "(AL|al)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern": [{"TEXT": {"REGEX": "(AL|al)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern": [{"TEXT": {"REGEX": "(AL|al)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "al", "pattern": [{"TEXT": {"REGEX": "(AL|al)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern":[{"TEXT": {"REGEX": "(ZN|zn)\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern": [{"TEXT": {"REGEX": "(ZN|zn)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern": [{"TEXT": {"REGEX": "(ZN|zn)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern": [{"TEXT": {"REGEX": "(ZN|zn)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern": [{"TEXT": {"REGEX": "(ZN|zn)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zn", "pattern": [{"TEXT": {"REGEX": "(ZN|zn)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern":[{"TEXT": {"REGEX": "(PB|pb)\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern": [{"TEXT": {"REGEX": "(PB|pb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern": [{"TEXT": {"REGEX": "(PB|pb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern": [{"TEXT": {"REGEX": "(PB|pb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern": [{"TEXT": {"REGEX": "(PB|pb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pb", "pattern": [{"TEXT": {"REGEX": "(PB|pb)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern":[{"TEXT": {"REGEX": "(SN|sn)\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern": [{"TEXT": {"REGEX": "(SN|sn)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern": [{"TEXT": {"REGEX": "(SN|sn)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern": [{"TEXT": {"REGEX": "(SN|sn)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern": [{"TEXT": {"REGEX": "(SN|sn)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sn", "pattern": [{"TEXT": {"REGEX": "(SN|sn)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern":[{"TEXT": {"REGEX": "(NI|ni)\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern": [{"TEXT": {"REGEX": "(NI|ni)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern": [{"TEXT": {"REGEX": "(NI|ni)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern": [{"TEXT": {"REGEX": "(NI|ni)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern": [{"TEXT": {"REGEX": "(NI|ni)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ni", "pattern": [{"TEXT": {"REGEX": "(NI|ni)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern":[{"TEXT": {"REGEX": "(AU|au)\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern": [{"TEXT": {"REGEX": "(AU|au)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern": [{"TEXT": {"REGEX": "(AU|au)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern": [{"TEXT": {"REGEX": "(AU|au)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern": [{"TEXT": {"REGEX": "(AU|au)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "au", "pattern": [{"TEXT": {"REGEX": "(AU|au)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern":[{"TEXT": {"REGEX": "(AG|ag)\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern": [{"TEXT": {"REGEX": "(AG|ag)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern": [{"TEXT": {"REGEX": "(AG|ag)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern": [{"TEXT": {"REGEX": "(AG|ag)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern": [{"TEXT": {"REGEX": "(AG|ag)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ag", "pattern": [{"TEXT": {"REGEX": "(AG|ag)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern":[{"TEXT": {"REGEX": "(RB|rb)\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern": [{"TEXT": {"REGEX": "(RB|rb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern": [{"TEXT": {"REGEX": "(RB|rb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern": [{"TEXT": {"REGEX": "(RB|rb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern": [{"TEXT": {"REGEX": "(RB|rb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rb", "pattern": [{"TEXT": {"REGEX": "(RB|rb)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern":[{"TEXT": {"REGEX": "(HC|hc)\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern": [{"TEXT": {"REGEX": "(HC|hc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern": [{"TEXT": {"REGEX": "(HC|hc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern": [{"TEXT": {"REGEX": "(HC|hc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern": [{"TEXT": {"REGEX": "(HC|hc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "hc", "pattern": [{"TEXT": {"REGEX": "(HC|hc)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern":[{"TEXT": {"REGEX": "(SS|ss)\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern": [{"TEXT": {"REGEX": "(SS|ss)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ss", "pattern": [{"TEXT": {"REGEX": "(SS|ss)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern":[{"TEXT": {"REGEX": "(FU|fu)\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern": [{"TEXT": {"REGEX": "(FU|fu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fu", "pattern": [{"TEXT": {"REGEX": "(FU|fu)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern":[{"TEXT": {"REGEX": "(BU|bu)\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern": [{"TEXT": {"REGEX": "(BU|bu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bu", "pattern": [{"TEXT": {"REGEX": "(BU|bu)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern":[{"TEXT": {"REGEX": "(RU|ru)\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern": [{"TEXT": {"REGEX": "(RU|ru)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ru", "pattern": [{"TEXT": {"REGEX": "(RU|ru)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern":[{"TEXT": {"REGEX": "(NR|nr)\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern": [{"TEXT": {"REGEX": "(NR|nr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "nr", "pattern": [{"TEXT": {"REGEX": "(NR|nr)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern":[{"TEXT": {"REGEX": "(BR|br)\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern": [{"TEXT": {"REGEX": "(BR|br)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "br", "pattern": [{"TEXT": {"REGEX": "(BR|br)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern":[{"TEXT": {"REGEX": "(SP|sp)\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern": [{"TEXT": {"REGEX": "(SP|sp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sp", "pattern": [{"TEXT": {"REGEX": "(SP|sp)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern":[{"TEXT": {"REGEX": "(AO|ao)\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern": [{"TEXT": {"REGEX": "(AO|ao)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ao", "pattern": [{"TEXT": {"REGEX": "(AO|ao)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern":[{"TEXT": {"REGEX": "(SC|sc)\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern": [{"TEXT": {"REGEX": "(SC|sc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sc", "pattern": [{"TEXT": {"REGEX": "(SC|sc)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern":[{"TEXT": {"REGEX": "(LU|lu)\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern": [{"TEXT": {"REGEX": "(LU|lu)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lu", "pattern": [{"TEXT": {"REGEX": "(LU|lu)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern":[{"TEXT": {"REGEX": "(BC|bc)\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern": [{"TEXT": {"REGEX": "(BC|bc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bc", "pattern": [{"TEXT": {"REGEX": "(BC|bc)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern":[{"TEXT": {"REGEX": "(EC|ec)\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern": [{"TEXT": {"REGEX": "(EC|ec)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ec", "pattern": [{"TEXT": {"REGEX": "(EC|ec)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern":[{"TEXT": {"REGEX": "(A|a)\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern": [{"TEXT": {"REGEX": "(A|a)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern": [{"TEXT": {"REGEX": "(A|a)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern": [{"TEXT": {"REGEX": "(A|a)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern": [{"TEXT": {"REGEX": "(A|a)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "a", "pattern": [{"TEXT": {"REGEX": "(A|a)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern":[{"TEXT": {"REGEX": "(B|b)\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern": [{"TEXT": {"REGEX": "(B|b)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern": [{"TEXT": {"REGEX": "(B|b)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern": [{"TEXT": {"REGEX": "(B|b)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern": [{"TEXT": {"REGEX": "(B|b)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "b", "pattern": [{"TEXT": {"REGEX": "(B|b)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern":[{"TEXT": {"REGEX": "(M|m)\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern": [{"TEXT": {"REGEX": "(M|m)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern": [{"TEXT": {"REGEX": "(M|m)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern": [{"TEXT": {"REGEX": "(M|m)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern": [{"TEXT": {"REGEX": "(M|m)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "m", "pattern": [{"TEXT": {"REGEX": "(M|m)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern":[{"TEXT": {"REGEX": "(Y|y)\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern": [{"TEXT": {"REGEX": "(Y|y)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern": [{"TEXT": {"REGEX": "(Y|y)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern": [{"TEXT": {"REGEX": "(Y|y)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern": [{"TEXT": {"REGEX": "(Y|y)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "y", "pattern": [{"TEXT": {"REGEX": "(Y|y)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern":[{"TEXT": {"REGEX": "(P|p)\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern": [{"TEXT": {"REGEX": "(P|p)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern": [{"TEXT": {"REGEX": "(P|p)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern": [{"TEXT": {"REGEX": "(P|p)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern": [{"TEXT": {"REGEX": "(P|p)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "p", "pattern": [{"TEXT": {"REGEX": "(P|p)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern":[{"TEXT": {"REGEX": "(C|c)\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern": [{"TEXT": {"REGEX": "(C|c)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern": [{"TEXT": {"REGEX": "(C|c)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern": [{"TEXT": {"REGEX": "(C|c)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern": [{"TEXT": {"REGEX": "(C|c)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "c", "pattern": [{"TEXT": {"REGEX": "(C|c)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern":[{"TEXT": {"REGEX": "(CS|cs)\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern": [{"TEXT": {"REGEX": "(CS|cs)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern": [{"TEXT": {"REGEX": "(CS|cs)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern": [{"TEXT": {"REGEX": "(CS|cs)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern": [{"TEXT": {"REGEX": "(CS|cs)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cs", "pattern": [{"TEXT": {"REGEX": "(CS|cs)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern":[{"TEXT": {"REGEX": "(JD|jd)\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern": [{"TEXT": {"REGEX": "(JD|jd)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jd", "pattern": [{"TEXT": {"REGEX": "(JD|jd)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern":[{"TEXT": {"REGEX": "(LH|lh)\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern": [{"TEXT": {"REGEX": "(LH|lh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lh", "pattern": [{"TEXT": {"REGEX": "(LH|lh)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern":[{"TEXT": {"REGEX": "(FB|fb)\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern": [{"TEXT": {"REGEX": "(FB|fb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fb", "pattern": [{"TEXT": {"REGEX": "(FB|fb)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern":[{"TEXT": {"REGEX": "(BB|bb)\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern": [{"TEXT": {"REGEX": "(BB|bb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "bb", "pattern": [{"TEXT": {"REGEX": "(BB|bb)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern":[{"TEXT": {"REGEX": "(L|l)\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern": [{"TEXT": {"REGEX": "(L|l)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "l", "pattern": [{"TEXT": {"REGEX": "(L|l)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern":[{"TEXT": {"REGEX": "(V|v)\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern": [{"TEXT": {"REGEX": "(V|v)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern": [{"TEXT": {"REGEX": "(V|v)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern": [{"TEXT": {"REGEX": "(V|v)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern": [{"TEXT": {"REGEX": "(V|v)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "v", "pattern": [{"TEXT": {"REGEX": "(V|v)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern":[{"TEXT": {"REGEX": "(PP|pp)\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern": [{"TEXT": {"REGEX": "(PP|pp)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pp", "pattern": [{"TEXT": {"REGEX": "(PP|pp)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern":[{"TEXT": {"REGEX": "(EG|eg)\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern": [{"TEXT": {"REGEX": "(EG|eg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eg", "pattern": [{"TEXT": {"REGEX": "(EG|eg)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern":[{"TEXT": {"REGEX": "(EB|eb)\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern": [{"TEXT": {"REGEX": "(EB|eb)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "eb", "pattern": [{"TEXT": {"REGEX": "(EB|eb)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern":[{"TEXT": {"REGEX": "(PG|pg)\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern": [{"TEXT": {"REGEX": "(PG|pg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pg", "pattern": [{"TEXT": {"REGEX": "(PG|pg)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern":[{"TEXT": {"REGEX": "(BE|be)\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern": [{"TEXT": {"REGEX": "(BE|be)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "be", "pattern": [{"TEXT": {"REGEX": "(BE|be)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern":[{"TEXT": {"REGEX": "(I|i)\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern": [{"TEXT": {"REGEX": "(I|i)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern": [{"TEXT": {"REGEX": "(I|i)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern": [{"TEXT": {"REGEX": "(I|i)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern": [{"TEXT": {"REGEX": "(I|i)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "i", "pattern": [{"TEXT": {"REGEX": "(I|i)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern":[{"TEXT": {"REGEX": "(J|j)\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern": [{"TEXT": {"REGEX": "(J|j)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern": [{"TEXT": {"REGEX": "(J|j)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern": [{"TEXT": {"REGEX": "(J|j)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern": [{"TEXT": {"REGEX": "(J|j)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "j", "pattern": [{"TEXT": {"REGEX": "(J|j)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern":[{"TEXT": {"REGEX": "(JM|jm)\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern": [{"TEXT": {"REGEX": "(JM|jm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern": [{"TEXT": {"REGEX": "(JM|jm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern": [{"TEXT": {"REGEX": "(JM|jm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern": [{"TEXT": {"REGEX": "(JM|jm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jm", "pattern": [{"TEXT": {"REGEX": "(JM|jm)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern":[{"TEXT": {"REGEX": "(LM|lm)\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern": [{"TEXT": {"REGEX": "(LM|lm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lm", "pattern": [{"TEXT": {"REGEX": "(LM|lm)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern":[{"TEXT": {"REGEX": "(WH|wh)\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern": [{"TEXT": {"REGEX": "(WH|wh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "wh", "pattern": [{"TEXT": {"REGEX": "(WH|wh)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern":[{"TEXT": {"REGEX": "(PM|pm)\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern": [{"TEXT": {"REGEX": "(PM|pm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pm", "pattern": [{"TEXT": {"REGEX": "(PM|pm)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern":[{"TEXT": {"REGEX": "(RI|ri)\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern": [{"TEXT": {"REGEX": "(RI|ri)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ri", "pattern": [{"TEXT": {"REGEX": "(RI|ri)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern":[{"TEXT": {"REGEX": "(LR|lr)\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern": [{"TEXT": {"REGEX": "(LR|lr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lr", "pattern": [{"TEXT": {"REGEX": "(LR|lr)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern":[{"TEXT": {"REGEX": "(JR|jr)\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern": [{"TEXT": {"REGEX": "(JR|jr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "jr", "pattern": [{"TEXT": {"REGEX": "(JR|jr)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern":[{"TEXT": {"REGEX": "(CF|cf)\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern": [{"TEXT": {"REGEX": "(CF|cf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern": [{"TEXT": {"REGEX": "(CF|cf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern": [{"TEXT": {"REGEX": "(CF|cf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern": [{"TEXT": {"REGEX": "(CF|cf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cf", "pattern": [{"TEXT": {"REGEX": "(CF|cf)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern":[{"TEXT": {"REGEX": "(CY|cy)\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern": [{"TEXT": {"REGEX": "(CY|cy)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cy", "pattern": [{"TEXT": {"REGEX": "(CY|cy)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern":[{"TEXT": {"REGEX": "(SR|sr)\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern": [{"TEXT": {"REGEX": "(SR|sr)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern": [{"TEXT": {"REGEX": "(SR|sr)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern": [{"TEXT": {"REGEX": "(SR|sr)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern": [{"TEXT": {"REGEX": "(SR|sr)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sr", "pattern": [{"TEXT": {"REGEX": "(SR|sr)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern":[{"TEXT": {"REGEX": "(RS|rs)\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern": [{"TEXT": {"REGEX": "(RS|rs)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern": [{"TEXT": {"REGEX": "(RS|rs)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern": [{"TEXT": {"REGEX": "(RS|rs)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern": [{"TEXT": {"REGEX": "(RS|rs)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rs", "pattern": [{"TEXT": {"REGEX": "(RS|rs)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern":[{"TEXT": {"REGEX": "(OI|oi)\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern": [{"TEXT": {"REGEX": "(OI|oi)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern": [{"TEXT": {"REGEX": "(OI|oi)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern": [{"TEXT": {"REGEX": "(OI|oi)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern": [{"TEXT": {"REGEX": "(OI|oi)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "oi", "pattern": [{"TEXT": {"REGEX": "(OI|oi)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern":[{"TEXT": {"REGEX": "(RM|rm)\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern": [{"TEXT": {"REGEX": "(RM|rm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "rm", "pattern": [{"TEXT": {"REGEX": "(RM|rm)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern":[{"TEXT": {"REGEX": "(AP|ap)\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern": [{"TEXT": {"REGEX": "(AP|ap)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern": [{"TEXT": {"REGEX": "(AP|ap)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern": [{"TEXT": {"REGEX": "(AP|ap)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern": [{"TEXT": {"REGEX": "(AP|ap)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ap", "pattern": [{"TEXT": {"REGEX": "(AP|ap)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern":[{"TEXT": {"REGEX": "(CJ|cj)\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "cj", "pattern": [{"TEXT": {"REGEX": "(CJ|cj)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern":[{"TEXT": {"REGEX": "(PK|pk)\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern": [{"TEXT": {"REGEX": "(PK|pk)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pk", "pattern": [{"TEXT": {"REGEX": "(PK|pk)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern":[{"TEXT": {"REGEX": "(ZC|zc)\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern": [{"TEXT": {"REGEX": "(ZC|zc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern": [{"TEXT": {"REGEX": "(ZC|zc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern": [{"TEXT": {"REGEX": "(ZC|zc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern": [{"TEXT": {"REGEX": "(ZC|zc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "zc", "pattern": [{"TEXT": {"REGEX": "(ZC|zc)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern":[{"TEXT": {"REGEX": "(FG|fg)\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern": [{"TEXT": {"REGEX": "(FG|fg)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern": [{"TEXT": {"REGEX": "(FG|fg)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern": [{"TEXT": {"REGEX": "(FG|fg)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern": [{"TEXT": {"REGEX": "(FG|fg)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "fg", "pattern": [{"TEXT": {"REGEX": "(FG|fg)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern":[{"TEXT": {"REGEX": "(SA|sa)\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern": [{"TEXT": {"REGEX": "(SA|sa)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sa", "pattern": [{"TEXT": {"REGEX": "(SA|sa)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern":[{"TEXT": {"REGEX": "(MA|ma)\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern": [{"TEXT": {"REGEX": "(MA|ma)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern": [{"TEXT": {"REGEX": "(MA|ma)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern": [{"TEXT": {"REGEX": "(MA|ma)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern": [{"TEXT": {"REGEX": "(MA|ma)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ma", "pattern": [{"TEXT": {"REGEX": "(MA|ma)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern":[{"TEXT": {"REGEX": "(TA|ta)\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern": [{"TEXT": {"REGEX": "(TA|ta)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern": [{"TEXT": {"REGEX": "(TA|ta)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern": [{"TEXT": {"REGEX": "(TA|ta)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern": [{"TEXT": {"REGEX": "(TA|ta)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ta", "pattern": [{"TEXT": {"REGEX": "(TA|ta)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern":[{"TEXT": {"REGEX": "(UR|ur)\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern": [{"TEXT": {"REGEX": "(UR|ur)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ur", "pattern": [{"TEXT": {"REGEX": "(UR|ur)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern":[{"TEXT": {"REGEX": "(SM|sm)\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern": [{"TEXT": {"REGEX": "(SM|sm)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern": [{"TEXT": {"REGEX": "(SM|sm)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern": [{"TEXT": {"REGEX": "(SM|sm)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern": [{"TEXT": {"REGEX": "(SM|sm)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sm", "pattern": [{"TEXT": {"REGEX": "(SM|sm)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern":[{"TEXT": {"REGEX": "(SF|sf)\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern": [{"TEXT": {"REGEX": "(SF|sf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern": [{"TEXT": {"REGEX": "(SF|sf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern": [{"TEXT": {"REGEX": "(SF|sf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern": [{"TEXT": {"REGEX": "(SF|sf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sf", "pattern": [{"TEXT": {"REGEX": "(SF|sf)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern":[{"TEXT": {"REGEX": "(PF|pf)\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern": [{"TEXT": {"REGEX": "(PF|pf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "pf", "pattern": [{"TEXT": {"REGEX": "(PF|pf)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern":[{"TEXT": {"REGEX": "(SH|sh)\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern": [{"TEXT": {"REGEX": "(SH|sh)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "sh", "pattern": [{"TEXT": {"REGEX": "(SH|sh)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern":[{"TEXT": {"REGEX": "(PX|px)\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern": [{"TEXT": {"REGEX": "(PX|px)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "px", "pattern": [{"TEXT": {"REGEX": "(PX|px)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern":[{"TEXT": {"REGEX": "(IF|if)\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern": [{"TEXT": {"REGEX": "(IF|if)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "if", "pattern": [{"TEXT": {"REGEX": "(IF|if)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern":[{"TEXT": {"REGEX": "(IH|ih)\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern": [{"TEXT": {"REGEX": "(IH|ih)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ih", "pattern": [{"TEXT": {"REGEX": "(IH|ih)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern":[{"TEXT": {"REGEX": "(IC|ic)\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern": [{"TEXT": {"REGEX": "(IC|ic)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ic", "pattern": [{"TEXT": {"REGEX": "(IC|ic)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern":[{"TEXT": {"REGEX": "(IM|im)\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern": [{"TEXT": {"REGEX": "(IM|im)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "im", "pattern": [{"TEXT": {"REGEX": "(IM|im)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern":[{"TEXT": {"REGEX": "(TS|ts)\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern": [{"TEXT": {"REGEX": "(TS|ts)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ts", "pattern": [{"TEXT": {"REGEX": "(TS|ts)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern":[{"TEXT": {"REGEX": "(TF|tf)\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern": [{"TEXT": {"REGEX": "(TF|tf)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tf", "pattern": [{"TEXT": {"REGEX": "(TF|tf)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern":[{"TEXT": {"REGEX": "(T|t)\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern": [{"TEXT": {"REGEX": "(T|t)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern": [{"TEXT": {"REGEX": "(T|t)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern": [{"TEXT": {"REGEX": "(T|t)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern": [{"TEXT": {"REGEX": "(T|t)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "t", "pattern": [{"TEXT": {"REGEX": "(T|t)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern":[{"TEXT": {"REGEX": "(TL|tl)\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern": [{"TEXT": {"REGEX": "(TL|tl)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern": [{"TEXT": {"REGEX": "(TL|tl)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern": [{"TEXT": {"REGEX": "(TL|tl)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern": [{"TEXT": {"REGEX": "(TL|tl)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "tl", "pattern": [{"TEXT": {"REGEX": "(TL|tl)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern":[{"TEXT": {"REGEX": "(SI|si)\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern": [{"TEXT": {"REGEX": "(SI|si)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "si", "pattern": [{"TEXT": {"REGEX": "(SI|si)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern":[{"TEXT": {"REGEX": "(LC|lc)\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern": [{"TEXT": {"REGEX": "(LC|lc)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern": [{"TEXT": {"REGEX": "(LC|lc)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern": [{"TEXT": {"REGEX": "(LC|lc)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern": [{"TEXT": {"REGEX": "(LC|lc)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "lc", "pattern": [{"TEXT": {"REGEX": "(LC|lc)\\.\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern":[{"TEXT": {"REGEX": "(PS|ps)\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern": [{"TEXT": {"REGEX": "(PS|ps)$"}}, {"TEXT": "-"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern": [{"TEXT": {"REGEX": "(PS|ps)$"}}, {"TEXT": " "}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern": [{"TEXT": {"REGEX": "(PS|ps)$"}}, {"TEXT": "_"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern": [{"TEXT": {"REGEX": "(PS|ps)$"}}, {"TEXT": "/"}, {"TEXT": {"REGEX": "\\d{4}$"}}]}
+{"label": "合约", "id": "ps", "pattern": [{"TEXT": {"REGEX": "(PS|ps)\\.\\d{4}$"}}]}
