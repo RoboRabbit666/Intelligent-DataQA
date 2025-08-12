@@ -495,7 +495,6 @@ class DataQaWorkflow:
             WorkflowStepType.ENTITY_RECOGNITION, 2, entity_enriched_query
         )
         #Step3: semantic search FAQ
-        #
         faq_results = self.semantic_search_faq(entity_enriched_query, top_k=3)
         #---------------------新增:如果找到高相似度的FAQ(即0.9 =< 相似度),直接使用----------------------------
         if faq_results and faq_results[0]['similarity'] >= 0.9:
