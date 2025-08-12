@@ -120,7 +120,7 @@ class BaseOptimizationStrategy:
         system_msg = self.build_system_message(
             query=query, chat_history=chat_history, **kwargs
         )
-        response = await self.llm.invoke(messages=[system_msg])
+        response = await self.llm.ainvoke(messages=[system_msg])
         data = self.parse_response(response.choices[0].message.content)
         data["original_query"] = query
         return self.result_model.model_validate(data)
