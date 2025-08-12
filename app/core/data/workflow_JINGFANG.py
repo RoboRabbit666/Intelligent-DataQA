@@ -432,7 +432,11 @@ class DataQaWorkflow:
             ]
             return (
                 DataQAChatCompletionResponse(
+                    id=f"follow-up-{int(datetime.now().timestamp())}",  # 添加id字段
+                    model=request.model or "follow-up",  # 添加model字段
+                    created=int(datetime.now().timestamp()),  # 添加created字段
                     choices=choices,
+                    usage=ChatUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),  # 添加usage字段
                     steps=[step],
                     follow_up_num=follow_up_num,
                 ),
