@@ -52,11 +52,11 @@ from resources import (
     NER_PATTERNs_PATH,
 )
 #-------------新增imports------------
-#
-#
-#
-#
-#
+
+
+
+
+
 #-------新增余弦相似度函数-----------------
 def cosine_similarity(a, b):
     dot_product = np.dot(a, b)

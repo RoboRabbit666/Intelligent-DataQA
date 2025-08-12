@@ -14,3 +14,6 @@ class Message(BaseModel):
 
     # The reasoning content of the message.
     reasoning_content: Optional[Union[List[Any], str]] = None
+
+    # 该信息是否为assistant对 user 的追问信息
+    is_follow_up: Optional[bool] = None

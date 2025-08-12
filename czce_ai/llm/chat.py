@@ -111,6 +111,7 @@ class LLMChat(ABC):
         request_params = {k: v for k, v in base_params.items() if v is not None}
         return request_params
 
+    @handle_llm_exceptions
     def invoke(
         self, messages: List[Message]
     ) -> Union[ChatCompletion, ParsedChatCompletion]:
@@ -159,6 +160,7 @@ class LLMChat(ABC):
                 message=str(e), model_name=self.name, model_id=self.model
             ) from e
 
+    @handle_llm_exceptions
     def invoke_stream(self, messages: List[Message]) -> Iterator[ChatCompletionChunk]:
         """Send a streaming chat completion request to the OpenAI API."""
         try:
