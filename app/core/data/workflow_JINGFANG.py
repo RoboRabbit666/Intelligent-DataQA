@@ -566,12 +566,16 @@ class DataQaWorkflow:
             step4 = self._create_step(WorkflowStepType.LOCATE_TABLE, 4, located_table)
 
             #-----------------------新增:如果有相关的FAQ(即0.7 =< 相似度 < 0.9),可添加参考---------------------------------
+            # 创建input_messages副本并更新最后一条消息为实体识别增强后的查询
+            enhanced_input_messages = copy.deepcopy(input_messages)
+            enhanced_input_messages[-1].content = entity_enriched_query
+            
             if faq_results and faq_results[0]['similarity'] >= 0.7:
                 # step5: generate_sql (有FAQ参考)
                 table_schema = located_table[0]['table_info'] if located_table else ""
                 response = self.generate_sql(
                     table_schema=table_schema,
-                    input_messages=entity_enriched_query,
+                    input_messages=enhanced_input_messages,  # 使用增强后的消息
                     faq_results=faq_results,  # 添加FAQ结果
                     thinking=thinking,
                 )
@@ -581,7 +585,7 @@ class DataQaWorkflow:
                 table_schema = located_table[0]['table_info'] if located_table else ""
                 response = self.generate_sql(
                     table_schema=table_schema,
-                    input_messages=entity_enriched_query,
+                    input_messages=enhanced_input_messages,  # 使用增强后的消息
                     faq_results=None,  # 无FAQ参考
                     thinking=thinking,
                 )
