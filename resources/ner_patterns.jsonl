@@ -1,8 +1,8 @@
-{"label":"交易所", "id": [{"LOWER": "ice"}], "pattern": [{"LOWER": "ice"}]}
-{"label":"交易所", "id": [{"LOWER": "kcbt"}], "pattern":"堪萨斯城期货交易所"}
-{"label":"交易所", "id": [{"LOWER": "kcbt"}], "pattern": [{"LOWER": "kcbt"}]}
-{"label":"交易所", "id": [{"LOWER": "nymex"}], "pattern":"纽约商业交易所"}
-{"label":"交易所", "id": [{"LOWER": "nymex"}], "pattern": [{"LOWER": "nymex"}]}
+{"label":"交易所", "id": "ice", "pattern": [{"LOWER": "ice"}]}
+{"label":"交易所", "id": "kcbt", "pattern":"堪萨斯城期货交易所"}
+{"label":"交易所", "id": "kcbt", "pattern": [{"LOWER": "kcbt"}]}
+{"label":"交易所", "id": "nymex", "pattern":"纽约商业交易所"}
+{"label":"交易所", "id": "nymex", "pattern": [{"LOWER": "nymex"}]}
 {"label":"会员", "id": "0006", "pattern":"新疆粮油集团有限责任公司"}
 {"label":"会员", "id": "0035", "pattern":"河南天予粮食购销储运有限公司"}
 {"label":"会员", "id": "0056", "pattern":"河南省粮食储运公司"}
@@ -73,8 +73,8 @@
 {"label":"会员","id":"新疆粮油","pattern":"新疆粮油集团"}
 {"label":"会员","id":"新产业投资","pattern":"新产业投资股份有限公司"}
 {"label":"会员","id":"新产业投资","pattern":"新产业"}
-{"label":"会员","id":"河南天子","pattern":"河南天予粮食购销储运有限公司"}
-{"label":"会员","id":"河南天予","pattern":"天子"}
+{"label":"会员","id":"河南天予","pattern":"河南天予粮食购销储运有限公司"}
+{"label":"会员","id":"河南天予","pattern":"天予"}
 {"label":"会员","id":"上海欧亚美","pattern":"上海欧亚美进出口有限公司"}
 {"label":"会员","id":"农发行","pattern":"中国农业发展银行"}
 {"label":"会员","id":"河南利华","pattern":"河南利华实业发展有限公司"}
@@ -113,330 +113,331 @@
 {"label":"会员/期货公司","id": "0026", "pattern":"海航期货股份有限公司"}
 {"label":"会员/期货公司","id": "0027", "pattern":"中航期货有限公司"}
 {"label":"会员/期货公司","id": "0031", "pattern":"中金期货有限公司"}
-{"label":"品种", "id": [{"LOWER": "ap"}], "pattern": "鲜苹果"}
-{"label":"品种", "id": [{"LOWER": "cf"}], "pattern": "棉花"}
-{"label":"品种", "id": [{"LOWER": "cj"}], "pattern": "干制红枣"}
-{"label":"品种", "id": [{"LOWER": "cy"}], "pattern": "棉纱"}
-{"label":"品种", "id": [{"LOWER": "er"}], "pattern": "早籼稻"}
-{"label":"品种", "id": [{"LOWER": "fg"}], "pattern": "平板玻璃"}
-{"label":"品种", "id": [{"LOWER": "gn"}], "pattern": "绿豆"}
-{"label":"品种", "id": [{"LOWER": "jr"}], "pattern": "粳稻谷"}
-{"label":"品种", "id": [{"LOWER": "lr"}], "pattern": "晚籼稻"}
-{"label":"品种", "id": [{"LOWER": "ma"}], "pattern": "甲醇"}
-{"label":"品种", "id": [{"LOWER": "me"}], "pattern": "甲醇"}
-{"label":"品种", "id": [{"LOWER": "oi"}], "pattern": "菜籽油"}
-{"label":"品种", "id": [{"LOWER": "pf"}], "pattern": "涤纶短纤"}
-{"label":"品种", "id": [{"LOWER": "pk"}], "pattern": "花生仁"}
-{"label":"品种", "id": [{"LOWER": "pm"}], "pattern": "普通小麦"}
-{"label":"品种", "id": [{"LOWER": "pr"}], "pattern": "瓶级聚酯切片"}
-{"label":"品种", "id": [{"LOWER": "px"}], "pattern": "对二甲苯"}
-{"label":"品种", "id": [{"LOWER": "ri"}], "pattern": "早籼稻"}
-{"label":"品种", "id": [{"LOWER": "rm"}], "pattern": "菜籽粕"}
-{"label":"品种", "id": [{"LOWER": "ro"}], "pattern": "菜籽油"}
-{"label":"品种", "id": [{"LOWER": "rs"}], "pattern": "油菜籽"}
-{"label":"品种", "id": [{"LOWER": "sa"}], "pattern": "纯碱"}
-{"label":"品种", "id": [{"LOWER": "sf"}], "pattern": "硅铁"}
-{"label":"品种", "id": [{"LOWER": "sh"}], "pattern": "烧碱"}
-{"label":"品种", "id": [{"LOWER": "sm"}], "pattern": "锰硅"}
-{"label":"品种", "id": [{"LOWER": "sr"}], "pattern": "白砂糖"}
-{"label":"品种", "id": [{"LOWER": "ta"}], "pattern": "精对苯二甲酸"}
-{"label":"品种", "id": [{"LOWER": "tc"}], "pattern": "动力煤"}
-{"label":"品种", "id": [{"LOWER": "ur"}], "pattern": "尿素"}
-{"label":"品种", "id": [{"LOWER": "wh"}], "pattern": "优质强筋小麦"}
-{"label":"品种", "id": [{"LOWER": "ws"}], "pattern": "强麦"}
-{"label":"品种", "id": [{"LOWER": "wt"}], "pattern": "硬麦"}
-{"label":"品种", "id": [{"LOWER": "zc"}], "pattern": "动力煤"}
-{"label":"品种", "id": [{"LOWER": "ap"}], "pattern": "苹果"}
-{"label":"品种", "id": [{"LOWER": "cf"}], "pattern": "棉花"}
-{"label":"品种", "id": [{"LOWER": "cj"}], "pattern": "红枣"}
-{"label":"品种", "id": [{"LOWER": "cy"}], "pattern": "棉纱"}
-{"label":"品种", "id": [{"LOWER": "er"}], "pattern": "早籼稻"}
-{"label":"品种", "id": [{"LOWER": "fg"}], "pattern": "玻璃"}
-{"label":"品种","id": [{"LOWER": "gn"}], "pattern": "绿豆"}
-{"label":"品种","id": [{"LOWER": "jr"}], "pattern": "梗稻"}
-{"label":"品种","id": [{"LOWER": "lr"}], "pattern": "晚籼稻"}
-{"label":"品种","id": [{"LOWER": "ma"}], "pattern":"甲醇"}
-{"label":"品种","id": [{"LOWER": "me"}], "pattern":"甲醇"}
-{"label":"品种","id": [{"LOWER": "oi"}], "pattern":"菜油"}
-{"label":"品种","id": [{"LOWER": "pf"}], "pattern":"短纤"}
-{"label":"品种", "id": [{"LOWER": "pk"}], "pattern":"花生"}
-{"label":"品种", "id": [{"LOWER": "pm"}], "pattern":"普麦"}
-{"label":"品种", "id": [{"LOWER": "pr"}], "pattern":"瓶片"}
-{"label":"品种", "id":[{"LOWER": "ro"}], "pattern":"菜油"}
-{"label":"品种", "id":[{"LOWER": "px"}], "pattern":"对二甲苯"}
-{"label":"品种", "id":[{"LOWER": "ri"}], "pattern":"早籼稻"}
-{"label":"品种","id":[{"LOWER": "rm"}], "pattern":"菜粕"}
-{"label":"品种","id":[{"LOWER": "rs"}], "pattern":"菜籽"}
-{"label":"品种","id":[{"LOWER": "sa"}], "pattern":"纯碱"}
-{"label":"品种","id":[{"LOWER": "sf"}], "pattern":"硅铁"}
-{"label":"品种","id":[{"LOWER": "sh"}], "pattern":"烧碱"}
-{"label":"品种","id":[{"LOWER": "sm"}], "pattern":"锰硅"}
-{"label":"品种","id":[{"LOWER": "sr"}], "pattern":"白糖"}
-{"label":"品种","id":[{"LOWER": "ta"}], "pattern":"PTA"}
-{"label":"品种","id":[{"LOWER": "tc"}], "pattern":"煤"}
-{"label":"品种","id":[{"LOWER": "ur"}], "pattern":"尿素"}
-{"label":"品种","id":[{"LOWER": "wh"}], "pattern":"强麦"}
-{"label":"品种","id":[{"LOWER": "ws"}], "pattern":"强麦"}
-{"label":"品种","id":[{"LOWER": "wt"}], "pattern":"硬麦"}
-{"label":"品种","id":[{"LOWER": "zc"}], "pattern":"煤"}
-{"label":"品种","id":[{"LOWER": "ap"}], "pattern": [{"LOWER": "ap"}]}
-{"label":"品种","id":[{"LOWER": "cf"}], "pattern": [{"LOWER": "cf"}]}
-{"label":"品种","id":[{"LOWER": "cj"}], "pattern": [{"LOWER": "cj"}]}
-{"label":"品种","id":[{"LOWER": "cy"}], "pattern": [{"LOWER": "cy"}]}
-{"label":"品种","id":[{"LOWER": "er"}], "pattern": [{"LOWER": "er"}]}
-{"label":"品种","id":[{"LOWER": "fg"}], "pattern": [{"LOWER": "fg"}]}
-{"label":"品种","id":[{"LOWER": "gn"}], "pattern": [{"LOWER": "gn"}]}
-{"label":"品种","id":[{"LOWER": "jr"}], "pattern": [{"LOWER": "jr"}]}
-{"label":"品种","id":[{"LOWER": "lr"}], "pattern": [{"LOWER": "lr"}]}
-{"label":"品种","id":[{"LOWER": "ma"}], "pattern": [{"LOWER": "ma"}]}
-{"label":"品种","id":[{"LOWER": "me"}], "pattern": [{"LOWER": "me"}]}
-{"label":"品种","id":[{"LOWER": "oi"}], "pattern": [{"LOWER": "oi"}]}
-{"label":"品种","id":[{"LOWER": "pf"}], "pattern": [{"LOWER": "pf"}]}
-{"label":"品种","id":[{"LOWER": "pk"}], "pattern": [{"LOWER": "pk"}]}
-{"label":"品种","id":[{"LOWER": "pm"}], "pattern": [{"LOWER": "pm"}]}
-{"label":"品种","id":[{"LOWER": "pr"}], "pattern": [{"LOWER": "pr"}]}
-{"label":"品种","id":[{"LOWER": "px"}], "pattern": [{"LOWER": "px"}]}
-{"label":"品种","id":[{"LOWER": "ri"}], "pattern": [{"LOWER": "ri"}]}
-{"label":"品种","id":[{"LOWER": "rm"}], "pattern": [{"LOWER": "rm"}]}
-{"label":"品种","id":[{"LOWER": "ro"}], "pattern": [{"LOWER": "ro"}]}
-{"label":"品种","id":[{"LOWER": "rs"}], "pattern": [{"LOWER": "rs"}]}
-{"label":"品种","id":[{"LOWER": "sa"}], "pattern": [{"LOWER": "sa"}]}
-{"label":"品种","id":[{"LOWER": "sf"}], "pattern": [{"LOWER": "sf"}]}
-{"label":"品种","id":[{"LOWER": "sh"}], "pattern": [{"LOWER": "sh"}]}
-{"label":"品种","id":[{"LOWER": "sm"}], "pattern": [{"LOWER": "sm"}]}
-{"label":"品种","id":[{"LOWER": "sr"}], "pattern": [{"LOWER": "sr"}]}
-{"label":"品种","id":[{"LOWER": "ta"}], "pattern": [{"LOWER": "ta"}]}
-{"label":"品种","id":[{"LOWER": "tc"}], "pattern": [{"LOWER": "tc"}]}
-{"label":"品种","id":[{"LOWER": "ur"}], "pattern": [{"LOWER": "ur"}]}
-{"label":"品种","id":[{"LOWER": "wh"}], "pattern": [{"LOWER": "wh"}]}
-{"label":"品种","id":[{"LOWER": "ws"}], "pattern": [{"LOWER": "ws"}]}
-{"label":"品种","id":[{"LOWER": "wt"}], "pattern": [{"LOWER": "wt"}]}
-{"label":"品种","id":[{"LOWER": "zc"}], "pattern": [{"LOWER": "zc"}]}
-{"label":"品种","id":[{"LOWER": "ho"}], "pattern":"上证50指数"}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern":"铁矿石"}
-{"label":"品种","id":[{"LOWER": "ic"}], "pattern":"中证500股指期货"}
-{"label":"品种","id":[{"LOWER": "if"}], "pattern":"沪深300股指期货"}
-{"label":"品种","id":[{"LOWER": "ih"}], "pattern":"上证50股指期货"}
-{"label":"品种","id":[{"LOWER": "im"}], "pattern":"中证1000股指期货"}
-{"label":"品种","id":[{"LOWER": "io"}], "pattern":"沪深300股指期权"}
-{"label":"品种","id":[{"LOWER": "mo"}], "pattern":"中证1000股指期权"}
-{"label":"品种","id":[{"LOWER": "t"}], "pattern":"10年期国债期货"}
-{"label":"品种","id":[{"LOWER": "tf"}], "pattern":"5年期国债期货"}
-{"label":"品种","id":[{"LOWER": "tl"}], "pattern":"30年期国债期货"}
-{"label":"品种","id":[{"LOWER": "ts"}], "pattern":"2年期国债期货"}
-{"label":"品种","id":[{"LOWER": "a"}], "pattern":"黄大豆1号"}
-{"label":"品种","id":[{"LOWER": "b"}], "pattern":"黄大豆2号"}
-{"label":"品种","id":[{"LOWER": "bb"}], "pattern":"细木工板"}
-{"label":"品种","id":[{"LOWER": "bz"}], "pattern":"纯苯"}
-{"label":"品种","id":[{"LOWER": "c"}], "pattern":"黄玉米"}
-{"label":"品种","id":[{"LOWER": "cs"}], "pattern":"玉米淀粉"}
-{"label":"品种","id":[{"LOWER": "eb"}], "pattern":"苯乙烯"}
-{"label":"品种","id":[{"LOWER": "eg"}], "pattern":"乙二醇"}
-{"label":"品种","id":[{"LOWER": "fb"}], "pattern":"纤维板"}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern":"铁矿石"}
-{"label":"品种","id":[{"LOWER": "j"}], "pattern":"冶金焦炭"}
-{"label":"品种","id":[{"LOWER": "jd"}], "pattern":"鲜鸡蛋"}
-{"label":"品种","id":[{"LOWER": "jm"}], "pattern":"焦煤"}
-{"label":"品种","id":[{"LOWER": "l"}], "pattern":"线型低密度聚乙烯"}
-{"label":"品种","id":[{"LOWER": "lg"}], "pattern":"原木"}
-{"label":"品种","id":[{"LOWER": "lh"}], "pattern":"生猪"}
-{"label":"品种","id":[{"LOWER": "m"}], "pattern":"豆粕"}
-{"label":"品种","id":[{"LOWER": "p"}], "pattern":"棕榈油"}
-{"label":"品种","id":[{"LOWER": "pg"}], "pattern":"液化石油气"}
-{"label":"品种","id":[{"LOWER": "pp"}], "pattern":"聚丙烯"}
-{"label":"品种","id":[{"LOWER": "rr"}], "pattern":"粳米"}
-{"label":"品种","id":[{"LOWER": "v"}], "pattern":"聚氯乙烯"}
-{"label":"品种","id":[{"LOWER": "y"}], "pattern":"大豆原油"}
-{"label":"品种","id":[{"LOWER": "lc"}], "pattern":"碳酸锂"}
-{"label":"品种","id":[{"LOWER": "ps"}], "pattern":"多晶硅"}
-{"label":"品种","id":[{"LOWER": "si"}], "pattern":"工业硅"}
-{"label":"品种","id":[{"LOWER": "bc"}], "pattern":"阴极铜"}
-{"label":"品种","id":[{"LOWER": "ec"}], "pattern":"SCFIS欧线"}
-{"label":"品种","id":[{"LOWER": "lu"}], "pattern":"低硫燃料油"}
-{"label":"品种","id":[{"LOWER": "nr"}], "pattern":"20号胶"}
-{"label":"品种","id":[{"LOWER": "sc"}], "pattern":"中质含硫原油"}
-{"label":"品种","id":[{"LOWER": "sctas"}], "pattern":"原油期货TAS指令"}
-{"label":"品种","id":[{"LOWER": "ad"}], "pattern":"铸造铝合金"}
-{"label":"品种","id":[{"LOWER": "ag"}], "pattern":"白银"}
-{"label":"品种","id":[{"LOWER": "al"}], "pattern":"铝"}
-{"label":"品种","id":[{"LOWER": "ao"}], "pattern":"氧化铝"}
-{"label":"品种","id":[{"LOWER": "au"}], "pattern":"黄金"}
-{"label":"品种","id":[{"LOWER": "br"}], "pattern":"丁二烯橡胶"}
-{"label":"品种","id":[{"LOWER": "bu"}], "pattern":"石油沥青"}
-{"label":"品种","id":[{"LOWER": "cu"}], "pattern":"阴极铜"}
-{"label":"品种","id":[{"LOWER": "fu"}], "pattern":"燃料油"}
-{"label":"品种","id":[{"LOWER": "hc"}], "pattern":"热轧卷板"}
-{"label":"品种","id":[{"LOWER": "ni"}], "pattern":""}
-{"label":"品种","id":[{"LOWER": "pb"}], "pattern":"铅"}
-{"label":"品种","id":[{"LOWER": "rb"}], "pattern":"螺纹钢"}
-{"label":"品种","id":[{"LOWER": "ru"}], "pattern":"天然橡胶"}
-{"label":"品种","id":[{"LOWER": "sn"}], "pattern":"锡"}
-{"label":"品种","id":[{"LOWER": "sp"}], "pattern":"漂白硫酸盐针叶木浆"}
-{"label":"品种","id":[{"LOWER": "ss"}], "pattern":"不锈钢"}
-{"label":"品种","id":[{"LOWER": "wr"}], "pattern":"线材"}
-{"label":"品种","id":[{"LOWER": "zn"}], "pattern":"锌"}
-{"label":"品种","id":[{"LOWER": "ho"}], "pattern":"上证50指数"}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern":"铁矿石"}
-{"label":"品种","id":[{"LOWER": "ic"}], "pattern":"中证500股指期货"}
-{"label":"品种","id":[{"LOWER": "if"}], "pattern":"沪深300股指期货"}
-{"label":"品种","id":[{"LOWER": "ih"}], "pattern":"上证50股指期货"}
-{"label":"品种","id":[{"LOWER": "im"}], "pattern":"中证1000股指期货"}
-{"label":"品种","id":[{"LOWER": "io"}], "pattern":"沪深300股指期权"}
-{"label":"品种","id":[{"LOWER": "mo"}], "pattern":"中证1000股指期权"}
-{"label":"品种","id":[{"LOWER": "t"}], "pattern":"10年期国债期货"}
-{"label":"品种","id":[{"LOWER": "tf"}], "pattern":"5年期国债期货"}
-{"label":"品种","id":[{"LOWER": "t1"}], "pattern":"30年期国债期货"}
-{"label":"品种","id":[{"LOWER": "ts"}], "pattern":"2年期国债期货"}
-{"label":"品种","id":[{"LOWER": "a"}], "pattern":"豆一"}
-{"label":"品种","id":[{"LOWER": "b"}], "pattern":"豆二"}
-{"label":"品种","id":[{"LOWER": "bb"}], "pattern":"胶合板"}
-{"label":"品种","id":[{"LOWER": "bz"}], "pattern":"纯苯"}
-{"label":"品种","id":[{"LOWER": "c"}], "pattern":"玉米"}
-{"label":"品种","id":[{"LOWER": "cs"}], "pattern":"玉米淀粉"}
-{"label":"品种","id":[{"LOWER": "eb"}], "pattern":"苯乙烯"}
-{"label":"品种","id":[{"LOWER": "eg"}], "pattern":"乙二醇"}
-{"label":"品种","id":[{"LOWER": "fb"}], "pattern":"纤维板"}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern":"铁矿石"}
-{"label":"品种","id":[{"LOWER": "j"}], "pattern":"焦炭"}
-{"label":"品种","id":[{"LOWER": "jd"}], "pattern":"鸡蛋"}
-{"label":"品种","id":[{"LOWER": "jm"}], "pattern":"焦煤"}
-{"label":"品种","id":[{"LOWER": "l"}], "pattern":"聚乙烯"}
-{"label":"品种","id":[{"LOWER": "lg"}], "pattern":"原木"}
-{"label":"品种","id":[{"LOWER": "lh"}], "pattern":"生猪"}
-{"label":"品种","id":[{"LOWER": "m"}], "pattern":"豆粕"}
-{"label":"品种","id":[{"LOWER": "p"}], "pattern":"棕榈油"}
-{"label":"品种","id":[{"LOWER": "pg"}], "pattern":"LPG"}
-{"label":"品种","id":[{"LOWER": "pp"}], "pattern":"PP"}
-{"label":"品种","id":[{"LOWER": "rr"}], "pattern":"粳米"}
-{"label":"品种","id":[{"LOWER": "v"}], "pattern":"PVC"}
-{"label":"品种","id":[{"LOWER": "y"}], "pattern":"豆油"}
-{"label":"品种","id":[{"LOWER": "lc"}], "pattern":"碳酸锂"}
-{"label":"品种","id":[{"LOWER": "ps"}], "pattern":"多晶硅"}
-{"label":"品种","id":[{"LOWER": "si"}], "pattern":"工业硅"}
-{"label":"品种","id":[{"LOWER": "bc"}], "pattern":"铜(BC)"}
-{"label":"品种","id":[{"LOWER": "ec"}], "pattern":"SCFIS欧线"}
-{"label":"品种","id":[{"LOWER": "lu"}], "pattern":"低硫燃料油"}
-{"label":"品种","id":[{"LOWER": "nr"}], "pattern":"20号胶"}
-{"label":"品种","id":[{"LOWER": "sc"}], "pattern":"原油"}
-{"label":"品种","id":[{"LOWER": "sctas"}], "pattern":"原油TAS"}
-{"label":"品种","id":[{"LOWER": "ad"}], "pattern":"铸造铝合金"}
-{"label":"品种","id":[{"LOWER": "ag"}], "pattern":"白银"}
-{"label":"品种","id":[{"LOWER": "al"}], "pattern":"铝"}
-{"label":"品种","id":[{"LOWER": "ao"}], "pattern":"氧化铝"}
-{"label":"品种","id":[{"LOWER": "au"}], "pattern":"黄金"}
-{"label":"品种","id":[{"LOWER": "br"}], "pattern":"丁二烯橡胶"}
-{"label":"品种","id":[{"LOWER": "bu"}], "pattern":"沥青"}
-{"label":"品种","id":[{"LOWER": "cu"}], "pattern":"铜"}
-{"label":"品种","id":[{"LOWER": "fu"}], "pattern":"燃料油"}
-{"label":"品种","id":[{"LOWER": "hc"}], "pattern":"热轧卷板"}
-{"label":"品种","id":[{"LOWER": "ni"}], "pattern":"镍"}
-{"label":"品种","id":[{"LOWER": "pb"}], "pattern":"铅"}
-{"label":"品种","id":[{"LOWER": "rb"}], "pattern":"螺纹钢"}
-{"label":"品种","id":[{"LOWER": "ru"}], "pattern":"天胶"}
-{"label":"品种","id":[{"LOWER": "sn"}], "pattern":"锡"}
-{"label":"品种","id":[{"LOWER": "sp"}], "pattern":"纸浆"}
-{"label":"品种","id":[{"LOWER": "ss"}], "pattern":"不锈钢"}
-{"label":"品种","id":[{"LOWER": "wr"}], "pattern":"线材"}
-{"label":"品种","id":[{"LOWER": "zn"}], "pattern":"锌"}
-{"label":"品种","id":[{"LOWER": "ho"}], "pattern": [{"LOWER": "ho"}]}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern": [{"LOWER": "i"}]}
-{"label":"品种","id":[{"LOWER": "ic"}], "pattern": [{"LOWER": "ic"}]}
-{"label":"品种","id":[{"LOWER": "if"}], "pattern": [{"LOWER": "if"}]}
-{"label":"品种","id":[{"LOWER": "ih"}], "pattern": [{"LOWER": "ih"}]}
-{"label":"品种","id":[{"LOWER": "im"}], "pattern": [{"LOWER": "im"}]}
-{"label":"品种","id":[{"LOWER": "io"}], "pattern": [{"LOWER": "io"}]}
-{"label":"品种","id":[{"LOWER": "mo"}], "pattern": [{"LOWER": "mo"}]}
-{"label":"品种","id":[{"LOWER": "t"}], "pattern": [{"LOWER": "t"}]}
-{"label":"品种","id":[{"LOWER": "tf"}], "pattern": [{"LOWER": "tf"}]}
-{"label":"品种","id":[{"LOWER": "tl"}], "pattern": [{"LOWER": "tl"}]}
-{"label":"品种","id":[{"LOWER": "ts"}], "pattern": [{"LOWER": "ts"}]}
-{"label":"品种","id":[{"LOWER": "a"}], "pattern": [{"LOWER": "a"}]}
-{"label":"品种","id":[{"LOWER": "b"}], "pattern": [{"LOWER": "b"}]}
-{"label":"品种","id":[{"LOWER": "bb"}], "pattern": [{"LOWER": "bb"}]}
-{"label":"品种","id":[{"LOWER": "bz"}], "pattern": [{"LOWER": "bz"}]}
-{"label":"品种","id":[{"LOWER": "c"}], "pattern": [{"LOWER": "c"}]}
-{"label":"品种","id":[{"LOWER": "cs"}], "pattern": [{"LOWER": "cs"}]}
-{"label":"品种","id":[{"LOWER": "eb"}], "pattern": [{"LOWER": "eb"}]}
-{"label":"品种","id":[{"LOWER": "eg"}], "pattern": [{"LOWER": "eg"}]}
-{"label":"品种","id":[{"LOWER": "fb"}], "pattern": [{"LOWER": "fb"}]}
-{"label":"品种","id":[{"LOWER": "i"}], "pattern": [{"LOWER": "i"}]}
-{"label":"品种","id":[{"LOWER": "j"}], "pattern": [{"LOWER": "j"}]}
-{"label":"品种","id":[{"LOWER": "jd"}], "pattern": [{"LOWER": "jd"}]}
-{"label":"品种","id":[{"LOWER": "jm"}], "pattern": [{"LOWER": "jm"}]}
-{"label":"品种","id":[{"LOWER": "l"}], "pattern": [{"LOWER": "l"}]}
-{"label":"品种","id":[{"LOWER": "lg"}], "pattern": [{"LOWER": "lg"}]}
-{"label":"品种","id":[{"LOWER": "lh"}], "pattern": [{"LOWER": "lh"}]}
-{"label":"品种","id":[{"LOWER": "m"}], "pattern": [{"LOWER": "m"}]}
-{"label":"品种","id":[{"LOWER": "p"}], "pattern": [{"LOWER": "p"}]}
-{"label":"品种","id":[{"LOWER": "pg"}], "pattern": [{"LOWER": "pg"}]}
-{"label":"品种","id":[{"LOWER": "pp"}], "pattern": [{"LOWER": "pp"}]}
-{"label":"品种","id":[{"LOWER": "rr"}], "pattern": [{"LOWER": "rr"}]}
-{"label":"品种","id":[{"LOWER": "v"}], "pattern": [{"LOWER": "v"}]}
-{"label":"品种","id":[{"LOWER": "y"}], "pattern": [{"LOWER": "y"}]}
-{"label":"品种","id":[{"LOWER": "lc"}], "pattern": [{"LOWER": "lc"}]}
-{"label":"品种","id":[{"LOWER": "ps"}], "pattern": [{"LOWER": "ps"}]}
-{"label":"品种","id":[{"LOWER": "si"}], "pattern": [{"LOWER": "si"}]}
-{"label":"品种","id":[{"LOWER": "bc"}], "pattern": [{"LOWER": "bc"}]}
-{"label":"品种","id":[{"LOWER": "ec"}], "pattern": [{"LOWER": "ec"}]}
-{"label":"品种","id":[{"LOWER": "lu"}], "pattern": [{"LOWER": "lu"}]}
-{"label":"品种","id":[{"LOWER": "nr"}], "pattern": [{"LOWER": "nr"}]}
-{"label":"品种","id":[{"LOWER": "sc"}], "pattern": [{"LOWER": "sc"}]}
-{"label":"品种","id":[{"LOWER": "sctas"}], "pattern": [{"LOWER": "sctas"}]}
-{"label":"品种","id":[{"LOWER": "ad"}], "pattern": [{"LOWER": "ad"}]}
-{"label":"品种","id":[{"LOWER": "ag"}], "pattern": [{"LOWER": "ag"}]}
-{"label":"品种","id":[{"LOWER": "al"}], "pattern": [{"LOWER": "al"}]}
-{"label":"品种","id":[{"LOWER": "ao"}], "pattern": [{"LOWER": "ao"}]}
-{"label":"品种","id":[{"LOWER": "au"}], "pattern": [{"LOWER": "au"}]}
-{"label":"品种","id":[{"LOWER": "br"}], "pattern": [{"LOWER": "br"}]}
-{"label":"品种","id":[{"LOWER": "bu"}], "pattern": [{"LOWER": "bu"}]}
-{"label":"品种","id":[{"LOWER": "cu"}], "pattern": [{"LOWER": "cu"}]}
-{"label":"品种","id":[{"LOWER": "fu"}], "pattern": [{"LOWER": "fu"}]}
-{"label":"品种", "id":[{"LOWER": "hc"}], "pattern": [{"LOWER": "hc"}]}
-{"label":"品种", "id":[{"LOWER": "ni"}], "pattern": [{"LOWER": "ni"}]}
-{"label":"品种", "id":[{"LOWER": "pb"}], "pattern": [{"LOWER": "pb"}]}
-{"label":"品种", "id":[{"LOWER": "rb"}], "pattern": [{"LOWER": "rb"}]}
-{"label":"品种", "id":[{"LOWER": "ru"}], "pattern": [{"LOWER": "ru"}]}
-{"label":"品种", "id":[{"LOWER": "sn"}], "pattern": [{"LOWER": "sn"}]}
-{"label":"品种", "id":[{"LOWER": "sp"}], "pattern": [{"LOWER": "sp"}]}
-{"label":"品种", "id":[{"LOWER": "ss"}], "pattern": [{"LOWER": "ss"}]}
-{"label":"品种", "id":[{"LOWER": "wr"}], "pattern": [{"LOWER": "wr"}]}
-{"label":"品种","id":[{"LOWER": "zn"}], "pattern": [{"LOWER": "zn"}]}
-{"label":"交易所","id":[{"LOWER": "shfe"}], "pattern": [{"LOWER": "shfe"}]}
-{"label":"交易所","id":[{"LOWER": "shfe"}], "pattern":"上期所"}
-{"label":"交易所","id":[{"LOWER": "shfe"}], "pattern":"上海期货交易所"}
-{"label":"交易所","id":[{"LOWER": "ine"}], "pattern": [{"LOWER": "ine"}]}
-{"label":"交易所","id":[{"LOWER": "ine"}], "pattern":"上期能源"}
-{"label":"交易所","id":[{"LOWER": "ine"}], "pattern":"上海国际能源交易中心"}
-{"label":"交易所","id":[{"LOWER": "czce"}], "pattern": [{"LOWER": "czce"}]}
-{"label":"交易所","id":[{"LOWER": "czce"}], "pattern":"郑商所"}
-{"label":"交易所","id":[{"LOWER": "czce"}], "pattern":"郑州商品交易所"}
-{"label":"交易所","id":[{"LOWER": "czce"}], "pattern": [{"LOWER": "zce"}]}
-{"label":"交易所", "id":[{"LOWER": "dce"}], "pattern": [{"LOWER": "dce"}]}
-{"label":"交易所", "id":[{"LOWER": "dce"}], "pattern":"大商所"}
-{"label":"交易所", "id":[{"LOWER": "dce"}], "pattern":"大连商品交易所"}
-{"label":"交易所", "id":[{"LOWER": "gfe"}], "pattern": [{"LOWER": "gfex"}]}
-{"label":"交易所", "id":[{"LOWER": "gfe"}], "pattern": [{"LOWER": "gfe"}]}
-{"label":"交易所", "id":[{"LOWER": "gfe"}], "pattern":"广期所"}
-{"label":"交易所", "id":[{"LOWER": "gfe"}], "pattern":"广州期货交易所"}
-{"label":"交易所", "id":[{"LOWER": "cffex"}], "pattern": [{"LOWER": "cffex"}]}
-{"label":"交易所", "id":[{"LOWER": "cffex"}], "pattern":"中金所"}
-{"label":"交易所", "id":[{"LOWER": "cffex"}], "pattern":"中国金融期货交易所"}
-{"label":"交易所", "id":[{"LOWER": "sse"}], "pattern": [{"LOWER": "sse"}]}
-{"label":"交易所", "id":[{"LOWER": "sse"}], "pattern":"上交所"}
-{"label":"交易所", "id":[{"LOWER": "sse"}], "pattern":"上海证券交易所"}
-{"label":"交易所", "id":[{"LOWER": "szse"}], "pattern": [{"LOWER": "szse"}]}
-{"label":"交易所","id":[{"LOWER": "szse"}], "pattern":"深交所"}
-{"label":"交易所","id":[{"LOWER": "szse"}], "pattern":"深圳证券交易所"}
-{"label":"交易所","id":[{"LOWER": "cme"}], "pattern":"芝加哥商业交易所"}
-{"label":"交易所","id":[{"LOWER": "cme"}], "pattern": [{"LOWER": "cme"}]}
-{"label":"交易所","id":[{"LOWER": "cme group"}], "pattern":"芝加哥商业交易所集团"}
-{"label":"交易所","id":[{"LOWER": "cme group"}], "pattern": [{"LOWER": "cme group"}]}
-{"label":"交易所","id":[{"LOWER": "cbot"}], "pattern":"芝加哥期货交易所"}
-{"label":"交易所","id":[{"LOWER": "cbot"}], "pattern": [{"LOWER": "cbot"}]}
-{"label":"交易所","id":[{"LOWER": "bmd"}], "pattern":"马来西亚衍生产品交易所"}
-{"label":"交易所","id":[{"LOWER": "bmd"}], "pattern":"马来西亚衍生品交易所"}
-{"label":"交易所","id":[{"LOWER": "bmd"}], "pattern": [{"LOWER": "bmd"}]}
-{"label":"交易所","id":[{"LOWER": "ice"}], "pattern":"洲际交易所"}
+{"label":"品种", "id": "ap", "pattern": "鲜苹果"}
+{"label":"品种", "id": "cf", "pattern": "棉花"}
+{"label":"品种", "id": "cj", "pattern": "干制红枣"}
+{"label":"品种", "id": "cy", "pattern": "棉纱"}
+{"label":"品种", "id": "er", "pattern": "早籼稻"}
+{"label":"品种", "id": "fg", "pattern": "平板玻璃"}
+{"label":"品种", "id": "gn", "pattern": "绿豆"}
+{"label":"品种", "id": "jr", "pattern": "粳稻谷"}
+{"label":"品种", "id": "lr", "pattern": "晚籼稻"}
+{"label":"品种", "id": "ma", "pattern": "甲醇"}
+{"label":"品种", "id": "me", "pattern": "甲醇"}
+{"label":"品种", "id": "oi", "pattern": "菜籽油"}
+{"label":"品种", "id": "pf", "pattern": "涤纶短纤"}
+{"label":"品种", "id": "pk", "pattern": "花生仁"}
+{"label":"品种", "id": "pm", "pattern": "普通小麦"}
+{"label":"品种", "id": "pr", "pattern": "瓶级聚酯切片"}
+{"label":"品种", "id": "px", "pattern": "对二甲苯"}
+{"label":"品种", "id": "ri", "pattern": "早籼稻"}
+{"label":"品种", "id": "rm", "pattern": "菜籽粕"}
+{"label":"品种", "id": "ro", "pattern": "菜籽油"}
+{"label":"品种", "id": "rs", "pattern": "油菜籽"}
+{"label":"品种", "id": "sa", "pattern": "纯碱"}
+{"label":"品种", "id": "sf", "pattern": "硅铁"}
+{"label":"品种", "id": "sh", "pattern": "烧碱"}
+{"label":"品种", "id": "sm", "pattern": "锰硅"}
+{"label":"品种", "id": "sr", "pattern": "白砂糖"}
+{"label":"品种", "id": "ta", "pattern": "精对苯二甲酸"}
+{"label":"品种", "id": "tc", "pattern": "动力煤"}
+{"label":"品种", "id": "ur", "pattern": "尿素"}
+{"label":"品种", "id": "wh", "pattern": "优质强筋小麦"}
+{"label":"品种", "id": "ws", "pattern": "强麦"}
+{"label":"品种", "id": "wt", "pattern": "硬麦"}
+{"label":"品种", "id": "zc", "pattern": "动力煤"}
+{"label":"品种", "id": "ap", "pattern": "苹果"}
+{"label":"品种", "id": "cf", "pattern": "棉花"}
+{"label":"品种", "id": "cj", "pattern": "红枣"}
+{"label":"品种", "id": "cy", "pattern": "棉纱"}
+{"label":"品种", "id": "er", "pattern": "早籼稻"}
+{"label":"品种", "id": "fg", "pattern": "玻璃"}
+{"label":"品种","id": "gn", "pattern": "绿豆"}
+{"label":"品种","id": "jr", "pattern": "梗稻"}
+{"label":"品种","id": "lr", "pattern": "晚籼稻"}
+{"label":"品种","id": "ma", "pattern":"甲醇"}
+{"label":"品种","id": "me", "pattern":"甲醇"}
+{"label":"品种","id": "oi", "pattern":"菜油"}
+{"label":"品种","id": "pf", "pattern":"短纤"}
+{"label":"品种", "id": "pk", "pattern":"花生"}
+{"label":"品种", "id": "pm", "pattern":"普麦"}
+{"label":"品种", "id": "pr", "pattern":"瓶片"}
+{"label":"品种", "id": "ro", "pattern":"菜油"}
+{"label":"品种", "id": "px", "pattern":"对二甲苯"}
+{"label":"品种", "id": "ri", "pattern":"早籼稻"}
+{"label":"品种","id": "rm", "pattern":"菜粕"}
+{"label":"品种","id": "rs", "pattern":"菜籽"}
+{"label":"品种","id": "sa", "pattern":"纯碱"}
+{"label":"品种","id": "sf", "pattern":"硅铁"}
+{"label":"品种","id": "sh", "pattern":"烧碱"}
+{"label":"品种","id": "sm", "pattern":"锰硅"}
+{"label":"品种","id": "sr", "pattern":"白糖"}
+{"label":"品种","id": "ta", "pattern":"PTA"}
+{"label":"品种","id": "tc", "pattern":"煤"}
+{"label":"品种","id": "ur", "pattern":"尿素"}
+{"label":"品种","id": "wh", "pattern":"强麦"}
+{"label":"品种","id": "ws", "pattern":"强麦"}
+{"label":"品种","id": "wt", "pattern":"硬麦"}
+{"label":"品种","id": "zc", "pattern":"煤"}
+{"label":"品种","id": "ap", "pattern": [{"LOWER": "ap"}]}
+{"label":"品种","id": "cf", "pattern": [{"LOWER": "cf"}]}
+{"label":"品种","id": "cj", "pattern": [{"LOWER": "cj"}]}
+{"label":"品种","id": "cy", "pattern": [{"LOWER": "cy"}]}
+{"label":"品种","id": "er", "pattern": [{"LOWER": "er"}]}
+{"label":"品种","id": "fg", "pattern": [{"LOWER": "fg"}]}
+{"label":"品种","id": "gn", "pattern": [{"LOWER": "gn"}]}
+{"label":"品种","id": "jr", "pattern": [{"LOWER": "jr"}]}
+{"label":"品种","id": "lr", "pattern": [{"LOWER": "lr"}]}
+{"label":"品种","id": "ma", "pattern": [{"LOWER": "ma"}]}
+{"label":"品种","id": "me", "pattern": [{"LOWER": "me"}]}
+{"label":"品种","id": "oi", "pattern": [{"LOWER": "oi"}]}
+{"label":"品种","id": "pf", "pattern": [{"LOWER": "pf"}]}
+{"label":"品种","id": "pk", "pattern": [{"LOWER": "pk"}]}
+{"label":"品种","id": "pm", "pattern": [{"LOWER": "pm"}]}
+{"label":"品种","id": "pr", "pattern": [{"LOWER": "pr"}]}
+{"label":"品种","id": "px", "pattern": [{"LOWER": "px"}]}
+{"label":"品种","id": "ri", "pattern": [{"LOWER": "ri"}]}
+{"label":"品种","id": "rm", "pattern": [{"LOWER": "rm"}]}
+{"label":"品种","id": "ro", "pattern": [{"LOWER": "ro"}]}
+{"label":"品种","id": "rs", "pattern": [{"LOWER": "rs"}]}
+{"label":"品种","id": "sa", "pattern": [{"LOWER": "sa"}]}
+{"label":"品种","id": "sf", "pattern": [{"LOWER": "sf"}]}
+{"label":"品种","id": "sh", "pattern": [{"LOWER": "sh"}]}
+{"label":"品种","id": "sm", "pattern": [{"LOWER": "sm"}]}
+{"label":"品种","id": "sr", "pattern": [{"LOWER": "sr"}]}
+{"label":"品种","id": "ta", "pattern": [{"LOWER": "ta"}]}
+{"label":"品种","id": "tc", "pattern": [{"LOWER": "tc"}]}
+{"label":"品种","id": "ur", "pattern": [{"LOWER": "ur"}]}
+{"label":"品种","id": "wh", "pattern": [{"LOWER": "wh"}]}
+{"label":"品种","id": "ws", "pattern": [{"LOWER": "ws"}]}
+{"label":"品种","id": "wt", "pattern": [{"LOWER": "wt"}]}
+{"label":"品种","id": "zc", "pattern": [{"LOWER": "zc"}]}
+{"label":"品种","id": "ho", "pattern":"上证50指数"}
+{"label":"品种","id": "i", "pattern":"铁矿石"}
+{"label":"品种","id": "ic", "pattern":"中证500股指期货"}
+{"label":"品种","id": "if", "pattern":"沪深300股指期货"}
+{"label":"品种","id": "ih", "pattern":"上证50股指期货"}
+{"label":"品种","id": "im", "pattern":"中证1000股指期货"}
+{"label":"品种","id": "io", "pattern":"沪深300股指期权"}
+{"label":"品种","id": "mo", "pattern":"中证1000股指期权"}
+{"label":"品种","id": "t", "pattern":"10年期国债期货"}
+{"label":"品种","id": "tf", "pattern":"5年期国债期货"}
+{"label":"品种","id": "tl", "pattern":"30年期国债期货"}
+{"label":"品种","id": "ts", "pattern":"2年期国债期货"}
+{"label":"品种","id": "a", "pattern":"黄大豆1号"}
+{"label":"品种","id": "b", "pattern":"黄大豆2号"}
+{"label":"品种","id": "bb", "pattern":"细木工板"}
+{"label":"品种","id": "bz", "pattern":"纯苯"}
+{"label":"品种","id": "c", "pattern":"黄玉米"}
+{"label":"品种","id": "cs", "pattern":"玉米淀粉"}
+{"label":"品种","id": "eb", "pattern":"苯乙烯"}
+{"label":"品种","id": "eg", "pattern":"乙二醇"}
+{"label":"品种","id": "fb", "pattern":"纤维板"}
+{"label":"品种","id": "i", "pattern":"铁矿石"}
+{"label":"品种","id": "j", "pattern":"冶金焦炭"}
+{"label":"品种","id": "jd", "pattern":"鲜鸡蛋"}
+{"label":"品种","id": "jm", "pattern":"焦煤"}
+{"label":"品种","id": "l", "pattern":"线型低密度聚乙烯"}
+{"label":"品种","id": "lg", "pattern":"原木"}
+{"label":"品种","id": "lh", "pattern":"生猪"}
+{"label":"品种","id": "m", "pattern":"豆粕"}
+{"label":"品种","id": "p", "pattern":"棕榈油"}
+{"label":"品种","id": "pg", "pattern":"液化石油气"}
+{"label":"品种","id": "pp", "pattern":"聚丙烯"}
+{"label":"品种","id": "rr", "pattern":"粳米"}
+{"label":"品种","id": "v", "pattern":"聚氯乙烯"}
+{"label":"品种","id": "y", "pattern":"大豆原油"}
+{"label":"品种","id": "lc", "pattern":"碳酸锂"}
+{"label":"品种","id": "ps", "pattern":"多晶硅"}
+{"label":"品种","id": "si", "pattern":"工业硅"}
+{"label":"品种","id": "bc", "pattern":"阴极铜"}
+{"label":"品种","id": "ec", "pattern":"SCFIS欧线"}
+{"label":"品种","id": "lu", "pattern":"低硫燃料油"}
+{"label":"品种","id": "nr", "pattern":"20号胶"}
+{"label":"品种","id": "sc", "pattern":"中质含硫原油"}
+{"label":"品种","id": "sctas", "pattern":"原油期货TAS指令"}
+{"label":"品种","id": "ad", "pattern":"铸造铝合金"}
+{"label":"品种","id": "ag", "pattern":"白银"}
+{"label":"品种","id": "al", "pattern":"铝"}
+{"label":"品种","id": "ao", "pattern":"氧化铝"}
+{"label":"品种","id": "au", "pattern":"黄金"}
+{"label":"品种","id": "br", "pattern":"丁二烯橡胶"}
+{"label":"品种","id": "bu", "pattern":"石油沥青"}
+{"label":"品种","id": "cu", "pattern":"阴极铜"}
+{"label":"品种","id": "fu", "pattern":"燃料油"}
+{"label":"品种","id": "hc", "pattern":"热轧卷板"}
+{"label":"品种","id": "ni", "pattern":""}
+{"label":"品种","id": "pb", "pattern":"铅"}
+{"label":"品种","id": "rb", "pattern":"螺纹钢"}
+{"label":"品种","id": "ru", "pattern":"天然橡胶"}
+{"label":"品种","id": "sn", "pattern":"锡"}
+{"label":"品种","id": "sp", "pattern":"漂白硫酸盐针叶木浆"}
+{"label":"品种","id": "ss", "pattern":"不锈钢"}
+{"label":"品种","id": "wr", "pattern":"线材"}
+{"label":"品种","id": "zn", "pattern":"锌"}
+{"label":"品种","id": "ho", "pattern":"上证50指数"}
+{"label":"品种","id": "i", "pattern":"铁矿石"}
+{"label":"品种","id": "ic", "pattern":"中证500股指期货"}
+{"label":"品种","id": "if", "pattern":"沪深300股指期货"}
+{"label":"品种","id": "ih", "pattern":"上证50股指期货"}
+{"label":"品种","id": "im", "pattern":"中证1000股指期货"}
+{"label":"品种","id": "io", "pattern":"沪深300股指期权"}
+{"label":"品种","id": "mo", "pattern":"中证1000股指期权"}
+{"label":"品种","id": "t", "pattern":"10年期国债期货"}
+{"label":"品种","id": "tf", "pattern":"5年期国债期货"}
+{"label":"品种","id": "t1", "pattern":"30年期国债期货"}
+{"label":"品种","id": "ts", "pattern":"2年期国债期货"}
+{"label":"品种","id": "a", "pattern":"豆一"}
+{"label":"品种","id": "b", "pattern":"豆二"}
+{"label":"品种","id": "bb", "pattern":"胶合板"}
+{"label":"品种","id": "bz", "pattern":"纯苯"}
+{"label":"品种","id": "c", "pattern":"玉米"}
+{"label":"品种","id": "cs", "pattern":"玉米淀粉"}
+{"label":"品种","id": "eb", "pattern":"苯乙烯"}
+{"label":"品种","id": "eg", "pattern":"乙二醇"}
+{"label":"品种","id": "fb", "pattern":"纤维板"}
+{"label":"品种","id": "i", "pattern":"铁矿石"}
+{"label":"品种","id": "j", "pattern":"焦炭"}
+{"label":"品种","id": "jd", "pattern":"鸡蛋"}
+{"label":"品种","id": "jm", "pattern":"焦煤"}
+{"label":"品种","id": "l", "pattern":"聚乙烯"}
+{"label":"品种","id": "lg", "pattern":"原木"}
+{"label":"品种","id": "lh", "pattern":"生猪"}
+{"label":"品种","id": "m", "pattern":"豆粕"}
+{"label":"品种","id": "p", "pattern":"棕榈油"}
+{"label":"品种","id": "pg", "pattern":"LPG"}
+{"label":"品种","id": "pp", "pattern":"PP"}
+{"label":"品种","id": "rr", "pattern":"粳米"}
+{"label":"品种","id": "v", "pattern":"PVC"}
+{"label":"品种","id": "y", "pattern":"豆油"}
+{"label":"品种","id": "lc", "pattern":"碳酸锂"}
+{"label":"品种","id": "ps", "pattern":"多晶硅"}
+{"label":"品种","id": "si", "pattern":"工业硅"}
+{"label":"品种","id": "bc", "pattern":"铜(BC)"}
+{"label":"品种","id": "ec", "pattern":"SCFIS欧线"}
+{"label":"品种","id": "lu", "pattern":"低硫燃料油"}
+{"label":"品种","id": "nr", "pattern":"20号胶"}
+{"label":"品种","id": "sc", "pattern":"原油"}
+{"label":"品种","id": "sctas", "pattern":"原油TAS"}
+{"label":"品种","id": "ad", "pattern":"铸造铝合金"}
+{"label":"品种","id": "ag", "pattern":"白银"}
+{"label":"品种","id": "al", "pattern":"铝"}
+{"label":"品种","id": "ao", "pattern":"氧化铝"}
+{"label":"品种","id": "au", "pattern":"黄金"}
+{"label":"品种","id": "br", "pattern":"丁二烯橡胶"}
+{"label":"品种","id": "bu", "pattern":"沥青"}
+{"label":"品种","id": "cu", "pattern":"铜"}
+{"label":"品种","id": "fu", "pattern":"燃料油"}
+{"label":"品种","id": "hc", "pattern":"热轧卷板"}
+{"label":"品种","id": "ni", "pattern":"镍"}
+{"label":"品种","id": "pb", "pattern":"铅"}
+{"label":"品种","id": "rb", "pattern":"螺纹钢"}
+{"label":"品种","id": "ru", "pattern":"天胶"}
+{"label":"品种","id": "sn", "pattern":"锡"}
+{"label":"品种","id": "sp", "pattern":"纸浆"}
+{"label":"品种","id": "ss", "pattern":"不锈钢"}
+{"label":"品种","id": "wr", "pattern":"线材"}
+{"label":"品种","id": "zn", "pattern":"锌"}
+{"label":"品种","id": "ho", "pattern": [{"LOWER": "ho"}]}
+{"label":"品种","id": "i", "pattern": [{"LOWER": "i"}]}
+{"label":"品种","id": "ic", "pattern": [{"LOWER": "ic"}]}
+{"label":"品种","id": "if", "pattern": [{"LOWER": "if"}]}
+{"label":"品种","id": "ih", "pattern": [{"LOWER": "ih"}]}
+{"label":"品种","id": "im", "pattern": [{"LOWER": "im"}]}
+{"label":"品种","id": "io", "pattern": [{"LOWER": "io"}]}
+{"label":"品种","id": "mo", "pattern": [{"LOWER": "mo"}]}
+{"label":"品种","id": "t", "pattern": [{"LOWER": "t"}]}
+{"label":"品种","id": "tf", "pattern": [{"LOWER": "tf"}]}
+{"label":"品种","id": "tl", "pattern": [{"LOWER": "tl"}]}
+{"label":"品种","id": "ts", "pattern": [{"LOWER": "ts"}]}
+{"label":"品种","id": "a", "pattern": [{"LOWER": "a"}]}
+{"label":"品种","id": "b", "pattern": [{"LOWER": "b"}]}
+{"label":"品种","id": "bb", "pattern": [{"LOWER": "bb"}]}
+{"label":"品种","id": "bz", "pattern": [{"LOWER": "bz"}]}
+{"label":"品种","id": "c", "pattern": [{"LOWER": "c"}]}
+{"label":"品种","id": "cs", "pattern": [{"LOWER": "cs"}]}
+{"label":"品种","id": "eb", "pattern": [{"LOWER": "eb"}]}
+{"label":"品种","id": "eg", "pattern": [{"LOWER": "eg"}]}
+{"label":"品种","id": "fb", "pattern": [{"LOWER": "fb"}]}
+{"label":"品种","id": "i", "pattern": [{"LOWER": "i"}]}
+{"label":"品种","id": "j", "pattern": [{"LOWER": "j"}]}
+{"label":"品种","id": "jd", "pattern": [{"LOWER": "jd"}]}
+{"label":"品种","id": "jm", "pattern": [{"LOWER": "jm"}]}
+{"label":"品种","id": "l", "pattern": [{"LOWER": "l"}]}
+{"label":"品种","id": "lg", "pattern": [{"LOWER": "lg"}]}
+{"label":"品种","id": "lh", "pattern": [{"LOWER": "lh"}]}
+{"label":"品种","id": "m", "pattern": [{"LOWER": "m"}]}
+{"label":"品种","id": "p", "pattern": [{"LOWER": "p"}]}
+{"label":"品种","id": "pg", "pattern": [{"LOWER": "pg"}]}
+{"label":"品种","id": "pp", "pattern": [{"LOWER": "pp"}]}
+{"label":"品种","id": "rr", "pattern": [{"LOWER": "rr"}]}
+{"label":"品种","id": "v", "pattern": [{"LOWER": "v"}]}
+{"label":"品种","id": "y", "pattern": [{"LOWER": "y"}]}
+{"label":"品种","id": "lc", "pattern": [{"LOWER": "lc"}]}
+{"label":"品种","id": "ps", "pattern": [{"LOWER": "ps"}]}
+{"label":"品种","id": "si", "pattern": [{"LOWER": "si"}]}
+{"label":"品种","id": "bc", "pattern": [{"LOWER": "bc"}]}
+{"label":"品种","id": "ec", "pattern": [{"LOWER": "ec"}]}
+{"label":"品种","id": "lu", "pattern": [{"LOWER": "lu"}]}
+{"label":"品种","id": "nr", "pattern": [{"LOWER": "nr"}]}
+{"label":"品种","id": "sc", "pattern": [{"LOWER": "sc"}]}
+{"label":"品种","id": "sctas", "pattern": [{"LOWER": "sctas"}]}
+{"label":"品种","id": "ad", "pattern": [{"LOWER": "ad"}]}
+{"label":"品种","id": "ag", "pattern": [{"LOWER": "ag"}]}
+{"label":"品种","id": "al", "pattern": [{"LOWER": "al"}]}
+{"label":"品种","id": "ao", "pattern": [{"LOWER": "ao"}]}
+{"label":"品种","id": "au", "pattern": [{"LOWER": "au"}]}
+{"label":"品种","id": "br", "pattern": [{"LOWER": "br"}]}
+{"label":"品种","id": "bu", "pattern": [{"LOWER": "bu"}]}
+{"label":"品种","id": "cu", "pattern": [{"LOWER": "cu"}]}
+{"label":"品种","id": "fu", "pattern": [{"LOWER": "fu"}]}
+{"label":"品种", "id": "hc", "pattern": [{"LOWER": "hc"}]}
+{"label":"品种", "id": "ni", "pattern": [{"LOWER": "ni"}]}
+{"label":"品种", "id": "pb", "pattern": [{"LOWER": "pb"}]}
+{"label":"品种", "id": "rb", "pattern": [{"LOWER": "rb"}]}
+{"label":"品种", "id": "ru", "pattern": [{"LOWER": "ru"}]}
+{"label":"品种", "id": "sn", "pattern": [{"LOWER": "sn"}]}
+{"label":"品种", "id": "sp", "pattern": [{"LOWER": "sp"}]}
+{"label":"品种", "id": "ss", "pattern": [{"LOWER": "ss"}]}
+{"label":"品种", "id": "wr", "pattern": [{"LOWER": "wr"}]}
+{"label":"品种","id": "zn", "pattern": [{"LOWER": "zn"}]}
+{"label":"交易所","id": "shfe", "pattern": [{"LOWER": "shfe"}]}
+{"label":"交易所","id": "shfe", "pattern":"上期所"}
+{"label":"交易所","id": "shfe", "pattern":"上海期货交易所"}
+{"label":"交易所","id": "ine", "pattern": [{"LOWER": "ine"}]}
+{"label":"交易所","id": "ine", "pattern":"上期能源"}
+{"label":"交易所","id": "ine", "pattern":"上海国际能源交易中心"}
+{"label":"交易所","id": "czce", "pattern": [{"LOWER": "czce"}]}
+{"label":"交易所","id": "czce", "pattern":"郑商所"}
+{"label":"交易所","id": "czce", "pattern":"郑州商品交易所"}
+{"label":"交易所","id": "czce", "pattern": [{"LOWER": "zce"}]}
+{"label":"交易所", "id": "dce", "pattern": [{"LOWER": "dce"}]}
+{"label":"交易所", "id": "dce", "pattern":"大商所"}
+{"label":"交易所", "id": "dce", "pattern":"大连商品交易所"}
+{"label":"交易所", "id": "gfe", "pattern": [{"LOWER": "gfex"}]}
+{"label":"交易所", "id": "gfe", "pattern": [{"LOWER": "gfe"}]}
+{"label":"交易所", "id": "gfe", "pattern":"广期所"}
+{"label":"交易所", "id": "gfe", "pattern":"广州期货交易所"}
+{"label":"交易所", "id": "cffex", "pattern": [{"LOWER": "cffex"}]}
+{"label":"交易所", "id": "cffex", "pattern":"中金所"}
+{"label":"交易所", "id": "cffex", "pattern":"中国金融期货交易所"}
+{"label":"交易所", "id": "sse", "pattern": [{"LOWER": "sse"}]}
+{"label":"交易所", "id": "sse", "pattern":"上交所"}
+{"label":"交易所", "id": "sse", "pattern":"上海证券交易所"}
+{"label":"交易所", "id": "szse", "pattern": [{"LOWER": "szse"}]}
+{"label":"交易所","id": "szse", "pattern":"深交所"}
+{"label":"交易所","id": "szse", "pattern":"深圳证券交易所"}
+{"label":"交易所","id": "cme", "pattern":"芝加哥商业交易所"}
+{"label":"交易所","id": "cme", "pattern": [{"LOWER": "cme"}]}
+{"label":"交易所","id": "cme group", "pattern":"芝加哥商业交易所集团"}
+{"label":"交易所","id": "cme group", "pattern": [{"LOWER": "cme group"}]}
+{"label":"交易所","id": "cbot", "pattern":"芝加哥期货交易所"}
+{"label":"交易所","id": "cbot", "pattern": [{"LOWER": "cbot"}]}
+{"label":"交易所","id": "bmd", "pattern":"马来西亚衍生产品交易所"}
+{"label":"交易所","id": "bmd", "pattern":"马来西亚衍生品交易所"}
+{"label":"交易所","id": "bmd", "pattern": [{"LOWER": "bmd"}]}
+{"label":"交易所","id": "ice", "pattern":"洲际交易所"}
+
 {"label":"会员/期货公司", "id": "0032", "pattern":"徽商期货有限责任公司"}
 {"label":"会员/期货公司", "id": "0033", "pattern":"华龙期货股份有限公司"}
 {"label":"会员/期货公司", "id": "0037", "pattern":"长城期货股份有限公司"}
