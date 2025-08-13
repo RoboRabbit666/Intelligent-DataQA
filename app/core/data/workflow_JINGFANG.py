@@ -563,7 +563,7 @@ class DataQaWorkflow:
 
             #-----------------------新增:如果有相关的FAQ(即0.7 =< 相似度 < 0.9),可添加参考---------------------------------
             if faq_results and faq_results[0]['similarity'] >= 0.7:
-                # 修改
+                # step5: generate_sql
                 response = self.generate_sql(
                     table_schema=located_table, #[0]['table_info'] if located_table else "",
                     input_messages=entity_enriched_query,
