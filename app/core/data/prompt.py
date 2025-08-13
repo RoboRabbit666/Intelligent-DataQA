@@ -55,5 +55,9 @@ dataqa_prompt = """“你是一个严谨的PostgreSQL专家增长将用户请求
 <question>
 {question}
 </question>
+下面被<faq>和</faq>包括在中间的是来自知识库FAQ中不是100%相关且仅供参考的示例（请勿直接引用！！！）:
+<faq>
+{faq}
+</faq>
 现在按照上面的要求,开始生成符合规范的答案。
 """

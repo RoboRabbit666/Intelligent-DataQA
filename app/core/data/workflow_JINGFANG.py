@@ -172,10 +172,10 @@ class DataQaWorkflow:
                     if entity['label'] == '合约':
                         #标准化合约代码- 将所有分隔符转换为标准模式
                         normalized_code = re.sub(r'[-_\.\s/]+', '', entity["text"].upper())
-                        substring = f"{normalized_code} (合约)"
+                        substring = f"{normalized_code} ({entity['label']})"
                     else:
                         #其他实体正确格式化
-                        substring = f"{entity['id']} ({entity['label']})"
+                        substring = f"{entity['text']} ({entity['label']})"
                     enhanced_query = enhanced_query.replace(entity['text'], substring, 1)
             logger.info(f"实体识别完成: {query} -> {enhanced_query}")
             return enhanced_query
