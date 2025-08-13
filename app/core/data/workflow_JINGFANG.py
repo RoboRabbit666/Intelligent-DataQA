@@ -567,11 +567,22 @@ class DataQaWorkflow:
 
             #-----------------------新增:如果有相关的FAQ(即0.7 =< 相似度 < 0.9),可添加参考---------------------------------
             if faq_results and faq_results[0]['similarity'] >= 0.7:
-                # step5: generate_sql
+                # step5: generate_sql (有FAQ参考)
+                table_schema = located_table[0]['table_info'] if located_table else ""
                 response = self.generate_sql(
-                    table_schema=located_table, #[0]['table_info'] if located_table else "",
+                    table_schema=table_schema,
                     input_messages=entity_enriched_query,
                     faq_results=faq_results,  # 添加FAQ结果
+                    thinking=thinking,
+                )
+                step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
+            else:
+                # step5: generate_sql (无FAQ参考，相似度 < 0.7)
+                table_schema = located_table[0]['table_info'] if located_table else ""
+                response = self.generate_sql(
+                    table_schema=table_schema,
+                    input_messages=entity_enriched_query,
+                    faq_results=None,  # 无FAQ参考
                     thinking=thinking,
                 )
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
