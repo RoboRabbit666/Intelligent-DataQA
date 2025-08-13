@@ -362,20 +362,20 @@ class DataQaWorkflow:
             logger.error(f"Locate table Error: {e}")
             return []
 
-    #生成单表查询的prompt
-    def generate_single_table_prompt(self, tables: List[Dict[str, Any]]) -> str:
-        """ ”生成单表查询的prompt
-        Args:
-            tables:表格信息列表
-        Returns:
-            表格提示词
-        """
-        #从数据库中获取该表的字段信息,该字段信息需要包含完整的字段信息(包括英文名称、中文名称、解释等)
-        # 用作sq1生成的prompt的一部分
-        table_info = tables[0].get("table_info", "")
-        #生成prompt
-        table_prompt = f"已知如下数据表信息:\n{table_info}\n"
-        return table_prompt
+    # #生成单表查询的prompt
+    # def generate_single_table_prompt(self, tables: List[Dict[str, Any]]) -> str:
+    #     """ ”生成单表查询的prompt
+    #     Args:
+    #         tables:表格信息列表
+    #     Returns:
+    #         表格提示词
+    #     """
+    #     #从数据库中获取该表的字段信息,该字段信息需要包含完整的字段信息(包括英文名称、中文名称、解释等)
+    #     # 用作sq1生成的prompt的一部分
+    #     table_info = tables[0].get("table_info", "")
+    #     #生成prompt
+    #     table_prompt = f"已知如下数据表信息:\n{table_info}\n"
+    #     return table_prompt
 
     def generate_sql(
         self,
@@ -384,13 +384,17 @@ class DataQaWorkflow:
         faq_results: Optional[Dict[str, Any]] = None,
         thinking: Optional[bool] = False,
     ):
-        """   生成SQL
+        """   
+        生成SQL
+
         Args:
-            table_schema (str): _description_
-            input_messages (List[ChatMessage]): _description_
-            thinking (Optional[bool], optional): _description_. Defaults to False.
+            table_schema (str): 表格模式
+            input_messages (List[ChatMessage]): 输入消息
+            faq_results (Optional[Dict[str, Any]], optional): FAQ结果. Defaults to None.
+            thinking (Optional[bool], optional): 是否思考. Defaults to False.
+
         Returns:
-            _type_:_description_
+            response: 返回生成的SQL响应
         """
         query = input_messages[-1].content
         content = dataqa_prompt.format(table_schema=table_schema, question=query, faq=faq_results)
