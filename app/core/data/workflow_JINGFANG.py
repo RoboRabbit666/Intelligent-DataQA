@@ -381,6 +381,7 @@ class DataQaWorkflow:
         self,
         table_schema: str,
         input_messages: List[ChatMessage],
+        faq_results: Optional[Dict[str, Any]] = None,
         thinking: Optional[bool] = False,
     ):
         """   生成SQL
@@ -392,7 +393,7 @@ class DataQaWorkflow:
             _type_:_description_
         """
         query = input_messages[-1].content
-        content = dataqa_prompt.format(table_schema=table_schema, question=query)
+        content = dataqa_prompt.format(table_schema=table_schema, question=query, faq=faq_results)
         # print(content)
         system_msg = ChatMessage(
             role="system",
@@ -553,32 +554,25 @@ class DataQaWorkflow:
                 step3 = self._create_step(WorkflowStepType.SEMANTIC_SEARCH_FAQ,3,"找到相关FAQ, 但是不满足0.9阈值")
             else:
                 step3 = self._create_step(WorkflowStepType.SEMANTIC_SEARCH_FAQ,3,"没有找到相关FAQ")
+                faq_results = None
             #----------------------------------------------------------------------------------------
 
             # Step4: locate table
             located_table = self.locate_table(entity_enriched_query, knowledge_base_ids)
             step4 = self._create_step(WorkflowStepType.LOCATE_TABLE, 4, located_table)
-            # Step5: generate single table prompt
-            # TODO 未发现使用位置
-            single_table_prompt = self.generate_single_table_prompt(located_table)
 
             #-----------------------新增:如果有相关的FAQ(即0.7 =< 相似度 < 0.9),可添加参考---------------------------------
             if faq_results and faq_results[0]['similarity'] >= 0.7:
-                single_table_prompt += f"\n\n参考示例:\n问题: {faq_results[0]['question']}\nSQL: {faq_results[0]['sql']}\n"
+                # 修改
+                response = self.generate_sql(
+                    table_schema=located_table, #[0]['table_info'] if located_table else "",
+                    input_messages=entity_enriched_query,
+                    faq_results=faq_results,  # 添加FAQ结果
+                    thinking=thinking,
+                )
+                step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
+                
             #---------------------------------------------------------------------------------------------------------
-            
-            step5 = self._create_step(
-                WorkflowStepType.GENERATE_PROMPT, 5, single_table_prompt
-            )
-            #Step6: generate_sql
-            # 修改
-            response = self.generate_sql(
-                table_schema=located_table, #[0]['table_info'] if located_table else "",
-                input_messages=entity_enriched_query,
-                thinking=thinking,
-            )
-            step6 = self._create_step(WorkflowStepType.GENERATE_SQL, 6, response)
-            
             # 构造最终响应
             usage = ChatUsage(
                 prompt_tokens=response.usage.prompt_tokens,
@@ -606,25 +600,5 @@ class DataQaWorkflow:
                 created=response.created,
                 choices=choices,
                 usage=usage,
-                steps=[step1, step2, step3, step4, step5, step6],
+                steps=[step1, step2, step3, step4, step5],
             )
-#11m:app/core/components.py
-# query="苹果是在哪个交易所上市的"
-# dataga = DataQaWorkflow(llm=qwen3_llm,query=query)
-# #测试locate_table函数
-# chunk_id, table_name, tabel_score = dataga.locate_table()
-# print(chunk_id)
-# print(table_name)
-# print(tabel_score)
-# #测试generate_single_table_prompt函数
-# chunk_id = "1e7fcf17-cac8-5322-912e-b96900beae78"
-# prompt = dataqa.generate_single_table_prompt(chunk_id)
-# analysis_info, sql_code = dataqa.generate_sql_code(prompt,query)
-# print(analysis_info)
-# print('---------')
-# print(sql_code)
-# HMM
-# #测试entity_recgnition函数
-# query = "华泰期货在郑商所的持仓量是多少?,"
-# query = dataqa.entity_recognition(query)
-# print(query)
