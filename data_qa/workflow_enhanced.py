@@ -171,6 +171,38 @@ class DataQaWorkflow:
         """提取输入信息列表"""
         return request.messages[-self.config.history_round * 2:]
 
+    #=========== 新增：短格式合约扩展 ================
+    def _expand_short_contracts(self, query: str) -> str:
+        """
+        扩展短格式合约代码    
+        """
+        def expand_match(match):
+            prefix = match.group(1)
+            year_digit = int(match.group(3))
+            month = match.group(4)
+            
+            # Rolling decade rule
+            current_year = datetime.now().year
+            current_decade = (current_year // 10) * 10
+            
+            option1 = current_decade + year_digit
+            option2 = current_decade + 10 + year_digit
+            
+            if abs(option1 - current_year) <= abs(option2 - current_year):
+                target_year = option1
+            else:
+                target_year = option2
+            
+            result = f"{prefix}{str(target_year)[-2:]}{month}"
+            logger.info(f"短格式扩展: {match.group(0)} -> {result}")
+            return result
+
+        # 正则表达式匹配短格式合约代码
+        short_pattern = r'(?<![A-Za-z])([A-Za-z]{1,3})(([0-9]{1})(0[1-9]|1[0-2]))(?![A-Za-z0-9])'
+        result = regex_module.sub(short_pattern, expand_match, query)
+        return result
+
+
     # ========== 增强版实体识别（替换原函数） ==========
     def entity_recognition(self, query: str):
         """
