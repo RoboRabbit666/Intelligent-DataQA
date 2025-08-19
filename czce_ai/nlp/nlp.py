@@ -68,11 +68,18 @@ class NLPToolkit:
     def _init_entity_ruler(self):
         if "entity_ruler" in self.nlp.pipe_names:
             self.nlp.remove_pipe("entity_ruler")
-        if "ner" in self.nlp.pipe_names:
-            ruler = self.nlp.add_pipe("entity_ruler", before="ner")
-        else:
-            ruler = self.nlp.add_pipe("entity_ruler")
         
+        cfg = {
+            "phrase_matcher_attr": "LOWER",  # 让字符串模式大小写不敏感（针对英文缩写/代码）
+            "overwrite_ents": True           # 优先用规则识别实体（覆盖spaCy模型识别）
+        }
+
+        if "ner" in self.nlp.pipe_names:
+            # 规则覆盖模型
+            ruler = self.nlp.add_pipe("entity_ruler", after="ner", config=cfg)
+        else:
+            ruler = self.nlp.add_pipe("entity_ruler", config=cfg)
+
         # 从jsonl文件加载patterns
         if self.patterns_path and self.patterns_path.exists():
             ruler.from_disk(str(self.patterns_path))
