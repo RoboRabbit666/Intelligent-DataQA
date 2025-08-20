@@ -174,7 +174,8 @@ class DataQaWorkflow:
     #=========== 新增：短格式合约扩展 ================
     def _expand_short_contracts(self, query: str) -> str:
         """
-        扩展短格式合约代码    
+        autocompleted docstrings:
+        
         """
         def expand_match(match):
             prefix = match.group(1)
