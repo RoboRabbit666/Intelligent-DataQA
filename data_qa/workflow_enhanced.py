@@ -174,31 +174,51 @@ class DataQaWorkflow:
     #=========== 新增：短格式合约扩展 ================
     def _expand_short_contracts(self, query: str) -> str:
         """
-        autocompleted docstrings:
+        将短格式合约代码扩展为标准长格式。
+    
+        使用rolling decade rule将单位年份数字转换为完整年份：
+        - 基于当前年份选择最接近的十年
+        - 平局时选择较早的十年
         
+        Args:
+            query (str): 输入查询字符串
+            
+        Returns:
+            str: 处理后的查询字符串，短格式合约代码已扩展
+            
+        Examples:
+             # 2025年场景
+            _expand_short_contracts("查询AP509的成交量")
+            "查询AP2509的成交量"
+            _expand_short_contracts("CU601期货价格") 
+            "CU2601期货价格"
+
         """
         def expand_match(match):
-            prefix = match.group(1)
-            year_digit = int(match.group(3))
-            month = match.group(4)
-            
-            # Rolling decade rule
+            """处理单个短格式匹配的回调函数"""
+            prefix = match.group(1)             # 品种代码，如 "AP"
+            year_digit = int(match.group(3))    # 年份数字，如 "5"
+            month = match.group(4)              # 月份，如 "09"
+
+            # Rolling decade rule: 选择距离当前年份最近的选项
             current_year = datetime.now().year
             current_decade = (current_year // 10) * 10
             
-            option1 = current_decade + year_digit
-            option2 = current_decade + 10 + year_digit
+            option1 = current_decade + year_digit           # 当前十年
+            option2 = current_decade + 10 + year_digit      # 下个十年
             
+            # 选择距离最近的，平局选较早的
             if abs(option1 - current_year) <= abs(option2 - current_year):
                 target_year = option1
             else:
                 target_year = option2
             
+            # 构建完整合约代码
             result = f"{prefix}{str(target_year)[-2:]}{month}"
             logger.info(f"短格式扩展: {match.group(0)} -> {result}")
             return result
 
-        # 正则表达式匹配短格式合约代码
+        # 正则模式匹配短格式合约代码：品种代码(1-3字母) + 年份(1位数字) + 月份(01-12)
         short_pattern = r'(?<![A-Za-z])([A-Za-z]{1,3})(([0-9]{1})(0[1-9]|1[0-2]))(?![A-Za-z0-9])'
         result = regex_module.sub(short_pattern, expand_match, query)
         return result
