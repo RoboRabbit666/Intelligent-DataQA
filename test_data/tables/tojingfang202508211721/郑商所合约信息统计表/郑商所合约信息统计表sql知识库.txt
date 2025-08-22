@@ -1,0 +1,431 @@
+问题：查询郑商所所有在市合约的交易代码和中文名称
+SELECT distinct comd_code, comd_name 
+FROM dataqa.comd_info_stas_tab
+where l_trade_date>'2025-07-02'
+and exch_code='CZCE';
+
+问题：查询当前交易的所有农产品的期权合约的交易代码和其中文描述
+SELECT comd_code, comd_name
+FROM dataqa.comd_info_stas_tab 
+WHERE fut_opt_flag = 'O'
+and l_trade_date>'2025-07-02'
+and exch_code='CZCE'
+and is_prod='Y';
+
+问题：查询2025-07-02日郑商所所有期货合约的交易代码、中文名称及收盘价
+SELECT biz_dt,comd_code, comd_name, clos_prc 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' AND fut_opt_flag = 'F' AND exch_code = 'CZCE';
+
+问题：查询今日棉花品种的所有合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE clas_name like %棉花%
+and biz_dt = '2025-07-02' 
+and exch_code='CZCE';
+
+问题：查询棉花的所有期权合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE clas_code = 'CF' AND fut_opt_flag = 'O'
+and biz_dt = '2025-07-02' 
+and exch_code='CZCE';
+
+问题：查询棉花期货在2025-07-02日的主力合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' 
+AND is_main_comd = 'Y'
+and clas_name like %棉花%
+and fut_opt_flag='F'
+AND exch_code = 'CZCE';
+
+问题：查询棉花在2025-07-02日的期权主力合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' 
+AND is_opt_mon_main_comd = 'Y'
+and clas_name like %棉花%
+and fut_opt_flag='O'
+AND exch_code = 'CZCE';
+
+问题：查询2025-07-02日所有合约的近月合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' 
+AND near_mon_comd_logo = 'Y'
+AND exch_code = 'CZCE';
+
+问题：查询品种代码为'CF'的近月合约信息。
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE clas_code = 'CF' AND near_mon_comd_logo = 'Y'
+and biz_dt = '2025-07-02' AND exch_code = 'CZCE';
+
+问题：查询2025-07-02日CF2507P系列期权下所有合约的交易量和持仓量
+SELECT biz_dt, comd_code, trd_qty, hld_qty 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02'
+and opt_ser_code = 'CF2201P'
+AND exch_code = 'CZCE';
+
+问题：查询当前哪些期权合约存在短期系列期权
+SELECT biz_dt, comd_code, opt_ser_code
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02'
+and pro_flag = 'Y'
+AND exch_code = 'CZCE'
+order by opt_ser_code;
+
+问题：查询郑商所2025-07-02日期内交易量最大的合约信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+ORDER BY trd_qty DESC 
+LIMIT 1;
+
+问题：查询郑商所2025-07-02日的最大涨幅的期权合约是哪个
+SELECT biz_dt, comd_code, mx_urng
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02'
+and fut_opt_flag='O'
+AND exch_code = 'CZCE'
+order by mx_urng desc
+limit 1;
+
+问题：查询郑商所2025-07-02日CF2507P6500合约的开盘价、收盘价、最高成交价、最低成交价、历史最高价和历史最低价
+SELECT biz_dt, comd_code, opn_qn_prc, clos_prc, highest_trd_prc, lowest_trd_prc,hist_highest_prc, hist_lowest_prc
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02'
+AND exch_code = 'CZCE'
+and comd_code='CF2507P6500';
+
+问题：查询郑商所2025-07-02日内所有农产品合约的信息，并按照合约代码排序
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' AND is_prod = 'Y' AND exch_code = 'CZCE'
+order by come_code;
+
+问题：查询郑商所2025-07-02日的所有非农产品合约的信息
+SELECT * 
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' AND is_prod = 'N' AND exch_code = 'CZCE';
+
+问题：查询郑商所2025-07-02日的所有达到涨停或跌停的合约
+SELECT biz_dt, comd_code, llm_status_code_desc
+FROM dataqa.comd_info_stas_tab 
+WHERE biz_dt = '2025-07-02' AND llm_status_code IN ('U', 'D') AND exch_code = 'CZCE';
+
+问题：查询郑商所2025-07-02日成交量大于10000手的合约信息。
+SELECT * FROM dataqa.comd_info_stas_tab 
+WHERE trd_qty > 10000
+and biz_dt = '2025-07-02' AND exch_code = 'CZCE';
+
+问题：棉花2003合约的上市日期和最后交易日分别是多少
+SELECT comd_name,lst_dt,l_trade_date
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  comd_code = 'CF2003'
+  and biz_dt='2025-07-02' AND exch_code = 'CZCE';
+  
+问题:棉花2003期权的今日交易数据
+select * 
+from dataqa.comd_info_stas_tab
+where subj_code='CF2003'
+and biz_dt ='2025-07-02'
+order by comd_code;
+
+问题：棉花2409合约当日的最高价与最低价差值是多少
+SELECT biz_dt,comd_name ,
+  (highest_trd_prc - lowest_trd_prc) AS 最高价与最低价差值
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  comd_code = 'CF2409'
+  and biz_dt='2025-07-02' AND exch_code = 'CZCE';
+
+问题：棉花2409合约结算价较昨结算价上涨幅度是多少
+SELECT biz_dt, comd_name,
+  ((clr_prc - l_clr_prc) / l_clr_prc) * 100.0 AS 结算价较昨结算价上涨幅度_百分比
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  comd_code = 'CF2409'
+  and biz_dt='2025-07-02' AND exch_code = 'CZCE';
+
+问题：罗列下今日CF2201P期权系列中的虚实值
+SELECT 
+  biz_dt,comd_name,ioa_code_desc
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  opt_ser_code = 'CF2201P' 
+  and biz_dt='2025-07-02' AND exch_code = 'CZCE';
+
+问题：今日成交量排名前10的合约有哪些
+SELECT biz_dt,comd_name ,trd_qty 
+FROM 
+  dataqa.comd_info_stas_tab
+  where biz_dt='2025-07-02' AND exch_code = 'CZCE'
+ORDER BY 
+  trd_qty DESC
+LIMIT 10;
+
+问题：苹果期货的今年3月份交易的合约以及合约对应的成交量和成交额是多少
+SELECT comd_code ,sum(trd_qty) as 成交量 ,sum(trd_amt) as 成交额
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  clas_code = 'AP' 
+  AND BIZ_DT BETWEEN '2025-03-01' AND '2025-03-31' 
+  AND fut_opt_flag = 'F' AND exch_code = 'CZCE'
+  group by comd_code
+  order by come_code;
+
+问题：棉花期权的3月份交易的合约以及合约对应的成交量和成交额是多少
+SELECT comd_code ,sum(trd_qty) as 成交量 ,sum(trd_amt) as 成交额
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  clas_code = 'CF' 
+  AND BIZ_DT BETWEEN '2025-03-01' AND '2025-03-31'
+  and fut_opt_flag = 'O' AND exch_code = 'CZCE'
+group by comd_code
+order by come_code;
+
+问题：棉花买权的3月份交易的合约以及合约对应的的成交量和成交额是多少
+SELECT comd_code ,sum(trd_qty) as 成交量 ,sum(trd_amt) as 成交额
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  clas_code ='CF' AND cp_flag = 'C'
+  and BIZ_DT BETWEEN '2025-03-01' AND '2025-03-31'
+  and fut_opt_flag = 'O' AND exch_code = 'CZCE'
+  group by comd_code
+  order by come_code;
+
+问题：今日菜粕101看涨期权和看跌期权成交量分别是多少
+SELECT biz_dt,comd_name ,cp_flag_desc ,trd_qty
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  clas_code = 'RM' 
+  AND fut_opt_flag = 'O'
+  and biz_dt='2025-07-02'
+  AND exch_code = 'CZCE';
+
+问题：罗列今日棉花7月标的期权的行权价是多少
+SELECT biz_dt, comd_name, exec_prc
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  clas_code = 'CF' 
+  AND subj_code = 'CF2507' 
+  AND fut_opt_flag = 'O' 
+  and biz_dt='2025-07-02' AND exch_code = 'CZCE';
+
+问题：AP2409合约2025-07-02日内平今仓手续费总额是多少
+SELECT 
+  SUM(cth_trd_cmsn_fee) AS 平今仓手续费总额
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  comd_code = 'AP2409' AND
+  biz_dt = '2025-07-02'
+  AND exch_code = 'CZCE'
+group by comd_code;
+
+问题：当前连续单边市天数3天以上的合约有哪些
+SELECT biz_dt,comd_code,comd_name ,llm_days 
+FROM 
+  dataqa.comd_info_stas_tab
+WHERE 
+  llm_days > 3
+  and biz_dt='2025-07-02'
+  AND exch_code = 'CZCE';
+
+问题：郑商所当前不同品种交易的最小变动价位是什么
+SELECT clas_code,fut_opt_flag,tick
+FROM 
+  dataqa.comd_info_stas_tab
+where l_trade_date>'2025-07-02'
+and exch_code='CZCE'
+GROUP BY 
+  clas_code,fut_opt_flag
+order by clas_code,fut_opt_flag;
+
+问题：当前棉花品种交易的合约有哪些，并且罗列出对应的主力期货合约和期权合约
+select distinct comd_code,clas_code,fut_opt_flag,is_main_comd
+FROM 
+  dataqa.comd_info_stas_tab
+where l_trade_date>'2025-07-02'
+and clas_code = 'CF' AND exch_code = 'CZCE';
+
+问题：罗列菜籽油品种期货的主力合约和近月合约，并显示主力合约和近月合约的结算价在近7天的差价？
+WITH 
+-- 获取菜籽油主力合约代码
+main_contract AS (
+    SELECT comd_code
+    FROM dataqa.comd_info_stas_tab
+    WHERE clas_code = 'OI'
+    AND is_main_comd = 'Y'
+    AND fut_opt_flag = 'F'
+    AND biz_dt = '2025-07-02'
+    LIMIT 1
+),
+
+-- 获取菜籽油近月合约代码
+near_contract AS (
+    SELECT comd_code
+    FROM dataqa.comd_info_stas_tab
+    WHERE clas_code = 'OI'
+    AND near_mon_comd_logo = 'Y'
+    AND fut_opt_flag = 'F'
+    AND biz_dt = '2025-07-02'
+    LIMIT 1
+),
+
+-- 获取主力合约近7天结算价数据
+main_prices AS (
+    SELECT 
+        biz_dt,
+        comd_code,
+        comd_name,
+        clr_prc AS main_clr_prc
+    FROM dataqa.comd_info_stas_tab
+    WHERE comd_code = (SELECT comd_code FROM main_contract)
+    AND biz_dt >（'2025-07-02'::date -7）
+    ORDER BY biz_dt
+),
+
+-- 获取近月合约近7天结算价数据
+near_prices AS (
+    SELECT 
+        biz_dt,
+        comd_code,
+        comd_name,
+        clr_prc AS near_clr_prc
+    FROM dataqa.comd_info_stas_tab
+    WHERE comd_code = (SELECT comd_code FROM near_contract)
+    AND biz_dt >（'2025-07-02'::date -7）
+    ORDER BY biz_dt
+)
+
+-- 合并结果并计算差价
+SELECT 
+    m.biz_dt,
+    m.comd_code AS main_contract_code,
+    m.comd_name AS main_contract_name,
+    m.main_clr_prc,
+    n.comd_code AS near_contract_code,
+    n.comd_name AS near_contract_name,
+    n.near_clr_prc,
+    (m.main_clr_prc - n.near_clr_prc) AS price_diff
+FROM main_prices m
+JOIN near_prices n ON m.biz_dt = n.biz_dt
+ORDER BY m.biz_dt DESC;
+
+问题：查询郑商所当前期权隐含波动率最高的合约
+select biz_dt,comd_code ,ABS(opt_impl_volt)
+FROM dataqa.comd_info_stas_tab
+where biz_dt = '2025-07-02'
+  AND exch_code = 'CZCE'
+  and fut_opt_flag = 'O'
+  order by ABS(opt_impl_volt) 
+  limit 1;
+
+问题：查询郑商所近7天合约代码为CF2101C13600期权的隐含波动率
+select biz_dt,comd_code,opt_impl_volt
+FROM dataqa.comd_info_stas_tab
+where exch_code = 'CZCE'
+  and fut_opt_flag = 'O'
+  and comd_code = 'CF2101C13600'
+  and biz_dt >（'2025-07-02'::date -7）
+
+问题：查询已进入交割月的合约信息，即进入到合约月份，但当前日期小于最后交易日的日期的数据
+SELECT distinct comd_code, comd_name, lst_dt
+FROM dataqa.comd_info_stas_tab
+WHERE EXTRACT(YEAR FROM '2025-07-02'::date) = EXTRACT(YEAR FROM lst_dt) 
+and EXTRACT(month FROM '2025-07-02'::date) = EXTRACT(month FROM lst_dt) 
+AND exch_code = 'CZCE'
+and fut_opt_flag = 'F';
+
+问题：查询棉花品种当前可交割合约的交割日期,交割配对量和最后交易日
+SELECT biz_dt,comd_code, comd_name,dlv_mch_qty, lst_dt
+FROM dataqa.comd_info_stas_tab
+WHERE clas_code = 'CF'
+and EXTRACT(YEAR FROM '2025-07-02'::date) = EXTRACT(YEAR FROM lst_dt) 
+and EXTRACT(month FROM '2025-07-02'::date) = EXTRACT(month FROM lst_dt) 
+AND exch_code = 'CZCE'
+and fut_opt_flag = 'F'
+ORDER BY biz_dt desc;
+
+问题：查询今日持仓量大于10000手且已进入交割月的合约
+SELECT biz_dt, comd_code, comd_name, hld_qty, lst_dt
+FROM dataqa.comd_info_stas_tab
+WHERE hld_qty > 10000
+and EXTRACT(YEAR FROM '2025-07-02'::date) = EXTRACT(YEAR FROM lst_dt) 
+and EXTRACT(month FROM '2025-07-02'::date) = EXTRACT(month FROM lst_dt) 
+AND biz_dt = '2025-07-02'
+AND exch_code = 'CZCE'
+ORDER BY hld_qty DESC;
+
+问题：查询今日棉花品种所有合约的交割月份
+SELECT biz_dt,comd_code,TO_DATE(RIGHT(subj_code, 4), 'YYMM') AS delivery_month
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND exch_code = 'CZCE'
+and fut_opt_flag = 'F'
+and clas_code = 'CF'
+ORDER BY delivery_month;
+
+问题：查询郑商所当前近7天即将到期的期权合约及其标的期货合约
+SELECT distinct comd_code ,comd_name,subj_code,lst_dt
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'O'
+AND lst_dt BETWEEN '2025-07-02' AND ('2025-07-02'::date +7)
+AND exch_code = 'CZCE'
+order by lst_dt;
+
+问题：过去一周郑商所FG2509的成交额环比增长多少,今天日期是2025-07-02
+WITH 
+-- 本周数据
+current_week AS (
+    SELECT 
+        SUM(trd_amt) AS 成交额_本周
+    FROM 
+        znwd.znwd_czce_clas_info_tab
+    WHERE 
+        comd_code = 'FG2509' --合约代码
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='F'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)-1))
+                      AND '2025-07-02'::date
+),
+-- 上周数据
+last_week AS (
+    SELECT 
+        SUM(trd_amt) AS 成交额_上周
+    FROM 
+        znwd.znwd_czce_clas_info_tab
+    WHERE 
+        comd_code = 'FG2509' --合约代码
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='F'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)+6))
+                      AND ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)))
+)
+ 
+SELECT 
+    cw.成交额_本周,
+    lw.成交额_上周,
+    CASE 
+        WHEN lw.成交额_上周 = 0 THEN NULL  -- 避免除以0
+        ELSE ROUND((cw.成交额_本周 - lw.成交额_上周) * 100.0 / lw.成交额_上周, 2)
+    END AS 环比增长率_百分比
+FROM 
+    current_week cw, last_week lw;
+
+

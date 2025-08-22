@@ -1,0 +1,208 @@
+郑商所品种信息统计表数据问答SQL集合
+
+-- 基础查询类
+
+问题1：查询郑商所当前所有期货品种的基本信息
+SELECT BIZ_DT, CLAS_CODE, CLAS_NAME, CLAS_ABBR, IS_PROD, fut_opt_flag
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+ORDER BY CLAS_CODE;
+
+问题2：查询当前主力合约结算价超过1000元的品种及其主力合约信息
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, main_comd, main_comd_clr_prc, main_comd_trd_qty, main_comd_hld_qty
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND main_comd_clr_prc > 1000
+ORDER BY main_comd_clr_prc DESC;
+
+问题3：查询当前所有期权品种的交易和持仓情况
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, trd_qty, trd_amt, hld_qty, hld_amt
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'O'
+ORDER BY trd_qty DESC;
+
+问题4：查询当前农产品期货的近月合约信息
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, IS_PROD, near_mon_comd, near_mon_comd_clr_prc, near_mon_comd_trd_qty, near_mon_comd_hld_qty
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND IS_PROD = '农产品'
+ORDER BY near_mon_comd_clr_prc DESC;
+
+问题5：查询当前成交量大于10000手的品种基本信息
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, trd_qty, trd_amt, main_comd, main_comd_clr_prc
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_qty > 10000
+ORDER BY trd_qty DESC;
+
+-- 统计分析类
+
+问题6：统计郑商所当前持仓量最大的前10个品种
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, hld_qty, hld_amt
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+ORDER BY hld_qty DESC
+LIMIT 10;
+
+问题7：统计当前各品种的成交量占郑商所总成交量的比例
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag,
+       trd_qty as 品种成交量,
+       ROUND(trd_qty * 100.0 / (SELECT SUM(trd_qty) FROM dataqa.clas_info_stas_tab WHERE BIZ_DT = '2025-07-02' AND EXCH_CODE = 'CZCE'), 2) as 成交量占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+ORDER BY 成交量占比_百分比 DESC;
+
+问题8：统计当前各品种的交易客户数和持仓客户数
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, trd_clit_qty, hld_clit_qty
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_clit_qty > 0
+ORDER BY trd_clit_qty DESC;
+
+问题9：统计当前不同交易手续费标准的品种数量分布
+SELECT trd_cmsn_fee_std as 交易手续费标准, COUNT(*) as 品种数量
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+GROUP BY trd_cmsn_fee_std
+ORDER BY 品种数量 DESC;
+
+问题10：统计当前农产品和非农产品的成交量和成交额对比
+SELECT IS_PROD, 
+       SUM(trd_qty) as 总成交量,
+       SUM(trd_amt) as 总成交额,
+       COUNT(*) as 品种数量
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+GROUP BY IS_PROD
+ORDER BY 总成交量 DESC;
+
+-- 比率计算类
+
+问题11：计算各品种的成交持仓比（成交量/持仓量）
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, trd_qty, hld_qty,
+       CASE 
+           WHEN hld_qty > 0 THEN ROUND(trd_qty::NUMERIC / hld_qty, 4)
+           ELSE NULL
+       END as 成交持仓比
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_qty > 0
+ORDER BY 成交持仓比 DESC NULLS LAST;
+
+问题12：查询期现价格偏离度绝对值超过5%的品种
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, SPOT_PRC, near_mon_comd_clr_prc, 
+       prd_spot_prc_ske_rate, SPOT_PRC_SRC, PRON_NAME
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ABS(prd_spot_prc_ske_rate) > 0.05
+ORDER BY ABS(prd_spot_prc_ske_rate) DESC;
+
+问题13：计算各品种主力合约持仓量占总持仓量的比例
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, main_comd_hld_qty, hld_qty,
+       ROUND(main_comd_hld_qty * 100.0 / NULLIF(hld_qty, 0), 2) as 主力合约持仓占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND hld_qty > 0
+ORDER BY 主力合约持仓占比_百分比 DESC;
+
+问题14：计算各品种的撤单率（撤单手数/定单手数）
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, cancel_order_lot, ord_lot,
+       ROUND(cancel_order_lot * 100.0 / NULLIF(ord_lot, 0), 2) as 撤单率_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ord_lot > 0
+ORDER BY 撤单率_百分比 DESC;
+
+问题15：计算各品种投机交易占总交易的比例
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag, spe_trd_qty, trd_qty,
+       ROUND(spe_trd_qty * 100.0 / NULLIF(trd_qty, 0), 2) as 投机交易占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_qty > 0
+ORDER BY 投机交易占比_百分比 DESC;
+
+-- 时间序列类
+
+问题16：查询最近7天棉花期货的交易数据汇总
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag,
+       SUM(trd_qty) as 总成交量, SUM(trd_amt) as 总成交额,
+       SUM(hld_qty) as 总持仓量, SUM(hld_amt) as 总持仓额
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT > ('2025-07-02'::date - 7)
+AND EXCH_CODE = 'CZCE'
+AND CLAS_CODE = 'CF'
+AND fut_opt_flag = 'F'
+GROUP BY BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag
+ORDER BY BIZ_DT DESC;
+
+问题17：查询7月份各农产品期货的月度交易汇总
+SELECT CLAS_NAME, CLAS_CODE, IS_PROD,
+       SUM(trd_qty) as 月度总成交量,
+       SUM(trd_amt) as 月度总成交额,
+       AVG(main_comd_clr_prc) as 主力合约平均结算价
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND IS_PROD = '农产品'
+GROUP BY CLAS_NAME, CLAS_CODE, IS_PROD
+ORDER BY 月度总成交量 DESC;
+
+问题18：查询近30天期权行权量的历史数据
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, 
+       SUM(opt_exer_qty) as 日度行权量,
+       SUM(opt_exer_amt) as 日度行权额
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT >= ('2025-07-02'::date - 30)
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'O'
+AND opt_exer_qty > 0
+GROUP BY BIZ_DT, CLAS_NAME, CLAS_CODE
+ORDER BY BIZ_DT DESC, 日度行权量 DESC;
+
+问题19：对比主力合约与近月合约结算价差的历史变化（近7天）
+SELECT BIZ_DT, CLAS_NAME, CLAS_CODE, fut_opt_flag,
+       main_comd_clr_prc, near_mon_comd_clr_prc,
+       (main_comd_clr_prc - near_mon_comd_clr_prc) as 主力近月价差
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT > ('2025-07-02'::date - 7)
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND main_comd_clr_prc IS NOT NULL
+AND near_mon_comd_clr_prc IS NOT NULL
+ORDER BY BIZ_DT DESC, ABS(主力近月价差) DESC;
+
+问题20：统计各品种近一个月的交易活跃度变化趋势
+SELECT CLAS_NAME, CLAS_CODE, fut_opt_flag,
+       COUNT(DISTINCT BIZ_DT) as 交易天数,
+       SUM(trd_qty) as 累计成交量,
+       AVG(trd_qty) as 日均成交量,
+       MAX(trd_qty) as 最大单日成交量,
+       MIN(trd_qty) as 最小单日成交量,
+       STDDEV(trd_qty) as 成交量标准差
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT >= ('2025-07-02'::date - 30)
+AND EXCH_CODE = 'CZCE'
+AND trd_qty > 0
+GROUP BY CLAS_NAME, CLAS_CODE, fut_opt_flag
+HAVING COUNT(DISTINCT BIZ_DT) >= 10
+ORDER BY 日均成交量 DESC;

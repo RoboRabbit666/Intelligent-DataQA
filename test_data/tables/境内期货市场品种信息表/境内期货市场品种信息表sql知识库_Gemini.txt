@@ -1,0 +1,109 @@
+问题：查询2025年7月2日郑州商品交易所的所有期货品种。
+SELECT CLAS_NAME
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND EXCH_CODE = 'CZCE' AND fut_opt_flag = 'F';
+
+问题：查询2025年7月上海期货交易所成交量最大的前5个期货品种。
+SELECT CLAS_NAME, SUM(trd_qty) as total_trd_qty
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE EXCH_CODE = 'SHFE' AND BIZ_DT >= '2025-07-01' AND BIZ_DT <= '2025-07-31' AND fut_opt_flag = 'F'
+GROUP BY CLAS_NAME
+ORDER BY total_trd_qty DESC
+LIMIT 5;
+
+问题：统计每个交易所的品种数量。
+SELECT EXCH_NAME, COUNT(DISTINCT CLAS_CODE) as number_of_products
+FROM dataqa.fut_mrkt_clas_info_tab
+GROUP BY EXCH_NAME;
+
+问题：找出所有交易所的苹果(AP)期货在2025年7月2日的总成交额。
+SELECT SUM(trd_amt)
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND CLAS_CODE = 'AP' AND fut_opt_flag = 'F';
+
+问题：2025年第一季度，哪个品种的月均成交量最高？
+SELECT CLAS_NAME, AVG(trd_qty) as avg_monthly_volume
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT BETWEEN '2025-01-01' AND '2025-03-31'
+GROUP BY CLAS_NAME
+ORDER BY avg_monthly_volume DESC
+LIMIT 1;
+
+问题：查询中国金融期货交易所（CFFEX）所有股指期权的列表。
+SELECT DISTINCT CLAS_NAME
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE EXCH_CODE = 'CFFEX' AND fut_opt_flag = 'O';
+
+问题：2025年7月2日，哪些品种的期货和期权都有交易？
+SELECT CLAS_NAME
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY CLAS_NAME
+HAVING COUNT(DISTINCT fut_opt_flag) = 2;
+
+问题：查询大连商品交易所（DCE）在2025年7月2日的主力合约成交量和成交额。
+SELECT CLAS_NAME, main_comd_trd_qty, main_comd_trd_amt
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND EXCH_CODE = 'DCE';
+
+问题：2025年7月份，郑州商品交易所（CZCE）的总成交额是多少？
+SELECT SUM(trd_amt)
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE EXCH_CODE = 'CZCE' AND BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31';
+
+问题：查询所有交易所名称及其对应的代码。
+SELECT DISTINCT EXCH_CODE, EXCH_NAME
+FROM dataqa.fut_mrkt_clas_info_tab;
+
+问题：2025年7月2日，哪个交易所的期权成交量最大？
+SELECT EXCH_NAME, SUM(trd_qty) as total_option_volume
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND fut_opt_flag = 'O'
+GROUP BY EXCH_NAME
+ORDER BY total_option_volume DESC
+LIMIT 1;
+
+问题：查询2025年7月2日，所有品种的主力合约成交量占总成交量的比例。
+SELECT CLAS_NAME, SUM(main_comd_trd_qty) * 100.0 / SUM(trd_qty) as main_contract_volume_ratio
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND trd_qty > 0
+GROUP BY CLAS_NAME;
+
+问题：查询品种代码为'SR'的品种名称是什么？
+SELECT DISTINCT CLAS_NAME FROM dataqa.fut_mrkt_clas_info_tab WHERE CLAS_CODE = 'SR';
+
+问题：查询2025年7月2日，近月合约持仓量超过10000的品种有哪些？
+SELECT CLAS_NAME, near_mon_comd_hld_qty
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND near_mon_comd_hld_qty > 10000;
+
+问题：统计2025年7月2日，每个交易所的期货和期权合约的数量分别是多少？
+SELECT EXCH_NAME, fut_opt_flag, COUNT(*) as contract_count
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY EXCH_NAME, fut_opt_flag;
+
+问题：查询2025年7月2日，品种简称中包含'油'字的期货品种有哪些？
+SELECT CLAS_NAME, CLAS_ABBR
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND CLAS_ABBR LIKE '%油%' AND fut_opt_flag = 'F';
+
+问题：找出2025年7月2日，所有成交额大于1亿的品种。
+SELECT CLAS_NAME, trd_amt
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND trd_amt > 100000000;
+
+问题：2025年7月2日，查询所有品种的主力合约代码。
+SELECT CLAS_NAME, main_cont_code
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02';
+
+问题：查询2025年7月上半月（1日至15日）的总成交量和总成交额。
+SELECT SUM(trd_qty) as total_volume, SUM(trd_amt) as total_amount
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-07-15';
+
+问题：查询2025年7月2日，上海国际能源交易中心（INE）的所有品种列表。
+SELECT DISTINCT CLAS_NAME
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02' AND EXCH_CODE = 'INE';

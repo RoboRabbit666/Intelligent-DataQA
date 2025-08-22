@@ -1,0 +1,421 @@
+
+
+问题：查询郑商所2025-07-02日东方财富在SR品种的交易数据
+SELECT *
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND mem_name = '上海东方财富期货有限公司'
+  AND clas_code = 'SR'
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE';
+
+问题：郑商所今日会员交易活跃度排名，即成交量前十会员
+SELECT mem_name, SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+and exch_code='CZCE'
+GROUP BY mem_name
+ORDER BY total_trd_qty DESC
+LIMIT 10;
+
+问题：罗列郑商所中棉花品种7月份各会员下的成交量，并按照成交量降序排列
+SELECT mem_name, SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+  AND clas_code = 'CF'
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE'  
+GROUP BY mem_name
+ORDER BY total_trd_qty DESC;
+
+问题：罗列郑商所会员“上海东方财富期货有限公司”棉花品种7月份的成交量，并按照交易日降序排列
+SELECT mem_name, biz_dt, trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+  AND clas_code = 'CF'
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE'  
+  and mem_name='上海东方财富期货有限公司'
+ORDER BY biz_dt DESC;
+
+问题：罗列郑商所今天各品种的买卖方向的成交量和总成交量，用于分析买卖方向是否失衡
+SELECT clas_code, fut_opt_flag,
+       SUM(buy_trd_qty) AS total_buy_trd_qty, 
+       SUM(sell_trd_qty) AS total_sell_trd_qty, 
+       SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY clas_code, fut_opt_flag
+order by clas_code, fut_opt_flag;
+
+问题：罗列郑商所会员中“东方财富”的近1年的红枣期货的成交量，按照月的维度统计
+SELECT EXTRACT(YEAR FROM biz_dt) AS year, 
+       EXTRACT(MONTH FROM biz_dt) AS month, 
+       SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE mem_name = '上海东方财富期货有限公司'
+  AND clas_code = 'CJ' 
+  and fut_opt_flag = 'F'  
+  AND biz_dt >= '2025-07-02'::date - INTERVAL '1 year'
+GROUP BY year, month
+ORDER BY year, month;
+
+问题：2025年7月2日各会员成交量排行？
+SELECT mem_name, SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY mem_name
+ORDER BY total_trd_qty DESC;
+
+问题：郑商所2025-07-02单日成交量超10万手的会员，并罗列其交易的品种？
+SELECT clas_code,fut_opt_flag, mem_name,sum(trd_qty) as 成交量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt ='2025-07-02'
+  and exch_code='CZCE'
+  and mem_name in (SELECT mem_name, SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+and exch_code='CZCE'
+and sum(trd_qty) >100000
+GROUP BY mem_name)
+GROUP BY clas_code,fut_opt_flag, mem_name
+ORDER BY mem_name,成交量 DESC;
+
+问题：罗列郑商所当前各会员持仓的品种
+SELECT DISTINCT mem_name, clas_code,fut_opt_flag
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND hld_qty > 0
+  and exch_code='CZCE'
+  order by mem_name, clas_code,fut_opt_flag;
+
+问题：罗列郑商所当前不同类型会员对各个品种的交易量（或评定不同类型的会员交易的品种偏好）
+SELECT mem_type_code_desc, clas_code,fut_opt_flag, SUM(trd_qty) AS total_trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY mem_type_code_desc, clas_code,fut_opt_flag
+ORDER BY mem_type_code_desc, total_trd_qty DESC;
+
+问题：查询郑商所今天不同会员类型在交易策略的持仓量占比
+--第一步，获取各会员类型下各交易策略下的持仓量
+WITH strategy_total_hld AS (
+SELECT 
+    mem_type_code_desc,
+    -- 各交易类型数量
+    SUM(hdg_hld_qty) AS 套保持仓量,
+    SUM(spe_hld_qty) AS 投机持仓量,
+    SUM(cmb_hld_qty) AS 套利持仓量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY mem_type_code_desc
+ORDER BY mem_type_code_desc
+),
+--第二步，获取各会员类型的持仓量
+total_hld as (
+SELECT 
+    mem_type_code_desc,
+    -- 各交易类型数量
+    SUM(hld_qty) AS 会员类型总持仓量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY mem_type_code_desc
+ORDER BY mem_type_code_desc
+)
+--第三步合并结果
+SELECT t1.mem_type_code_desc, 
+	   t1.套保持仓量 as 套保持仓量,
+       ROUND(t1.套保持仓量* 100.0 / t2.会员类型总持仓量,2) AS 套保持仓量占会员类型总持仓量占比,
+	   t1.投机持仓量 as 投机持仓量,
+       ROUND(t1.投机持仓量* 100.0 / t2.会员类型总持仓量,2) AS 投机持仓量占会员类型总持仓量占比,
+	   t1.套利持仓量 as 套利持仓量,
+       ROUND(t1.套利持仓量* 100.0 / t2.会员类型总持仓量,2) AS 套利持仓量占会员类型总持仓量占比
+FROM strategy_total_hld t1
+left JOIN total_hld t2
+on t1.mem_type_code_desc = t2.mem_type_code_desc
+where t2.会员类型总持仓量>0;
+
+问题：查询郑商所今天不同会员类型在交易策略的交易量占比
+--第一步，获取各会员类型下各交易策略下的交易量
+WITH strategy_total_trd AS (
+SELECT 
+    mem_type_code_desc,
+    -- 各交易类型数量
+    SUM(hdg_trd_qty) AS 套保成交量,
+    SUM(spe_trd_qty) AS 投机成交量,
+    SUM(cmb_trd_qty) AS 套利成交量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY mem_type_code_desc
+ORDER BY mem_type_code_desc
+),
+--第二步，获取各会员类型的交易量
+total_trd as (
+SELECT 
+    mem_type_code_desc,
+    -- 各交易类型数量
+    SUM(trd_qty) AS 会员类型总成交量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY mem_type_code_desc
+ORDER BY mem_type_code_desc
+)
+--第三步合并结果
+SELECT t1.mem_type_code_desc, 
+	   t1.套保成交量 as 套保成交量,
+       ROUND(t1.套保成交量* 100.0 / t2.会员类型总持仓量,2) AS 套保成交量占会员类型总持仓量占比,
+	   t1.投机成交量 as 投机成交量,
+       ROUND(t1.投机成交量* 100.0 / t2.会员类型总持仓量,2) AS 投机成交量占会员类型总持仓量占比,
+	   t1.套利成交量 as 套利成交量,
+       ROUND(t1.套利成交量* 100.0 / t2.会员类型总持仓量,2) AS 套利成交量占会员类型总持仓量占比
+FROM strategy_total_trd t1
+left JOIN total_trd t2
+on t1.mem_type_code_desc = t2.mem_type_code_desc
+where t2.会员类型总持仓量>0;
+
+问题：罗列当前郑商所会员中持有棉花期货合约的会员
+SELECT DISTINCT mem_name
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F' 
+  AND hld_qty > 0
+  and exch_code='CZCE';
+
+问题：统计郑商所各会员当前持有棉花期货合约的持仓量
+SELECT mem_name, hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F' 
+  AND hld_qty > 0
+  and exch_code='CZCE'
+ORDER BY hld_qty DESC;
+
+问题：统计郑商所各会员当前持有棉花期权合约的持仓量
+SELECT mem_name, hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'O' 
+  AND hld_qty > 0
+  and exch_code='CZCE'
+ORDER BY hld_qty DESC;
+
+问题：统计郑商所各会员当前持有棉花期货合约的持仓量，以及各会员棉花期货品种持仓量占棉花期货持仓总量的百分比
+--第一步，统计各个会员棉花期货的持仓量
+with mem_hld_qty as (
+SELECT mem_name, hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F' 
+  AND hld_qty > 0
+  and exch_code='CZCE'
+ORDER BY hld_qty DESC
+),
+
+--第二步，统计棉花期货品种的总持仓量
+total_hld as (
+select sum(hld_qty) as 品种总持仓量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F' 
+  and exch_code='CZCE'
+)
+--第三步，合并结果
+select t1.mem_name,
+       t1.hld_qty,
+	   ROUND(t1.hld_qty * 100.0 / total_hld.品种总持仓量,2) AS 会员品种持仓量占该品种持仓总量占比
+from mem_hld_qty t1,total_hld
+order by 会员品种持仓量占该品种持仓总量占比 desc
+
+问题：按照郑商所会员维度统计当前交易棉花期货合约的成交量，以及各会员棉花期货品种成交量占棉花期货成交总量的百分比
+--第一步，统计各个会员棉花期货的成交量
+with mem_trd_qty as (
+SELECT mem_name, trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F'
+  AND trd_qty > 0
+  and exch_code='CZCE'
+ORDER BY hld_qty DESC
+),
+
+--第二步，统计棉花期货品种的总成交量
+total_trd as (
+select sum(trd_qty) as 品种总成交量
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE'
+)
+--第三步，合并结果
+select t1.mem_name,
+       t1.trd_qty,
+	   ROUND(t1.trd_qty * 100.0 / total_trd.品种总成交量,2) AS 会员品种成交量占该品种成交总量占比
+from mem_trd_qty t1,total_trd
+order by 会员品种成交量占该品种成交总量占比 desc
+
+问题：统计近一个月中郑商所会员“东方财富”持有棉花期货合约的持仓量
+SELECT mem_name,  biz_dt,  hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE'
+  and mem_name='上海东方财富期货有限公司'
+ORDER BY biz_dt DESC;
+
+问题：统计近一个月中郑商所会员“上海东方财富期货有限公司”持有棉花期货合约的持仓量
+SELECT mem_name,  biz_dt,  hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'F'
+  and exch_code='CZCE'
+  and mem_name='上海东方财富期货有限公司'
+ORDER BY biz_dt DESC;
+
+问题：统计近一个月中郑商所会员“上海东方财富期货有限公司”交易棉花期权合约的交易量
+SELECT mem_name,  biz_dt,  trd_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+  AND clas_code = 'CF'  -- 棉花期货品种代码为CF
+  and fut_opt_flag = 'O'
+  and exch_code='CZCE'
+  and mem_name='上海东方财富期货有限公司'
+ORDER BY biz_dt DESC;
+
+问题：罗列当前郑商所会员各品种下买持仓和卖持仓的数据
+SELECT mem_name, clas_code,fut_opt_flag, buy_hld_qty, sell_hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  and exch_code='CZCE'
+  order by mem_name,clas_code,fut_opt_flag;
+
+问题：罗列当前郑商所各品种下买持仓和卖持仓的数据
+SELECT  clas_code, fut_opt_flag,
+	sum(buy_hld_qty) as  buy_hld_qty_total , 
+	sum(sell_hld_qty) as sell_hld_qty_total
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  and exch_code='CZCE'
+group by clas_code, fut_opt_flag
+order by clas_code, fut_opt_flag;
+
+问题：查询今天郑商所白糖品种成交量前5的会员，以及各会员的白糖成交量市场占比？
+--第一步，获取当前交易日白糖品种的总成交量
+WITH total_trd AS (
+    SELECT SUM(trd_qty) AS total_qty
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02'
+      AND clas_code = 'SR'  -- 白糖品种代码为SR
+	  and fut_opt_flag = 'F'
+	  and exch_code='CZCE'
+),
+--第二步，获取白糖品种成交量前5的会员信息
+top_5_members AS (
+    SELECT mem_name, SUM(trd_qty) AS mem_trd_qty
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02'
+      AND clas_code = 'SR'
+	  and fut_opt_flag = 'F'
+    GROUP BY mem_name
+    ORDER BY mem_trd_qty DESC
+    LIMIT 5
+)
+SELECT mem_name, 
+mem_trd_qty, 
+mem_trd_qty * 100.0 / total_qty AS market_share
+FROM top_5_members, total_trd
+order by market_share desc;
+
+问题：罗列郑商所当前套保持仓量最大的前10家会员？
+SELECT mem_name, SUM(hdg_hld_qty) AS total_hdg_hld_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt ='2025-07-02'
+  and exch_code='CZCE'
+GROUP BY mem_name
+ORDER BY total_hdg_hld_qty DESC
+LIMIT 10;
+
+问题：罗列郑商所会员“东方财富”当前棉花品种的套利、投机和套保持仓额？
+select biz_dt,mem_name,cmb_hld_amt,spe_hld_amt,hdg_hld_amt
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt ='2025-07-02'
+  and exch_code='CZCE'
+  and mem_name='上海东方财富期货有限公司'
+  and clas_code = 'SR'  -- 白糖品种代码为SR
+  and fut_opt_flag = 'F';
+
+问题：罗列郑商所会员中今天交易客户数最多的会员信息？
+SELECT biz_dt,mem_name, SUM(trd_clit_qty) AS total_trd_clients
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY mem_name
+ORDER BY total_trd_clients DESC
+LIMIT 1;
+
+问题：罗列今日郑商所各个会员下棉花期货品种的报单客户数，交易客户数，及客户转化率（即报单客户中的交易客户占比），并按照客户转化率降序排列
+SELECT mem_name, 
+       SUM(drd_clit_qty) AS total_order_clients, 
+       SUM(trd_clit_qty) AS total_trade_clients, 
+       CASE WHEN SUM(drd_clit_qty) > 0 THEN SUM(trd_clit_qty) * 100.0 / SUM(drd_clit_qty) ELSE 0 END AS conversion_rate
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+  AND clas_code = 'CF'  -- 棉花品种代码为CF
+  and fut_opt_flag = 'F'
+GROUP BY mem_name
+ORDER BY conversion_rate DESC;
+
+问题：统计当前郑商所各会员各品种下，行权客户中境外行权客户数的占比
+SELECT mem_name, clas_code, fut_opt_flag,
+       SUM(exer_clit_qty) AS total_exer_clients, 
+       SUM(ovs_exer_clit_qty) AS total_ovs_exer_clients, 
+       CASE WHEN SUM(exer_clit_qty) > 0 THEN SUM(ovs_exer_clit_qty) * 100.0 / SUM(exer_clit_qty) ELSE 0 END AS ovs_exer_client_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY mem_name, clas_code, fut_opt_flag
+ORDER BY mem_name, clas_code, fut_opt_flag;
+
+问题：统计当前郑商所各会员各品种下，交易客户中境外交易客户数的占比
+SELECT mem_name, clas_code , fut_opt_flag,
+       SUM(trd_clit_qty) AS total_trd_clients, 
+       SUM(ovs_trd_clit_qty) AS total_ovs_trd_clients, 
+       CASE WHEN SUM(trd_clit_qty) > 0 THEN SUM(ovs_trd_clit_qty) * 100.0 / SUM(trd_clit_qty) ELSE 0 END AS ovs_trd_client_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt =  '2025-07-02'
+GROUP BY mem_name, clas_code , fut_opt_flag
+ORDER BY mem_name, clas_code , fut_opt_flag;
+
+问题：查询郑商所会员中“东方财富”近30天的棉花期货品种交易客户数中境外交易客户数的占比
+SELECT biz_dt,clas_code,fut_opt_flag,
+    SUM(trd_clit_qty) AS total_trd_clients, 
+    SUM(ovs_trd_clit_qty) AS total_ovs_trd_clients, 
+    CASE WHEN SUM(trd_clit_qty) > 0 THEN SUM(ovs_trd_clit_qty) * 100.0 / SUM(trd_clit_qty) ELSE 0 END AS ovs_trd_client_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt >= '2025-07-02'::date - INTERVAL '30 days'
+  AND mem_name = '上海东方财富期货有限公司'
+  AND clas_code = 'CF';  -- 假设棉花品种代码为CF
+  and fut_opt_flag ='F';
+
+问题：罗列当前郑商所会员中持有棉花期货合约的会员，持仓量，持仓量排名
+    SELECT 
+        mem_no,
+        mem_name,
+        clas_code,
+		fut_opt_flag,
+        hld_qty,
+        RANK() OVER (ORDER BY hld_qty DESC) AS volume_rank
+    FROM 
+        dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE 
+        hld_qty > 0  -- 只包含有持仓的会员
+        and fut_opt_flag = 'F'
+		AND clas_code = 'CF'
+        AND biz_dt = '2025-07-02'
+
+  

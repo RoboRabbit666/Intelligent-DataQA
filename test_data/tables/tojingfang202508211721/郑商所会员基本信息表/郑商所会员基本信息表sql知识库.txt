@@ -1,0 +1,186 @@
+问题：统计郑商所2025年新增会员及会员状态：
+SELECT mem_name, mem_status_code_desc
+FROM dataqa.mem_base_info_tab
+WHERE join_dt BETWEEN '2025-01-01' AND '2025-12-31'
+and exch_code='CZCE'
+and biz_dt='2025-07-02';
+
+问题：统计郑商所下当前会员状态为正常的会员信息：
+SELECT *
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'N'
+and exch_code='CZCE'
+and biz_dt='2025-07-02';
+
+问题：截止到2024年12月，共有多少存续会员：
+SELECT COUNT(*)
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'N'
+AND (ret_dt IS NULL OR ret_dt > '2024-12-31')
+and exch_code='CZCE'
+and biz_dt='2025-07-02';
+
+问题：会员评级为AA的，当前保证基金费费率是多少：
+SELECT distinct grade,grd_fee_rate
+FROM dataqa.mem_base_info_tab
+where exch_code='CZCE'
+and grade='AA'
+and biz_dt='2025-07-02';
+
+问题：统计每年新加入的郑商所的会员数量：
+SELECT EXTRACT(YEAR FROM join_dt) AS join_year, COUNT(*) AS mem_count
+FROM dataqa.mem_base_info_tab
+where biz_dt='2025-07-02'
+and exch_code='CZCE'
+GROUP BY EXTRACT(YEAR FROM join_dt)
+ORDER BY join_year;
+
+问题：2025年6月退会的会员列表：
+SELECT mem_name
+FROM dataqa.mem_base_info_tab
+WHERE ret_dt BETWEEN '2025-06-01' AND '2025-06-30'
+and biz_dt='2025-07-02'
+and exch_code='CZCE'
+order by mem_name;
+
+问题：列出郑商所下“新华期货”的基本信息：
+SELECT *
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+and biz_dt='2025-07-02'
+and exch_code='CZCE';
+
+问题：郑商所会员“上海东方财富期货有限公司”的会员号和注册资本分别是多少？
+SELECT mem_no, reg_capi
+FROM dataqa.mem_base_info_tab
+WHERE mem_name = '上海东方财富期货有限公司'
+and biz_dt='2025-07-02'
+and exch_code='CZCE';
+
+问题：列出郑商所当下所有期货会员的简称和状态：
+SELECT mem_abbr, mem_status_code_desc
+FROM dataqa.mem_base_info_tab
+WHERE mem_type_code = 'N'
+and biz_dt='2025-07-02'
+and exch_code='CZCE';
+
+问题：统一信用代码为91540000710910420Y的公司是否是郑商所会员？
+SELECT CASE WHEN EXISTS (
+  SELECT 1
+  FROM dataqa.mem_base_info_tab
+  WHERE scil_crdt_code = '91540000710910420Y'
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE'
+) THEN '是' ELSE '否' END AS is_member;
+
+问题：郑商所会员“招商银行”的会员编号是多少？
+SELECT mem_no,mem_abbr
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%招商银行%'
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE';
+
+问题：当前郑商所续存的会员中的企业性质分析：
+SELECT corp_own, COUNT(*) AS mem_count
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'N'
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE'
+GROUP BY corp_own;
+
+问题：郑商所会员中注册资本大于1亿元的会员有哪些：
+SELECT mem_name，reg_capi
+FROM dataqa.mem_base_info_tab
+WHERE CAST(reg_capi AS numeric) > 10000
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE';
+
+问题：按省份分类统计郑商所会员中正常状态的会员数：
+SELECT reg_addr_prvc, COUNT(*) AS mem_count 
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'N'
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE'
+GROUP BY reg_addr_prvc;
+
+问题：罗列办公地址和注册地址一致的郑商所会员信息列表：
+SELECT *
+FROM dataqa.mem_base_info_tab
+WHERE ofc_addr = reg_addr
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE';
+
+问题：政商所会员中在江苏省注册的会员有哪些：
+SELECT mem_name,reg_addr
+FROM dataqa.mem_base_info_tab
+WHERE reg_addr_prvc LIKE '%江苏%'
+  and biz_dt='2025-07-02'
+  and exch_code='CZCE';
+
+问题：罗列不同会员有相同的联系人的会员信息？
+SELECT a.*
+FROM dataqa.mem_base_info_tab a
+JOIN (
+  SELECT ctc_name, COUNT(*) AS cnt
+  FROM dataqa.mem_base_info_tab
+    and biz_dt='2025-07-02'
+	and exch_code='CZCE'
+  GROUP BY ctc_name
+  HAVING COUNT(*) > 1
+) b ON a.ctc_name = b.ctc_name;
+
+问题：罗列郑商所会员“新华期货”的联系人信息是什么：
+SELECT ctc_name, ctc_mbl, ctc_eml, ctc_fix_tel
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+    and biz_dt='2025-07-02'
+	and exch_code='CZCE';
+
+问题：郑商所会员“新华期货”的法人代表是谁：
+SELECT mem_abbr,legal_rep
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+    and biz_dt='2025-07-02'
+	and exch_code='CZCE';
+
+问题：查询郑商所会员“新华期货”归属哪个监管机构：
+SELECT mem_abbr,spvs_org_code
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+    and biz_dt='2025-07-02'
+	and exch_code='CZCE';
+
+问题：按监管机构分类，显示郑商所正常状态的会员名单：
+SELECT spvs_org_code, STRING_AGG(mem_name, ', ') AS mem_list
+FROM dataqa.mem_base_info_tab
+WHERE  biz_dt='2025-07-02'
+	and exch_code='CZCE'
+GROUP BY spvs_org_code;
+
+问题：罗列郑商所低评级会员（B类及B类以下）的会员信息？
+SELECT *
+FROM dataqa.mem_base_info_tab
+WHERE grade IN ('B', 'BB', 'BBB', 'C', 'CC', 'CCC', 'D', 'Z')
+	and biz_dt='2025-07-02'
+	and exch_code='CZCE';
+
+问题：当前评级为A的郑商所会员有哪些：
+SELECT mem_name,grade
+FROM dataqa.mem_base_info_tab
+WHERE grade = 'A'
+	and biz_dt='2025-07-02'
+	and exch_code='CZCE';
+
+问题：显示“新华期货”公司当前适用的保障基金缴纳比例：
+SELECT mem_abbr,grd_fee_rate
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+AND biz_dt = '2025-07-02'
+and exch_code='CZCE';
+
+问题：罗列“新华期货”历史保障基金费费率变动情况：
+select distinct mem_abbr,efct_strt_dt, efct_end_dt, grd_fee_rate
+FROM dataqa.mem_base_info_tab
+WHERE mem_abbr like '%新华期货%'
+ORDER BY efct_strt_dt
+and exch_code='CZCE';

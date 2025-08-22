@@ -1,0 +1,128 @@
+问题：2024年11月15日中国金融期货交易所交易的品种有哪些
+SELECT CLAS_NAME
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2024-11-15' AND EXCH_CODE = 'CFFEX';
+
+问题：大连交易所4月份期货的成交量？
+SELECT 
+    SUM(trd_qty) AS 总成交量
+FROM 
+    dataqa.fut_mrkt_clas_info_tab
+WHERE 
+    EXCH_CODE = 'DCE' 
+    AND BIZ_DT BETWEEN '2025-04-01' AND '2025-04-30'  
+    AND fut_opt_flag = 'F';
+	
+问题：大连交易所4月份期权的成交量？
+SELECT 
+    SUM(trd_qty) AS 总成交量
+FROM 
+    dataqa.fut_mrkt_clas_info_tab
+WHERE 
+    EXCH_CODE = 'DCE' 
+    AND BIZ_DT BETWEEN '2025-04-01' AND '2025-04-30' 
+    AND fut_opt_flag = 'O';
+
+问题：大连交易所4月份铁矿石期货的成交额？
+SELECT 
+    CLAS_NAME,
+    SUM(trd_amt) AS 总成交额
+FROM 
+    dataqa.fut_mrkt_clas_info_tab
+WHERE 
+    EXCH_CODE = 'DCE' 
+    AND BIZ_DT BETWEEN '2025-04-01' AND '2025-04-30'  
+    AND CLAS_CODE = 'I'
+    AND fut_opt_flag = 'F';
+
+问题：2025-07-02上海期货交易所交易的黄金的成交量，持仓量，成交额？ 
+SELECT  CLAS_NAME,trd_qty,hld_qty,trd_amt
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE EXCH_CODE = 'SHFE' 
+AND CLAS_NAME='黄金'
+and biz_dt='2025-07-02';
+
+问题：当日成交量前五的品种是哪些？ 
+SELECT CLAS_NAME，trd_qty,fut_opt_flag
+FROM 
+    dataqa.fut_mrkt_clas_info_tab
+WHERE 
+    BIZ_DT = '2025-07-02'
+ORDER BY 
+    trd_qty DESC
+LIMIT 5;
+
+问题：2025年6月成交量前5的品种有哪些？
+SELECT CLAS_NAME, SUM(trd_qty) AS 总成交量 
+FROM dataqa.fut_mrkt_clas_info_tab 
+WHERE BIZ_DT BETWEEN '2025-06-01' AND '2025-06-30' 
+GROUP BY CLAS_NAME 
+ORDER BY 总成交量 DESC 
+LIMIT 5;
+
+问题：2024年11月15日玻璃品种的主力合约代码和结算价是多少？ 
+SELECT main_comd,main_comd_clr_prc
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2024-11-15' 
+AND CLAS_CODE = 'FG'
+and fut_opt_flag='F';
+
+问题：白银期权的主力合约的今日成交量如何？
+SELECT main_comd_trd_qty
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02'
+AND CLAS_CODE = 'AG' 
+AND fut_opt_flag = 'O';
+  
+问题：沪深300股指期权的主力合约的今日成交量如何？ 
+SELECT main_comd_trd_qty
+FROM dataqa.fut_mrkt_clas_info_tab
+WHERE BIZ_DT = '2025-07-02'
+AND clas_code = 'IO'
+AND fut_opt_flag = 'O';
+
+问题：2025年7月主力合约成交额占全市场比例是多少
+SELECT 
+    (SUM(main_comd_trd_amt) / SUM(trd_amt)) * 100 AS 主力合约成交额占比 
+FROM dataqa.fut_mrkt_clas_info_tab 
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31' ;
+
+问题：找出2025-07月近月合约持仓量大于1000手的品种
+SELECT 
+    CLAS_NAME, 
+    near_mon_comd, 
+    sum(near_mon_comd_hld_qty) as 近月合约持仓量
+FROM 
+    dataqa.fut_mrkt_clas_info_tab 
+WHERE 
+    near_mon_comd_hld_qty > 1000
+	AND BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+group by CLAS_NAME, near_mon_comd 
+
+问题：黄金期货近7天的成交额
+SELECT BIZ_DT , trd_amt
+FROM 
+    dataqa.fut_mrkt_clas_info_tab
+WHERE 
+    CLAS_CODE = 'AU'  -- 黄金期货品种代码为'AU'
+    AND fut_opt_flag = 'F'
+    AND BIZ_DT > ('2025-07-02'::date - 7)  -- 近7天（含今日）
+ORDER BY 
+    BIZ_DT;
+
+问题：2025年第二季度各交易所的总成交额是多少？
+SELECT EXCH_NAME, SUM(trd_amt) AS 总成交额 
+FROM dataqa.fut_mrkt_clas_info_tab 
+WHERE BIZ_DT BETWEEN '2025-04-01' AND '2025-06-30' 
+GROUP BY EXCH_NAME;
+
+问题：2025年第三季度哪些品种发生过主力合约切换
+SELECT DISTINCT CLAS_NAME 
+FROM dataqa.fut_mrkt_clas_info_tab 
+WHERE BIZ_DT BETWEEN '2025-07-01' AND '2025-09-30' 
+GROUP BY CLAS_NAME, main_comd 
+HAVING COUNT(DISTINCT main_comd) > 1;
+
+
+
+

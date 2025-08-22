@@ -1,0 +1,236 @@
+问题：当前有多少分支机构处于开业状态
+SELECT biz_dt,COUNT(*) 
+FROM dataqa.mem_brh_org_tab 
+WHERE is_opn = 'Y' AND brh_org_status = 'N' AND biz_dt = '2025-07-02'
+group by biz_dt;
+
+问题：查询开业状态的所有分支机构信息
+SELECT mem_no, mem_name, brh_org_id, brh_org_name, brh_org_type, brh_org_site, brh_org_status, is_opn
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'Y' AND brh_org_status = 'N' AND biz_dt = '2025-07-02';
+
+问题：统计各会员的分支机构数量
+SELECT mem_no, mem_name, COUNT(*) as branch_count
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY mem_no, mem_name
+ORDER BY branch_count DESC;
+
+问题：统计各会员下开业的分支机构数量
+SELECT mem_no, mem_name, COUNT(*) as branch_count
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+and  is_opn = 'Y' AND brh_org_status = 'N' 
+GROUP BY mem_no, mem_name
+ORDER BY branch_count DESC;
+
+问题：查看最近7天发生停业变更的分支机构有哪些
+SELECT biz_dt,brh_org_name, mem_name, clos_dt 
+FROM dataqa.mem_brh_org_tab 
+WHERE clos_dt BETWEEN '2025-07-02'::date - INTERVAL '7 days' AND '2025-07-02'
+and biz_dt='2025-07-02'
+ORDER BY clos_dt DESC;
+
+问题：会员编号0050下有哪些分支机构？
+SELECT  biz_dt,brh_org_id,brh_org_name 
+FROM dataqa.mem_brh_org_tab 
+WHERE mem_no = '0050'
+and biz_dt='2025-07-02';
+
+问题：当前盛达期货公司旗下有多少个分支机构？
+SELECT biz_dt,mem_name,COUNT(*) 
+FROM dataqa.mem_brh_org_tab 
+WHERE mem_name ='盛达期货有限公司' AND biz_dt = '2025-07-02'
+group by biz_dt,mem_name ;
+
+问题：当前中信建投期货的分支机构分布情况？
+SELECT biz_dt,mem_name,brh_org_name, brh_org_site, brh_org_type 
+FROM dataqa.mem_brh_org_tab 
+WHERE mem_name = '中信建投期货有限公司' AND biz_dt = '2025-07-02';
+
+问题：当前是否存在同一会员下，分支机构名称重复的情况？
+SELECT biz_dt,mem_no, brh_org_name, COUNT(*) as cnt
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY biz_dt,mem_no, brh_org_name
+HAVING COUNT(*) > 1;
+
+问题：统一社会信用代码为XXXX的机构叫什么？
+SELECT biz_dt,brh_org_name ,scil_crdt_code
+FROM dataqa.mem_brh_org_tab 
+WHERE scil_crdt_code = 'XXXX' AND biz_dt = '2025-07-02';
+
+问题：在北京（需从所在地详细地址中提取）有多少家分支机构，并列出分支机构详情？
+--第一步，展示北京分支机构的数量
+SELECT COUNT(*) 
+FROM dataqa.mem_brh_org_tab 
+WHERE brh_org_site LIKE '%北京%' AND biz_dt = '2025-07-02';
+--第二部，展示具体的坐落北京的分支机构的详情
+select * from dataqa.mem_brh_org_tab
+WHERE brh_org_site LIKE '%北京%' AND biz_dt = '2025-07-02';
+
+问题：查询方正中期期货有限公司在北京开业的分公司
+SELECT biz_dt,brh_org_name,is_opn,brh_org_type,brh_org_site
+FROM dataqa.mem_brh_org_tab 
+WHERE mem_name = '方正中期期货有限公司' 
+AND brh_org_site LIKE '%北京%' 
+AND is_opn = 'Y' 
+AND brh_org_status = 'N' 
+AND biz_dt = '2025-07-02';
+
+问题：方正中期当前有效机构数是多少？分别是什么机构类型？
+SELECT brh_org_type, COUNT(*) as count
+FROM dataqa.mem_brh_org_tab
+WHERE mem_name ='方正中期期货有限公司' 
+AND is_opn = 'Y' 
+AND brh_org_status = 'N' 
+AND biz_dt = '2025-07-02'
+GROUP BY brh_org_type;
+
+问题：按照机构类型、开业状态、机构状态维度，统计其数量
+SELECT brh_org_type,is_opn, brh_org_status,COUNT(*) as count
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+GROUP BY brh_org_type,is_opn, brh_org_status
+order by brh_org_type,is_opn, brh_org_status;
+
+问题：哪个会员（会员名称）拥有最多的开业状态的分支机构？
+SELECT mem_name, COUNT(*) as count
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'Y' AND brh_org_status = 'N' AND biz_dt = '2025-07-02'
+GROUP BY mem_name
+ORDER BY count DESC
+LIMIT 1;
+
+问题：截至今日，方正中期仍处于开业状态的机构详情？
+SELECT *  
+FROM dataqa.mem_brh_org_tab 
+WHERE is_opn = 'Y' AND brh_org_status = 'N' AND biz_dt ='2025-07-02'
+and mem_name='方正中期期货有限公司';
+
+问题：查询本月新开业的机构？
+SELECT biz_dt,brh_org_name, mem_name, opn_dt
+FROM dataqa.mem_brh_org_tab
+WHERE EXTRACT(MONTH FROM opn_dt) = EXTRACT(MONTH FROM '2025-07-02'::date)
+AND EXTRACT(YEAR FROM opn_dt) = EXTRACT(YEAR FROM '2025-07-02'::date)
+AND biz_dt = '2025-07-02';
+
+问题：当前处于"暂停营业"状态的机构列表？
+SELECT biz_dt,brh_org_name, mem_name
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_status = 'D' AND biz_dt = '2025-07-02';
+
+问题：东方财富期货公司拉萨营业部的开业状态，联系方式是多少？
+SELECT mem_name,brh_org_name,is_opn, brh_org_ctc_mode
+FROM dataqa.mem_brh_org_tab
+WHERE mem_name = '上海东方财富期货有限公司'
+AND brh_org_name like '%拉萨营业部%'
+AND biz_dt = '2025-07-02';
+
+问题：今日新增开业/停业机构列表
+SELECT brh_org_name, mem_name, 
+       CASE WHEN opn_dt = '2025-07-02' THEN '新开业' 
+            WHEN clos_dt = '2025-07-02' THEN '新停业' 
+       END AS change_type,
+	   opn_dt AS "开业日期",
+		clos_dt AS "停业日期",
+		brh_org_site AS "所在地"
+FROM dataqa.mem_brh_org_tab
+WHERE (opn_dt = '2025-07-02' OR clos_dt = '2025-07-02')
+AND biz_dt = '2025-07-02'
+order by change_type;
+
+问题：近一个月新增开业/停业机构列表
+SELECT brh_org_name, mem_name, 
+       CASE WHEN opn_dt >= ('2025-07-02'::date - 30) THEN '新开业' 
+            WHEN clos_dt >=( '2025-07-02'::date - 30) THEN '新停业' 
+       END AS change_type,
+	   opn_dt AS "开业日期",
+		clos_dt AS "停业日期",
+		brh_org_site AS "所在地"
+FROM dataqa.mem_brh_org_tab
+WHERE (opn_dt >= ('2025-07-02'::date - 30) OR clos_dt >=( '2025-07-02'::date - 30)
+AND biz_dt = '2025-07-02'
+ORDER BY 
+    CASE 
+        WHEN opn_dt >= ('2025-07-02'::date - 30) THEN opn_dt
+        ELSE clos_dt
+    END DESC; 
+
+问题：近一个年新增开业/停业机构列表
+SELECT brh_org_name, mem_name, 
+       CASE WHEN opn_dt >= ('2025-07-02'::date  - INTERVAL '1 year') THEN '新开业' 
+            WHEN clos_dt >=( '2025-07-02'::date -  INTERVAL '1 year') THEN '新停业' 
+       END AS change_type,
+	   opn_dt AS "开业日期",
+		clos_dt AS "停业日期",
+		brh_org_site AS "所在地"
+FROM dataqa.mem_brh_org_tab
+WHERE (opn_dt >= ('2025-07-02'::date - INTERVAL '1 year') OR clos_dt >=( '2025-07-02'::date -INTERVAL '1 year')
+AND biz_dt = '2025-07-02'
+ORDER BY 
+    CASE 
+        WHEN opn_dt >= ('2025-07-02'::date - INTERVAL '1 year') THEN opn_dt
+        ELSE clos_dt
+    END DESC; 
+
+问题：近一个月新增开业机构列表
+SELECT brh_org_name, mem_name, 
+	   opn_dt AS "开业日期",
+		brh_org_site AS "所在地"
+FROM dataqa.mem_brh_org_tab
+WHERE opn_dt >= ('2025-07-02'::date - 30)
+AND biz_dt = '2025-07-02'; 
+
+问题：哪些分支机构的开业时间超过10年？
+SELECT brh_org_name, mem_name, opn_dt
+FROM dataqa.mem_brh_org_tab
+WHERE opn_dt <= '2025-07-02'::date - INTERVAL '10 years'
+AND biz_dt = '2025-07-02';
+
+问题：查询所有已停业的分支机构的停业日期
+SELECT brh_org_name, mem_name, clos_dt
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'N' AND clos_dt IS NOT NULL
+AND biz_dt = '2025-07-02';
+
+问题：是否存在已停业（停业日期不为空且早于业务日期）但是否开业仍为"是"的分支机构（数据质量检查）？
+SELECT brh_org_name, mem_name, is_opn, clos_dt
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'Y' AND clos_dt IS NOT NULL AND clos_dt < biz_dt
+AND biz_dt = '2025-07-02';
+
+问题：查询方正中期期货有限公司北京营业部的联系电话与邮箱？
+SELECT biz_dt,mem_name,brh_org_name,brh_org_ctc_mode, brh_org_eml
+FROM dataqa.mem_brh_org_tab
+WHERE mem_name = '方正中期期货有限公司'
+AND brh_org_name LIKE '%北京营业部%'
+AND biz_dt = '2025-07-02';
+
+问题：统计哪些分支机构尚未填写联系方式？
+SELECT brh_org_name, mem_name
+FROM dataqa.mem_brh_org_tab
+WHERE (brh_org_ctc_mode IS NULL OR brh_org_ctc_mode = '')
+AND biz_dt = '2025-07-02';
+
+问题：哪些分支机构的负责人联系方式不完整（例如，缺少手机或邮箱）？
+SELECT brh_org_name, mem_name
+FROM dataqa.mem_brh_org_tab
+WHERE (brh_org_praler_mbl IS NULL OR brh_org_praler_mbl = '' 
+       OR brh_org_praler_eml IS NULL OR brh_org_praler_eml = '')
+AND biz_dt = '2025-07-02';
+
+问题：方正中期期货有限公司北京营业部负责人是谁？联系方式是什么？
+SELECT biz_dt,mem_name,brh_org_name,brh_org_praler_name, brh_org_praler_mbl, brh_org_praler_eml, brh_org_praler_fix_tel
+FROM dataqa.mem_brh_org_tab
+WHERE mem_name = '方正中期期货有限公司'
+AND brh_org_name LIKE '%北京营业部%'
+AND biz_dt = '2025-07-02';
+
+问题：有没有同一个负责人（负责人名称）管理多个不同分支机构（分支机构编号）的情况
+SELECT brh_org_praler_name, COUNT(DISTINCT brh_org_id) as branch_count
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_praler_name IS NOT NULL AND brh_org_praler_name != ''
+AND biz_dt = '2025-07-02'
+GROUP BY brh_org_praler_name
+HAVING COUNT(DISTINCT brh_org_id) > 1;

@@ -1,0 +1,356 @@
+问题：交割仓库代码"0451"的仓库名称和简称是什么？它支持哪些品种的交割？
+SELECT WH_NAME, WH_ABBR, CLAS_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE DLV_WH_CODE = '0451'
+and stas_dt='2025-07-02';
+
+问题：哪些仓库支持SR的交割
+SELECT DISTINCT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SR'
+and stas_dt='2025-07-02';
+
+问题：查询白糖品种的所有仓库信息
+SELECT 
+    DLV_WH_CODE,
+    WH_ABBR,
+    WH_NAME,
+    WH_TYPE,
+    APRD_WH_CPY,
+    PROD_CPY
+FROM 
+    dataqa.wh_clas_info_tab
+WHERE 
+    CLAS_CODE = 'SR'
+	and stas_dt='2025-07-02'
+ORDER BY 
+    PROD_CPY DESC;
+
+问题：当前支持白糖交割预报的仓库有几个？分别是哪些仓库？
+SELECT COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count, 
+       STRING_AGG(DISTINCT WH_NAME, ', ') AS warehouse_names
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SR' AND IS_PBL_DLV_PRCT = 'Y' 
+AND stas_DT ='2025-07-02';
+
+问题：针对"豆粕"品种，哪些仓库可以发布交割预报
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_ABBR = '豆粕' AND IS_PBL_DLV_PRCT = 'Y'
+AND stas_DT ='2025-07-02';
+
+问题：有哪些仓库是"保税仓库"，并且支持"白糖"品种的交割？
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE IS_BND_WH = 'Y' AND CLAS_CODE = 'SR'
+AND stas_DT ='2025-07-02';
+
+问题：哪些仓库是"菜粕"品种"主产区"的仓库？
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE IS_MAIN_PROA = 'Y' AND CLAS_CODE = 'RM'
+AND stas_DT ='2025-07-02';
+
+问题：针对"棉纱"品种，哪些仓库的核定库容最大？
+SELECT WH_NAME, WH_ABBR, APRD_WH_CPY
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'CY' 
+AND stas_DT ='2025-07-02'
+ORDER BY APRD_WH_CPY DESC
+LIMIT 1;
+
+问题：哪些仓库支持煤品种的送货？
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE ='ZC' AND IS_DLV = 'Y'
+AND stas_DT ='2025-07-02';
+
+问题：查询仓库是厂库类型且支持玻璃品种送货的仓库
+SELECT 
+    DLV_WH_CODE,
+    WH_ABBR,
+    WH_NAME,
+    CLAS_CODE,
+    CLAS_ABBR,
+    PROD_CPY
+FROM 
+    dataqa.wh_clas_info_tab
+WHERE 
+    WH_TYPE like '%1%'
+    AND IS_DLV = 'Y'
+	and WH_ABBR='玻璃'
+	AND stas_DT ='2025-07-02'
+ORDER BY 
+    CLAS_CODE, PROD_CPY DESC;
+
+问题：哪些品种在进行交割预报时需要审批？所有的仓库在进行这些品种交割预报时都需要审批吗？
+-- 需要审批的品种
+SELECT DISTINCT CLAS_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE IS_NEED_APRV = 'Y'
+AND stas_DT ='2025-07-02';
+
+-- 检查这些品种是否在所有仓库都需要审批
+SELECT CLAS_ABBR, 
+       COUNT(*) AS total_warehouses,
+       SUM(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) AS need_approval_warehouses,
+       CASE WHEN COUNT(*) = SUM(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) 
+            THEN '全部需要' ELSE '部分需要' END AS approval_status
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_ABBR IN (SELECT DISTINCT CLAS_ABBR FROM dataqa.wh_clas_info_tab WHERE IS_NEED_APRV = 'Y' and stas_DT ='2025-07-02')
+and stas_DT ='2025-07-02'
+GROUP BY CLAS_ABBR;
+
+问题：查找甲醇的保税仓库且交割库容最大？
+SELECT WH_NAME, WH_ABBR, APRD_WH_CPY
+FROM dataqa.wh_clas_info_tab
+WHERE IS_BND_WH = 'Y' AND CLAS_CODE = 'MA'
+and stas_DT ='2025-07-02'
+ORDER BY APRD_WH_CPY DESC
+LIMIT 1;
+
+问题：硅铁品种管送货且是主产区的生产量大于2000吨的仓库有哪些？
+SELECT WH_NAME, WH_ABBR, PROD_CPY
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SF' AND IS_DLV = 'Y' AND IS_MAIN_PROA = 'Y' AND PROD_CPY > 2000 
+and stas_DT ='2025-07-02';
+
+问题：锰硅品种的总核定库容是多少？
+SELECT SUM(APRD_WH_CPY) AS total_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SM' 
+and stas_DT ='2025-07-02';
+
+问题：具备最大"生产能力"的硅铁交割仓库是哪家？
+SELECT WH_NAME, WH_ABBR, PROD_CPY
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SF'
+and stas_DT ='2025-07-02'
+ORDER BY PROD_CPY DESC
+LIMIT 1;
+
+问题：找出生产能力最大但核定库容不是最大的仓库和品种的组合
+WITH 
+-- 找出每个品种的最大生产能力
+MaxProdCapacity AS (
+    SELECT 
+        CLAS_CODE,
+        CLAS_ABBR,
+        MAX(PROD_CPY) AS MAX_PROD_CPY
+    FROM 
+        dataqa.wh_clas_info_tab
+    WHERE 
+        PROD_CPY IS NOT NULL
+		and stas_DT ='2025-07-02'
+    GROUP BY 
+        CLAS_CODE, CLAS_ABBR
+),
+-- 找出每个品种的最大核定库容
+MaxApprovedCapacity AS (
+    SELECT 
+        CLAS_CODE,
+        MAX(APRD_WH_CPY) AS MAX_APRD_WH_CPY
+    FROM 
+        dataqa.wh_clas_info_tab
+    WHERE 
+        APRD_WH_CPY IS NOT NULL
+		and stas_DT ='2025-07-02'
+    GROUP BY 
+        CLAS_CODE
+)
+
+-- 查询结果
+SELECT 
+    t.EXCH_CODE,
+    t.EXCH_NAME,
+    t.DLV_WH_CODE,
+    t.WH_ABBR,
+    t.WH_NAME,
+    t.CLAS_CODE,
+    t.CLAS_ABBR,
+    t.WH_TYPE,
+    t.APRD_WH_CPY,
+    t.PROD_CPY
+FROM 
+    dataqa.wh_clas_info_tab t
+JOIN 
+    MaxProdCapacity mpc ON t.CLAS_CODE = mpc.CLAS_CODE AND t.PROD_CPY = mpc.MAX_PROD_CPY
+JOIN 
+    MaxApprovedCapacity mac ON t.CLAS_CODE = mac.CLAS_CODE
+WHERE 
+    t.APRD_WH_CPY < mac.MAX_APRD_WH_CPY
+    AND t.PROD_CPY IS NOT NULL
+	and stas_DT ='2025-07-02'
+ORDER BY 
+    t.CLAS_CODE, t.PROD_CPY DESC;
+
+问题：找出生产能力最大并且核定库容也是最大的仓库和品种的组合
+WITH 
+-- 找出每个品种的最大生产能力
+MaxProdCapacity AS (
+    SELECT 
+        CLAS_CODE,
+        MAX(PROD_CPY) AS MAX_PROD_CPY
+    FROM 
+        dataqa.wh_clas_info_tab
+    WHERE 
+        PROD_CPY IS NOT NULL
+		and stas_DT ='2025-07-02'
+    GROUP BY 
+        CLAS_CODE
+),
+-- 找出每个品种的最大核定库容
+MaxApprovedCapacity AS (
+    SELECT 
+        CLAS_CODE,
+        MAX(APRD_WH_CPY) AS MAX_APRD_WH_CPY
+    FROM 
+        dataqa.wh_clas_info_tab
+		and stas_DT ='2025-07-02'
+    WHERE 
+        APRD_WH_CPY IS NOT NULL
+    GROUP BY 
+        CLAS_CODE
+),
+-- 找出同时满足两个条件的仓库品种组合
+QualifiedCombinations AS (
+    SELECT 
+        t.*
+    FROM 
+        dataqa.wh_clas_info_tab t
+    JOIN 
+        MaxProdCapacity mpc ON t.CLAS_CODE = mpc.CLAS_CODE AND t.PROD_CPY = mpc.MAX_PROD_CPY
+    JOIN 
+        MaxApprovedCapacity mac ON t.CLAS_CODE = mac.CLAS_CODE AND t.APRD_WH_CPY = mac.MAX_APRD_WH_CPY
+	where stas_DT ='2025-07-02'
+)
+
+-- 查询最终结果
+SELECT 
+    EXCH_CODE,
+    EXCH_NAME,
+    DLV_WH_CODE,
+    WH_ABBR,
+    WH_NAME,
+    CLAS_CODE,
+    CLAS_ABBR,
+    WH_TYPE,
+    APRD_WH_CPY AS 核定库容,
+    PROD_CPY AS 生产能力
+FROM 
+    QualifiedCombinations
+ORDER BY 
+    CLAS_CODE, PROD_CPY DESC;
+
+问题：哪个期货品种下的仓库普遍要求"交割预报审批"？
+SELECT CLAS_ABBR, 
+       COUNT(*) AS total_warehouses,
+       SUM(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) AS need_approval_warehouses,
+       ROUND(SUM(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS approval_percentage
+FROM dataqa.wh_clas_info_tab
+where stas_DT ='2025-07-02'
+GROUP BY CLAS_ABBR
+ORDER BY approval_percentage DESC;
+
+问题：交割仓库类型为"厂库"的占比是多少？
+SELECT 
+    COUNT(*) AS total_warehouses,
+    SUM(CASE WHEN WH_TYPE like '%1%' THEN 1 ELSE 0 END) AS factory_warehouses,
+    ROUND(SUM(CASE WHEN WH_TYPE like '%1%' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS factory_percentage
+FROM dataqa.wh_clas_info_tab
+where stas_DT ='2025-07-02';
+
+问题：统计各品种中的厂库占比
+SELECT 
+    CLAS_ABBR,
+    COUNT(*) AS total_warehouses,
+    SUM(CASE WHEN WH_TYPE like '%1%' THEN 1 ELSE 0 END) AS factory_warehouses,
+    ROUND(SUM(CASE WHEN WH_TYPE like '%1%' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS factory_percentage
+FROM dataqa.wh_clas_info_tab
+where stas_DT ='2025-07-02'
+GROUP BY CLAS_ABBR
+ORDER BY factory_percentage DESC;
+
+问题：白糖支持交割预报的仓库占比
+SELECT 
+    COUNT(DISTINCT CASE WHEN IS_PBL_DLV_PRCT = 'Y' THEN DLV_WH_CODE END) AS supported_warehouses,
+    COUNT(DISTINCT DLV_WH_CODE) AS total_warehouses,
+    ROUND(COUNT(DISTINCT CASE WHEN IS_PBL_DLV_PRCT = 'Y' THEN DLV_WH_CODE END) * 100.0 / 
+          COUNT(DISTINCT DLV_WH_CODE), 2) AS support_percentage
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'SR'
+where stas_DT ='2025-07-02';
+
+问题：统计各品种的仓库数量
+SELECT 
+    CLAS_CODE,
+    CLAS_ABBR,
+    COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM 
+    dataqa.wh_clas_info_tab
+where stas_DT ='2025-07-02'
+GROUP BY 
+    CLAS_CODE, CLAS_ABBR
+ORDER BY 
+    warehouse_count DESC;
+	
+问题：查询各品种生产能力排名前三的仓库
+WITH RankedWarehouses AS (
+    SELECT 
+        CLAS_CODE,
+        CLAS_ABBR,
+        DLV_WH_CODE,
+        WH_ABBR,
+        WH_NAME,
+        PROD_CPY,
+        RANK() OVER (PARTITION BY CLAS_CODE ORDER BY PROD_CPY DESC) AS rank
+    FROM 
+        dataqa.wh_clas_info_tab
+    WHERE 
+        PROD_CPY IS NOT NULL
+		and stas_DT ='2025-07-02'
+)
+SELECT 
+    CLAS_CODE,
+    CLAS_ABBR,
+    DLV_WH_CODE,
+    WH_ABBR,
+    WH_NAME,
+    PROD_CPY
+FROM 
+    RankedWarehouses
+WHERE 
+    rank <= 3
+ORDER BY 
+    CLAS_CODE, rank;
+	
+问题：查询生产能力大于平均值的仓库
+WITH AvgProdCapacity AS (
+    SELECT 
+        CLAS_CODE,
+        AVG(PROD_CPY) AS avg_prod_capacity
+    FROM 
+        dataqa.wh_clas_info_tab
+    WHERE 
+        PROD_CPY IS NOT NULL
+		and stas_DT ='2025-07-02'
+    GROUP BY 
+        CLAS_CODE
+)
+SELECT 
+    t.DLV_WH_CODE,
+    t.WH_ABBR,
+    t.WH_NAME,
+    t.CLAS_CODE,
+    t.CLAS_ABBR,
+    t.PROD_CPY,
+    a.avg_prod_capacity
+FROM 
+    dataqa.wh_clas_info_tab t
+JOIN 
+    AvgProdCapacity a ON t.CLAS_CODE = a.CLAS_CODE
+WHERE 
+    t.PROD_CPY > a.avg_prod_capacity
+	and t.stas_DT ='2025-07-02'
+ORDER BY 
+    t.CLAS_CODE, t.PROD_CPY DESC;

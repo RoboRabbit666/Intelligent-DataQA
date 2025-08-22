@@ -1,0 +1,215 @@
+问题：查询2025-07-02交易日的所有外盘期货行情数据
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02';
+
+问题：查询芝加哥商业交易所的所有期货行情数据
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE EXCH_CODE = 'CME'
+and TRD_DT = '2025-07-02';
+
+问题：查询小麦今日的外盘期货行情数据
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE prod_name = '小麦'
+and TRD_DT = '2025-07-02';
+
+问题：查询BO2507合约代码的行情数据
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE COMD_CODE = 'BO2405'
+and TRD_DT = '2025-07-02';
+
+问题：查询2025-07-02交易日外盘成交量最大的期货合约
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+ORDER BY TRD_QTY DESC 
+LIMIT 1;
+
+问题：查询2025-07-02交易日外盘价格波动最大的期货合约（最高价与最低价差值最大）
+SELECT *, (HIGHEST_PRC - LOWEST_PRC) AS price_range 
+FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+ORDER BY price_range DESC 
+LIMIT 1;
+
+问题：查询2025-07-02交易日外盘结算价与收盘价差异较大的10个的合约
+SELECT *, ABS(CLR_PRC - CLOS_PRC) AS price_diff 
+FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+ORDER BY price_diff DESC 
+LIMIT 10;
+
+问题：查询外盘各交易所的在市的期货合约数量
+SELECT EXCH_CODE, EXCH_CODE_DESC, COUNT(*) AS contract_count 
+FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+GROUP BY EXCH_CODE, EXCH_CODE_DESC;
+
+问题：查询外盘各交易所的在市的期货商品名称
+SELECT EXCH_CODE, EXCH_CODE_DESC, prod_name
+FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+GROUP BY EXCH_CODE, EXCH_CODE_DESC,prod_name;
+
+问题：查询外盘期货中同一商品名称中主力合约的成交量占比
+WITH commodity_volume AS (
+    -- 计算每个商品的总成交量
+    SELECT 
+        prod_name,
+        SUM(TRD_QTY) AS total_volume
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT = '2025-07-02' 
+    GROUP BY prod_name
+),
+main_contract_volume AS (
+    -- 计算每个商品主力合约的成交量
+    SELECT 
+        prod_name,
+        sum(TRD_QTY) AS main_contract_volume,
+    FROM dataqa.ovs_fut_quot_tab 
+    WHERE is_main_comd = 'Y'
+    AND TRD_DT = '2025-07-02' 
+	group by prod_name
+)
+SELECT 
+    m.prod_name AS "商品名称",
+    m.main_contract_volume AS "主力合约成交量",
+    c.total_volume AS "该商品总成交量",
+    (m.main_contract_volume * 100.0 / NULLIF(m.total_volume, 0)) AS "主力合约成交量占比(%)",
+FROM main_contract_volume m
+join commodity_volume c
+on m.prod_name=c.prod_name
+ORDER BY "主力合约成交量占比(%)" DESC;
+
+问题：查询外盘EB2405合约的近一个月的交易数据
+SELECT TRD_DT, OPN_QN_PRC, CLOS_PRC ,CLR_PRC,TRD_QTY,HLD_QTY
+FROM dataqa.ovs_fut_quot_tab 
+WHERE COMD_CODE = 'EB2405'
+and trd_dt >= '2025-07-02'::date - INTERVAL '1 month'
+ORDER BY TRD_DT desc;
+
+问题：查询外盘期货中小麦所有合约的近一个月的持仓量变化
+SELECT TRD_DT, SUM(HLD_QTY) AS total_position 
+FROM dataqa.ovs_fut_quot_tab 
+WHERE prod_name = '小麦'
+and trd_dt >= '2025-07-02'::date - INTERVAL '1 month'
+GROUP BY TRD_DT 
+ORDER BY TRD_DT desc;
+
+问题：查询外盘期货中同一商品名称近月合约与非近月合约的价格差异
+SELECT 
+    prod_name,
+    NEAR_MON_COMD_LOGO,
+    AVG(CLOS_PRC) AS avg_closing_price,
+    AVG(TRD_QTY) AS avg_trading_volume
+FROM dataqa.ovs_fut_quot_tab 
+where trd_dt = '2025-07-02'
+GROUP BY prod_name, NEAR_MON_COMD_LOGO
+order by prod_name, NEAR_MON_COMD_LOGO;
+
+问题：查询外盘期货小麦商品下的主力合约
+select prod_name,COMD_CODE
+FROM dataqa.ovs_fut_quot_tab 
+where trd_dt = '2025-07-02'
+and  prod_name = '小麦'
+and is_main_comd='Y'
+
+问题：查询外盘期货各商品的主力合约对应的成交量与持仓量的比率（换手率）
+SELECT prod_name,COMD_CODE, (TRD_QTY / NULLIF(HLD_QTY, 0)) AS turnover_rate 
+FROM dataqa.ovs_fut_quot_tab 
+WHERE HLD_QTY > 0
+and trd_dt = '2025-07-02'
+and is_main_comd='Y'
+ORDER BY prod_name,turnover_rate DESC 
+
+问题：查询2025-07-02交易日CME交易所的主力合约行情
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE TRD_DT = '2025-07-02'
+  AND EXCH_CODE = 'CME'
+  AND is_main_comd = 'Y';
+
+问题：查询外盘期货收盘价格在8000到9000范围内的期货合约
+SELECT * FROM dataqa.ovs_fut_quot_tab 
+WHERE CLOS_PRC BETWEEN 8000 AND 9000
+and TRD_DT = '2025-07-02';
+
+问题：查询2025-07-02交易日外盘期货成交量前10的期货合约及其所属交易所
+SELECT 
+    COMD_CODE, 
+    prod_name, 
+    EXCH_CODE_DESC, 
+    TRD_QTY 
+FROM dataqa.ovs_fut_quot_tab 
+and TRD_DT = '2025-07-02'
+ORDER BY TRD_QTY DESC 
+LIMIT 10;
+
+问题：列出近7日外盘中各交易所总成交量和总成交额
+SELECT 
+    EXCH_CODE,
+    EXCH_CODE_DESC,
+    SUM(TRD_QTY) AS total_volume,
+    SUM(TRD_AMT) AS total_amount
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT >= '2025-07-02'::date - INTERVAL '7 days'
+GROUP BY EXCH_CODE, EXCH_CODE_DESC
+ORDER BY total_volume DESC;
+
+问题：比较外盘小麦商品近一个月中的近月合约与非近月合约的结算价？
+SELECT 
+    TRD_DT,
+    NEAR_MON_COMD_LOGO,
+    AVG(CLR_PRC) AS avg_settlement_price,
+    COUNT(*) AS contract_count
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name = '小麦'
+AND TRD_DT >= '2025-07-02' - INTERVAL '30 days'
+GROUP BY TRD_DT, NEAR_MON_COMD_LOGO
+ORDER BY TRD_DT, NEAR_MON_COMD_LOGO;
+
+问题：比较外盘今日开盘价与昨收盘价的差异，分析主力合约的隔夜跳空情况
+SELECT 
+    COMD_CODE,
+    prod_name,
+    L_CLOS_PRC AS yesterday_close,
+    OPN_QN_PRC AS today_open,
+    (OPN_QN_PRC - L_CLOS_PRC) AS gap,
+    ((OPN_QN_PRC - L_CLOS_PRC) / NULLIF(L_CLOS_PRC, 0)) * 100 AS gap_percentage
+FROM dataqa.ovs_fut_quot_tab
+WHERE is_main_comd = 'Y'
+AND TRD_DT = '2025-07-02'
+ORDER BY ABS(gap) DESC;
+
+问题：按成交量排名，今日外盘最活跃的10个合约是哪些？
+SELECT 
+    COMD_CODE,
+    prod_name,
+    EXCH_CODE_DESC,
+    TRD_QTY
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+ORDER BY TRD_QTY DESC 
+LIMIT 10;
+
+问题：列出外盘合约中近7日的持仓量持续增加的合约
+WITH position_trend AS (
+    SELECT 
+        COMD_CODE,
+        prod_name,
+        TRD_DT,
+        HLD_QTY,
+        LAG(HLD_QTY, 1) OVER (PARTITION BY COMD_CODE ORDER BY TRD_DT) AS prev_day_position
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT >= '2025-07-02' - INTERVAL '7 days'
+)
+SELECT 
+    COMD_CODE,
+    prod_name,
+    sum(CASE WHEN HLD_QTY > prev_day_position THEN 1 else 0 END) AS days_increased,
+    COUNT(*) AS days_observed
+FROM position_trend
+WHERE prev_day_position IS NOT NULL
+GROUP BY COMD_CODE, prod_name
+HAVING days_increased = COUNT(*)
+ORDER BY COMD_CODE, prod_name;
+
+
+

@@ -1,0 +1,252 @@
+问题：列出各交易所仓库及对应品种的列表
+SELECT DISTINCT EXCH_NAME, wh_abbr, clas_name
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where BIZ_DT ='2025-07-02'
+ORDER BY EXCH_NAME, wh_abbr, clas_name;
+
+问题：最近一个业务日，郑商所所有仓库所有品种的仓单量统计信息
+SELECT wh_abbr, clas_name, reg_rcpt_qty, cncl_rcpt_qty, ined_wh_qty, out_wh_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' 
+AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab WHERE EXCH_CODE = 'CZCE')
+ORDER BY wh_abbr, clas_name;
+
+问题：大商所鲜鸡蛋品种近一个月的入库量
+SELECT BIZ_DT, EXCH_NAME, clas_name,sum(ined_wh_qty)
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'DCE' AND clas_name = '鲜鸡蛋'
+and biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+group by BIZ_DT, EXCH_NAME, clas_name
+ORDER BY BIZ_DT desc;
+
+问题：统计铝品种在各仓库的注册仓单总量
+SELECT wh_abbr, SUM(reg_rcpt_qty) AS total_reg_rcpt_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name = '铝'
+and biz_dt = '2025-07-02'
+GROUP BY wh_abbr
+ORDER BY total_reg_rcpt_qty DESC;
+
+问题：罗列各品种注册仓单量和入库量的比
+SELECT clas_name, 
+       SUM(reg_rcpt_qty) AS total_reg_rcpt, 
+       SUM(ined_wh_qty) AS total_ined_wh,
+       CASE WHEN SUM(ined_wh_qty) = 0 THEN NULL 
+            ELSE SUM(reg_rcpt_qty)::float / SUM(ined_wh_qty) 
+       END AS ratio
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+and biz_dt = '2025-07-02'
+GROUP BY clas_name
+ORDER BY ratio DESC;
+
+问题：甘肃国通仓库的铝品种当前注册仓单数量是多少
+SELECT reg_rcpt_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE wh_abbr = '甘肃国通' AND clas_name = '铝'
+and biz_dt = '2025-07-02'
+ORDER BY BIZ_DT DESC;
+
+问题：当日铝品种的注册仓单净增量（注册 - 注销）是多少
+SELECT SUM(reg_rcpt_qty - cncl_rcpt_qty) AS net_increase
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name = '铝' 
+and biz_dt = '2025-07-02';
+
+问题：列出各品种的有效预报量占交割预报数量的比例最少的5个仓库
+WITH ratio_calculation AS (
+    SELECT 
+        clas_name,
+        wh_abbr,
+        CASE 
+            WHEN dlv_prct_qty = 0 THEN NULL 
+            ELSE vald_pre_qty::float / NULLIF(dlv_prct_qty, 0) 
+        END AS valid_ratio,
+        vald_pre_qty,
+        dlv_prct_qty
+    FROM 
+        dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE 
+        dlv_prct_qty > 0  -- 只考虑有交割预报数量的记录
+		and biz_dt = '2025-07-02'
+),
+ranked_warehouses AS (
+    SELECT 
+        clas_name,
+        wh_abbr,
+        valid_ratio,
+        vald_pre_qty,
+        dlv_prct_qty,
+        RANK() OVER (PARTITION BY clas_name ORDER BY valid_ratio ASC) AS ratio_rank
+    FROM 
+        ratio_calculation
+    WHERE 
+        valid_ratio IS NOT NULL  -- 排除无效比例
+)
+SELECT 
+    clas_name AS "品种名称",
+    wh_abbr AS "仓库简称",
+    ROUND(valid_ratio * 100, 2) AS "有效预报比例(%)",
+    vald_pre_qty AS "有效预报量",
+    dlv_prct_qty AS "交割预报数量"
+FROM 
+    ranked_warehouses
+WHERE 
+    ratio_rank <= 5  -- 每个品种取比例最低的5个仓库
+ORDER BY 
+    clas_name,
+    valid_ratio ASC;
+
+问题：列出各仓库各品种的注销仓单量与注册仓单量的比例，按照比例降序排列
+WITH ratio_calculation AS (
+    SELECT 
+        clas_name,
+        wh_abbr,
+        CASE 
+            WHEN reg_rcpt_qty = 0 THEN NULL 
+            ELSE cncl_rcpt_qty::float / NULLIF(reg_rcpt_qty, 0) 
+        END AS cncl_ratio,
+        reg_rcpt_qty,
+        cncl_rcpt_qty
+    FROM 
+        dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE 
+        reg_rcpt_qty > 0  -- 只考虑有交割预报数量的记录
+		and biz_dt = '2025-07-02'
+),
+ranked_warehouses AS (
+    SELECT 
+        clas_name,
+        wh_abbr,
+        cncl_ratio,
+        reg_rcpt_qty,
+        cncl_rcpt_qty,
+        RANK() OVER (PARTITION BY clas_name ORDER BY cncl_ratio DESC) AS ratio_rank
+    FROM 
+        ratio_calculation
+)
+SELECT 
+    clas_name AS "品种名称",
+    wh_abbr AS "仓库简称",
+    ROUND(cncl_ratio * 100, 2) AS "注销仓单比例(%)",
+    reg_rcpt_qty AS "注册仓单数量",
+    cncl_rcpt_qty AS "注销仓单数量"
+FROM 
+    ranked_warehouses
+ORDER BY 
+    clas_name,
+    valid_ratio ASC;
+
+问题：列出各仓库白糖有效预报量占交割预报数量的比例
+SELECT 
+    wh_abbr AS "仓库简称",
+    clas_name AS "品种名称",
+    CASE 
+        WHEN dlv_prct_qty = 0 THEN NULL 
+        ELSE ROUND((vald_pre_qty::numeric / NULLIF(dlv_prct_qty, 0)) * 100, 2) 
+    END AS "有效预报比例(%)",
+    vald_pre_qty AS "有效预报量",
+    dlv_prct_qty AS "交割预报数量",
+    BIZ_DT AS "业务日期"
+FROM 
+    dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE 
+    clas_name = '白糖'
+    AND dlv_prct_qty > 0  -- 只考虑有交割预报数量的记录
+    AND vald_pre_qty IS NOT NULL  -- 确保有效预报量有值
+	and biz_dt='2025-07-02'
+ORDER BY 
+    "有效预报比例(%)" DESC NULLS LAST;
+
+问题：罗列各品种各仓库近一个月的入库量和出库量，以及入库量-出库量的差值
+SELECT biz_dt,wh_abbr, clas_name, 
+       SUM(ined_wh_qty) AS total_in, 
+       SUM(out_wh_qty) AS total_out,
+       SUM(ined_wh_qty - out_wh_qty) AS inventory_increase
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+and biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+GROUP BY biz_dt,wh_abbr, clas_name
+ORDER BY biz_dt desc,wh_abbr, clas_name;
+
+问题：近一个月的仓库周转率分析（出库/入库）
+SELECT biz_dt,
+       wh_abbr, 
+       SUM(out_wh_qty) AS total_outbound,
+       SUM(ined_wh_qty) AS total_inbound,
+       CASE WHEN SUM(ined_wh_qty) = 0 THEN NULL 
+            ELSE SUM(out_wh_qty)::float / SUM(ined_wh_qty) 
+       END AS turnover_rate
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+and biz_dt >= '2025-07-02'::date - INTERVAL '1 month'
+GROUP BY biz_dt, wh_abbr
+ORDER BY biz_dt desc,turnover_rate DESC;
+
+问题：哪些仓库和品种的预报撤销量大于40%
+SELECT wh_abbr, clas_name,
+       CASE WHEN dlv_prct_qty = 0 THEN NULL 
+            ELSE pre_remove_qty::float / dlv_prct_qty 
+       END AS cancel_ratio
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE dlv_prct_qty > 0 AND (pre_remove_qty::float / dlv_prct_qty) > 0.4
+and biz_dt = '2025-07-02'
+ORDER BY clas_name, cancel_ratio DESC;
+
+问题：按月统计，统计近一年的不同品种的入库仓单量和注册仓单量
+SELECT clas_name, 
+	   EXTRACT(year FROM BIZ_DT) AS year,
+       EXTRACT(MONTH FROM BIZ_DT) AS month,
+       AVG(ined_wh_qty) AS avg_in,
+       AVG(reg_rcpt_qty) AS avg_reg
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+GROUP BY clas_name, EXTRACT(year FROM BIZ_DT),EXTRACT(MONTH FROM BIZ_DT)
+ORDER BY clas_name, EXTRACT(year FROM BIZ_DT)desc,month desc
+limit 12;
+
+问题：各交易所包含的仓库数量
+SELECT EXCH_NAME, COUNT(DISTINCT wh_abbr) AS warehouse_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY EXCH_NAME
+ORDER BY warehouse_count DESC;
+
+问题：各交易所包含的品种数量
+SELECT EXCH_NAME, COUNT(DISTINCT clas_name) AS product_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY EXCH_NAME
+ORDER BY product_count DESC;
+
+问题：各品种的仓库在各交易所的分布个数情况
+SELECT clas_name, EXCH_NAME, COUNT(DISTINCT wh_abbr) AS warehouse_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY clas_name, EXCH_NAME
+ORDER BY clas_name, warehouse_count DESC;
+
+问题：当前各品种总注册仓单量排名
+SELECT clas_name, SUM(reg_rcpt_qty) AS total_registered
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY clas_name
+ORDER BY total_registered DESC;
+
+问题：各仓库入库量排名
+SELECT wh_abbr, SUM(ined_wh_qty) AS total_inbound
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+where biz_dt = '2025-07-02'
+GROUP BY wh_abbr
+ORDER BY total_inbound DESC;
+
+问题：各交易所仓单总量对比
+SELECT EXCH_NAME, SUM(reg_rcpt_qty) AS total_registered
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY EXCH_NAME
+ORDER BY total_registered DESC;
+
+问题：交易所间品种仓单量分布对比
+SELECT EXCH_NAME, clas_name, SUM(reg_rcpt_qty) AS total_registered
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY EXCH_NAME, clas_name
+ORDER BY EXCH_NAME, total_registered DESC;
+

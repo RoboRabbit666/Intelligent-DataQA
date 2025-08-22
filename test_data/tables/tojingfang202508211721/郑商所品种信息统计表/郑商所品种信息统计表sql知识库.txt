@@ -1,0 +1,414 @@
+问题：查询郑商所当前主力合约的代码、结算价及成交量
+SELECT BIZ_DT,main_comd, main_comd_clr_prc, main_comd_trd_qty
+FROM 
+    dataqa.clas_info_stas_tab
+where biz_dt='2025-07-02'
+AND exch_code = 'CZCE';
+
+问题：筛选当前主力合约结算价超过2000元/吨的品种
+SELECT  CLAS_NAME,fut_opt_flag, main_comd, main_comd_clr_prc
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    main_comd_clr_prc > 2000
+	and biz_dt='2025-07-02';
+
+问题：棉花看涨期权主力合约持仓量占总持仓量的比例是多少
+SELECT 
+    BIZ_DT,
+    CLAS_NAME,
+	fut_opt_flag,
+	cp_flag,
+    main_comd_hld_qty,
+    hld_qty,
+    ROUND(main_comd_hld_qty * 100.0 / NULLIF(hld_qty, 0), 2) AS 主力合约持仓量占比_百分比
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    CLAS_code = 'CF' 
+	AND fut_opt_flag = 'O'
+	AND cp_flag = 'C'
+    AND EXCH_CODE = 'CZCE'
+    AND BIZ_DT ='2025-07-02' 
+
+问题：查询当前棉花品种近月合约的持仓量及成交均价
+SELECT BIZ_DT,clas_code,fut_opt_flag,near_mon_comd, near_mon_comd_hld_qty, near_mon_comd_trd_avg_prc
+FROM 
+    dataqa.clas_info_stas_tab
+	where biz_dt='2025-07-02'
+	and CLAS_code = 'CF' 
+	AND fut_opt_flag = 'F'
+    AND EXCH_CODE = 'CZCE';
+
+问题：找出当前近月合约持仓量大于5000手的品种
+SELECT BIZ_DT,CLAS_NAME, fut_opt_flag, near_mon_comd, near_mon_comd_hld_qty
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    near_mon_comd_hld_qty > 5000
+	and biz_dt='2025-07-02'
+	and EXCH_CODE = 'CZCE';
+
+问题：查询当前郑商所交易的期权品种
+SELECT  distinct BIZ_DT,CLAS_NAME,fut_opt_flag
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    fut_opt_flag = 'O',
+and biz_dt='2025-07-02'
+AND EXCH_CODE = 'CZCE';
+
+问题：查询当前郑商所交易的期货品种
+SELECT  distinct BIZ_DT,CLAS_NAME,fut_opt_flag
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    fut_opt_flag = 'F',
+and biz_dt='2025-07-02'
+AND EXCH_CODE = 'CZCE';
+
+问题：显示郑商所今日持仓量最多的5个品种，区分看涨看跌标识
+SELECT BIZ_DT, CLAS_NAME,fut_opt_flag,cp_flag,hld_qty
+FROM 
+    dataqa.clas_info_stas_tab
+where  biz_dt='2025-07-02'
+AND EXCH_CODE = 'CZCE'
+ORDER BY hld_qty DESC
+LIMIT 5;
+
+问题：查询郑商所当前投机成交量占总成交量占比超过50%的品种，区分看涨看跌标识
+SELECT  BIZ_DT, CLAS_NAME,fut_opt_flag,cp_flag,sum(spe_trd_qty) as spe_trd_qty,sum(trd_qty) as trd_qty
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    trd_qty > 0 and biz_dt='2025-07-02'
+group by  BIZ_DT, CLAS_NAME,fut_opt_flag,cp_flag,spe_trd_qty,trd_qty
+HAVING 
+    (spe_trd_qty * 100.0 / trd_qty) > 50;
+
+问题：查询郑商所当前交易套保持仓量最大的品种及套保持仓量，区分看涨看跌标识
+SELECT BIZ_DT,CLAS_NAME,fut_opt_flag,cp_flag ,hdg_hld_qty 
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    biz_dt='2025-07-02'
+ORDER BY 
+    hdg_hld_qty DESC
+LIMIT 1;
+
+问题：查询郑商所2025年7月1日及之后的棉花期货品种的交易数据(成交量、成交额、持仓量、持仓额)
+SELECT BIZ_DT,CLAS_CODE,fut_opt_flag,sum(trd_qty),sum(trd_amt),sum(hld_qty),sum(hld_amt)
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    BIZ_DT >= '2025-07-01'
+	and clas_code='CF'
+	and fut_opt_flag='F'
+	group by BIZ_DT,CLAS_CODE,fut_opt_flag
+order by biz_dt desc;
+
+问题：查询郑商所最近7天棉花期权的交易数据(成交量、成交额、持仓量、持仓额)
+SELECT BIZ_DT,CLAS_CODE,fut_opt_flag,sum(trd_qty),sum(trd_amt),sum(hld_qty),sum(hld_amt)
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    BIZ_DT >('2025-07-02'::date - 7)
+	and clas_code ='CF'
+	and fut_opt_flag='O'
+group by BIZ_DT,CLAS_CODE,fut_opt_flag
+order by biz_dt desc;
+
+问题：查询郑商所最近7天棉花期权的交易数据(成交量、成交额、持仓量、持仓额)，区分看涨看跌标识
+SELECT BIZ_DT,CLAS_CODE,fut_opt_flag,cp_flag,sum(trd_qty),sum(trd_amt),sum(hld_qty),sum(hld_amt)
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    BIZ_DT >('2025-07-02'::date - 7)
+	and clas_code ='CF'
+	and fut_opt_flag='O'
+group by BIZ_DT,CLAS_CODE,fut_opt_flag,cp_flag
+order by biz_dt desc;
+
+问题：查询郑商所当前品种名称包含“麦”且主力合约结算价超过3000元的品种
+SELECT biz_dt,CLAS_NAME , fut_opt_flag,main_comd , main_comd_clr_prc
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    CLAS_NAME LIKE '%麦%' 
+    AND main_comd_clr_prc > 3000
+	and biz_dt='2025-07-02';
+
+问题：查询期现偏离度超过10%的品种名称、现货价格、近月合约，近月合约结算价，期现偏离度
+SELECT CLAS_NAME ,fut_opt_flag,SPOT_PRC, near_mon_comd,near_mon_comd_clr_prc,prd_spot_prc_ske_rate
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE biz_dt='2025-07-02'
+   and  ABS(prd_spot_prc_ske_rate * 100.0) > 10;
+
+问题：2025年苹果品种在哪些交易所交易？产地是哪里？
+SELECT distinct EXCH_NAME,CLAS_NAME,fut_opt_flag,PRON_NAME
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    (CLAS_CODE = 'AP' OR CLAS_NAME LIKE '%苹果%')
+	and fut_opt_flag='F'
+    AND BIZ_DT >= '2025-01-01' 
+ORDER BY 
+    EXCH_NAME, CLAS_NAME; 
+
+问题：郑州商品交易所的7月份农产品期货成交总量和成交总额？
+SELECT
+    SUM(trd_qty) AS 期货总成交量_手, 
+    SUM(trd_amt) AS 期货总成交额_元 
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    EXCH_CODE = 'CZCE'
+    AND IS_PROD = 'Y'
+    AND BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+    AND fut_opt_flag = 'F'
+
+问题：郑州商品交易所的7月份农产品中各品种的成交总量和成交总额？
+SELECT clas_code,fut_opt_flag,
+    SUM(trd_qty) AS 品种期货总成交量_手, 
+    SUM(trd_amt) AS 品种期货总成交额_元 
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    EXCH_CODE = 'CZCE'
+    AND IS_PROD = 'Y'
+    AND BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+group by clas_code,fut_opt_flag
+
+问题：今日郑商所尿素期货品种的套保交易占比是多少？
+select BIZ_DT ,CLAS_NAME,fut_opt_flag,hdg_trd_qty/trd_qty as 套保交易占比
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    EXCH_CODE = 'CZCE'
+    AND CLAS_NAME like '%尿素%'
+    AND BIZ_DT = '2025-07-02'
+    AND fut_opt_flag = 'F'
+
+问题：罗列下7月份短纤期货品种的撤单率
+SELECT 
+    BIZ_DT,
+    CLAS_NAME,
+	fut_opt_flag,
+    cancel_order_lot,
+    ord_lot,
+    ROUND(cancel_order_lot * 100.0 / NULLIF(ord_lot, 0), 2) AS 撤单率_百分比
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    CLAS_name like '%短纤%'
+    AND EXCH_CODE = 'CZCE'
+    AND BIZ_DT BETWEEN '2025-07-01' AND '2025-07-31'
+	AND fut_opt_flag = 'F' 
+ORDER BY 
+    BIZ_DT desc;
+
+问题：上周郑商所白糖期货的总成交量是多少?
+SELECT 
+    CLAS_CODE,fut_opt_flag,SUM(trd_qty) AS 上周总成交量_手
+FROM 
+    dataqa.clas_info_stas_tab
+WHERE 
+    CLAS_CODE = 'SR'
+	AND fut_opt_flag = 'F' 
+    AND EXCH_CODE = 'CZCE'
+    AND BIZ_DT BETWEEN BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)+6))
+                      AND ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)))
+group by CLAS_CODE,fut_opt_flag;
+
+问题：哪种交易类型（套保、投机、套利）在苹果期货2025-07-02日的成交量最大
+select concat_ws(', ',
+	case when hdg_trd_qty =max_value then '套保' end,
+	case when spe_trd_qty =max_value then '投机' end,
+	case when cmb_trd_qty =max_value then '套利' end
+) as max_fields, max_value
+from 
+(select hdg_trd_qty,spe_trd_qty,cmb_trd_qty,greatest(hdg_trd_qty,spe_trd_qty,cmb_trd_qty) as max_value
+from dataqa.clas_info_stas_tab where clas_code='AP' and biz_dt='2024-10-25' and fut_opt_flag='F'
+) as subquery
+
+问题：过去一周甲醇期货的套利交易额环比增长多少,今天日期是2025-07-02
+WITH 
+-- 本周数据
+current_week AS (
+    SELECT 
+        SUM(cmb_trd_amt) AS 套利交易额_本周
+    FROM 
+        dataqa.clas_info_stas_tab
+    WHERE 
+        CLAS_CODE = 'MA'  -- 甲醇品种代码
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='F'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)-1))
+                      AND '2025-07-02'::date
+),
+-- 上周数据
+last_week AS (
+    SELECT 
+        SUM(cmb_trd_amt) AS 套利交易额_上周
+    FROM 
+        dataqa.clas_info_stas_tab
+    WHERE 
+        CLAS_CODE = 'MA'
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='F'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)+6))
+                      AND ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)))
+)
+ 
+SELECT 
+    cw.套利交易额_本周,
+    lw.套利交易额_上周,
+    CASE 
+        WHEN lw.套利交易额_上周 = 0 THEN NULL  -- 避免除以0
+        ELSE ROUND((cw.套利交易额_本周 - lw.套利交易额_上周) * 100.0 / lw.套利交易额_上周, 2)
+    END AS 环比增长率_百分比
+FROM 
+    current_week cw, last_week lw;
+
+问题：过去一周甲醇期权的套利交易额环比增长多少,今天日期是2025-07-02
+WITH 
+-- 本周数据
+current_week AS (
+    SELECT 
+        SUM(cmb_trd_amt) AS 套利交易额_本周
+    FROM 
+        dataqa.clas_info_stas_tab
+    WHERE 
+        CLAS_CODE = 'MA'  -- 甲醇品种代码
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='O'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)-1))
+                      AND '2025-07-02'::date
+),
+-- 上周数据
+last_week AS (
+    SELECT 
+        SUM(cmb_trd_amt) AS 套利交易额_上周
+    FROM 
+        dataqa.clas_info_stas_tab
+    WHERE 
+        CLAS_CODE = 'MA'
+        AND EXCH_CODE = 'CZCE'
+		and fut_opt_flag='O'
+        AND BIZ_DT BETWEEN ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)+6))
+                      AND ('2025-07-02'::date - interval '1 day' * (extract(dow from '2025-07-02'::date)))
+)
+ 
+SELECT 
+    cw.套利交易额_本周,
+    lw.套利交易额_上周,
+    CASE 
+        WHEN lw.套利交易额_上周 = 0 THEN NULL  -- 避免除以0
+        ELSE ROUND((cw.套利交易额_本周 - lw.套利交易额_上周) * 100.0 / lw.套利交易额_上周, 2)
+    END AS 环比增长率_百分比
+FROM 
+    current_week cw, last_week lw;
+
+问题：今日玻璃期权的投机持仓额相比前一日是增加还是减少了？
+WITH 玻璃投机持仓额 AS (
+  SELECT 
+    BIZ_DT,clas_name,fut_opt_flag,
+    sum(spe_hld_amt) as spe_hld_amt
+  FROM dataqa.clas_info_stas_tab
+  WHERE CLAS_NAME = '平板玻璃'
+  and fut_opt_flag ='O'
+  group by BIZ_DT,clas_name,fut_opt_flag
+),
+ranked_dates AS (
+  SELECT 
+    BIZ_DT,
+    ROW_NUMBER() OVER (ORDER BY BIZ_DT DESC) AS rn
+  FROM dataqa.clas_info_stas_tab
+  GROUP BY BIZ_DT
+)
+
+SELECT 
+  CASE 
+    WHEN t2.spe_hld_amt > t1.spe_hld_amt THEN '增加'
+    WHEN t2.spe_hld_amt < t1.spe_hld_amt THEN '减少'
+    ELSE '不变'
+  END AS 投机持仓额变化
+FROM 
+  (SELECT spe_hld_amt FROM 玻璃投机持仓额 WHERE BIZ_DT = (
+SELECT BIZ_DT
+FROM ranked_dates
+WHERE rn = 2)) t1,
+  (SELECT spe_hld_amt FROM 玻璃投机持仓额 WHERE BIZ_DT =( 
+SELECT BIZ_DT
+FROM ranked_dates
+WHERE rn = 1)) t2;
+
+问题：郑商所当前行权量最大的品种是哪个，区分看涨看跌标识？
+SELECT biz_dt,CLAS_NAME,fut_opt_flag,cp_flag
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02' AND EXCH_CODE = 'CZCE' AND fut_opt_flag = 'O'
+ORDER BY opt_exer_qty DESC
+LIMIT 1;
+
+问题：菜籽油期货在今日有多少客户进行了交易？
+SELECT trd_clit_qty
+FROM dataqa.clas_info_stas_tab
+WHERE CLAS_NAME = '菜籽油' AND fut_opt_flag = 'F' AND BIZ_DT = '2025-07-02';
+  
+问题：PTA买权的行权量近一个月的历史均值是多少？
+SELECT CLAS_code,fut_opt_flag,cp_flag,round(AVG(opt_exer_qty),2) AS 近一个月行权量均值
+FROM dataqa.clas_info_stas_tab
+WHERE CLAS_code = 'TA' 
+AND fut_opt_flag = 'O' 
+and cp_flag='C'
+AND BIZ_DT between ('2025-07-02'::date -30) and '2025-07-02'
+group by CLAS_code,fut_opt_flag,cp_flag;
+
+问题：罗列菜籽油品种主力合约和近月合约的结算价在近7天的差价？
+select 
+biz_dt,
+main_comd_clr_prc,
+near_mon_comd_clr_prc,
+main_comd_clr_prc - near_mon_comd_clr_prc as 主力合约和近月合约结算差价
+from dataqa.clas_info_stas_tab
+WHERE CLAS_NAME = '菜籽油'
+AND fut_opt_flag = 'F'
+and biz_dt >（'2025-07-02'::date -7）
+
+问题：白糖期货价格与现货价格的基差是多少？
+select biz_dt,clas_code,fut_opt_flag,SPOT_PRC，near_mon_comd_clr_prc，SPOT_PRC-near_mon_comd_clr_prc as 基差（现货价格-近月合约结算价）
+from dataqa.clas_info_stas_tab
+WHERE CLAS_code = 'SR'
+and  fut_opt_flag = 'F'
+and  biz_dt ='2025-07-02'
+
+问题：白糖期权的平今仓手续标准是多少？
+SELECT distinct biz_dt,clas_name,fut_opt_flag,cth_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE CLAS_code ='SR' AND fut_opt_flag = 'O' AND BIZ_DT = '2025-07-02';
+
+问题：罗列当日不同品种的交易手续费标准？
+SELECT DISTINCT biz_dt,CLAS_NAME,fut_opt_flag, trd_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE BIZ_DT = '2025-07-02';
+
+问题：交割手续费标准近7天有变化的品种有哪些？
+select t.clas_name,fut_opt_flag,count(*) from (
+select  clas_name,fut_opt_flag,dlv_cmsn_fee_std from dataqa.clas_info_stas_tab
+WHERE BIZ_DT > ('2025-07-02'::date - 7)
+group by clas_name,fut_opt_flag,dlv_cmsn_fee_std
+) t
+group by t.clas_name,fut_opt_flag
+having count(*)>1
+
+问题：查询郑商所今天各品种的成交量占比
+SELECT biz_dt,clas_code,fut_opt_flag, 
+       SUM(trd_qty) as total_volume,
+       ROUND(SUM(trd_qty) * 100.0 / (SELECT SUM(trd_qty) 
+	   FROM from dataqa.clas_info_stas_tab  WHERE biz_dt = '2025-07-02'), 2) as percentage
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND exch_code = 'CZCE'
+GROUP BY biz_dt,clas_code,fut_opt_flag
+ORDER BY total_volume DESC;
