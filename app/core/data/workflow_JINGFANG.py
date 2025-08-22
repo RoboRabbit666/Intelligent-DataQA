@@ -217,7 +217,7 @@ class DataQaWorkflow:
                     content = f.read()
 
                     # 解析QA对
-                    pattern = r'问题[:：](.*?)\n(?:--- ?\n)*((?:WITH|SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER).*?;)'
+                    pattern = r'问题[:：](.*?)\n(?:--.*?\n)*((?:WITH|SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER).*?)(?=\n\n问题[:：]|\n\n$|$)'
                     matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
                     #处理每一对问题和SQL
                     for question, sql in matches:
