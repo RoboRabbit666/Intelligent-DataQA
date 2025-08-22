@@ -121,7 +121,7 @@ class DataQaWorkflow:
             WorkflowStepType.SEMANTIC_SEARCH_FAQ:"语义搜索FAQ",
             #-------------------新增--------------------
             WorkflowStepType.LOCATE_TABLE:"表格定位",
-            WorkflowStepType.GENERATE_PROMPT:"上下文工程",
+            # WorkflowStepType.GENERATE_PROMPT:"上下文工程",
             WorkflowStepType.GENERATE_SQL:"SQL生成",
         }
         #---------------------------新增-------------------
@@ -397,7 +397,7 @@ class DataQaWorkflow:
             response: 返回生成的SQL响应
         """
         query = input_messages[-1].content
-        content = dataqa_prompt.format(table_schema=table_schema, question=query, faq=faq_results)
+        content = dataqa_prompt.format(table_schema=table_schema, question=query, faq_results=faq_results)
         # print(content)
         system_msg = ChatMessage(
             role="system",
