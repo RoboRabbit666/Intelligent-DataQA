@@ -1,0 +1,159 @@
+问题：查询在最近一个统计月份，哪个地区的期货公司总净利润最高？
+SELECT area, SUM(net_prof) AS total_net_profit
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+GROUP BY area
+ORDER BY total_net_profit DESC
+LIMIT 1;
+
+问题：找出在最近一个月，营业收入（biz_incm_ttl）排名前10，但净利润（net_prof）为负的公司。
+SELECT fut_corp_name, biz_incm_ttl, net_prof
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND net_prof < 0
+ORDER BY biz_incm_ttl DESC
+LIMIT 10;
+
+问题：计算在最近一个月，全国期货公司的总营业收入、总营业支出和总结算利润。
+SELECT SUM(biz_incm_ttl) AS national_total_income,
+       SUM(biz_exp_ttl) AS national_total_expense,
+       SUM(biz_prof_ttl) AS national_total_business_profit
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon);
+
+问题：查询2025年上半年（'202501'至'202506'），客户总数（clit_qty_ttl）月均增长率最高的期货公司是哪家？
+WITH MonthlyGrowth AS (
+    SELECT fut_corp_name,
+           stas_mon,
+           clit_qty_ttl,
+           LAG(clit_qty_ttl, 1, 0) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS prev_month_clients
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon BETWEEN '202501' AND '202506'
+)
+SELECT fut_corp_name,
+       AVG((clit_qty_ttl - prev_month_clients) / prev_month_clients) * 100 AS avg_monthly_growth_rate
+FROM MonthlyGrowth
+WHERE prev_month_clients > 0
+GROUP BY fut_corp_name
+ORDER BY avg_monthly_growth_rate DESC
+LIMIT 1;
+
+问题：在最近一个月，计算每家公司的“净利润率”（净利润 / 营业收入）。
+SELECT fut_corp_name, (net_prof / biz_incm_ttl) * 100 AS net_profit_margin
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND biz_incm_ttl > 0
+ORDER BY net_profit_margin DESC;
+
+问题：找出所有统计月份中，连续三个月或以上净利润持续增长的公司。
+WITH MonthlyChanges AS (
+    SELECT fut_corp_name, stas_mon, net_prof,
+           LAG(net_prof, 1, 0) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) as prev_prof1,
+           LAG(net_prof, 2, 0) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) as prev_prof2
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+)
+SELECT DISTINCT fut_corp_name
+FROM MonthlyChanges
+WHERE net_prof > prev_prof1 AND prev_prof1 > prev_prof2 AND prev_prof2 > 0;
+
+问题：查询在最近一个月，手续费净收入（cmsn_fee_and_coms_net_incm_ttl）占营业收入一半以上的公司有哪些？
+SELECT fut_corp_name, cmsn_fee_and_coms_net_incm_ttl, biz_incm_ttl
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND cmsn_fee_and_coms_net_incm_ttl > (biz_incm_ttl / 2);
+
+问题：统计2025年每个月全国期货公司的总活跃客户数（actv_act_ttl）和总休眠客户数（dort_act_ttl）。
+SELECT stas_mon, SUM(actv_act_ttl) AS total_active_clients, SUM(dort_act_ttl) AS total_dormant_clients
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon LIKE '2025%'
+GROUP BY stas_mon
+ORDER BY stas_mon;
+
+问题：在最近一个月，计算每家公司的“单位客户利润贡献”（净利润 / 活跃客户数）。
+SELECT fut_corp_name, net_prof / actv_act_ttl AS profit_per_active_client
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND actv_act_ttl > 0
+ORDER BY profit_per_active_client DESC;
+
+问题：找出在过去一年中，客户总数从未跌破10000的期货公司。
+SELECT fut_corp_name
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon >= TO_CHAR(TO_DATE((SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon), 'YYYYMM') - INTERVAL '1 year', 'YYYYMM')
+GROUP BY fut_corp_name
+HAVING MIN(clit_qty_ttl) >= 10000;
+
+问题：查询最近一个月，投资收益（inv_prof_ttl）对利润总额（prof_total_ttl）贡献最大的前5家公司。
+SELECT fut_corp_name, inv_prof_ttl, prof_total_ttl, (inv_prof_ttl / prof_total_ttl) * 100 AS investment_contribution_ratio
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND prof_total_ttl > 0
+ORDER BY investment_contribution_ratio DESC
+LIMIT 5;
+
+问题：按地区统计，查询最近一个月各地区期货公司的平均活跃客户比例（活跃客户数 / 客户总数）。
+SELECT area, AVG(actv_act_ttl / clit_qty_ttl) * 100 AS avg_active_client_ratio
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND clit_qty_ttl > 0
+GROUP BY area
+ORDER BY avg_active_client_ratio DESC;
+
+问题：查询“国泰君安”这家公司在2025年各个月份的净利润和客户总数变化情况。
+SELECT stas_mon, fut_corp_name, net_prof, clit_qty_ttl
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE fut_corp_name = '国泰君安' AND stas_mon LIKE '2025%'
+ORDER BY stas_mon;
+
+问题：在最近一个月，哪些公司的利息净收入（intr_net_incm_ttl）是负数？
+SELECT fut_corp_name, intr_net_incm_ttl
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND intr_net_incm_ttl < 0;
+
+问题：比较净利润排名前5的公司和后5的公司，在最近一个月的平均客户总数差异。
+WITH RankedCompanies AS (
+    SELECT fut_corp_name, net_prof, clit_qty_ttl,
+           ROW_NUMBER() OVER (ORDER BY net_prof DESC) as rn_desc,
+           ROW_NUMBER() OVER (ORDER BY net_prof ASC) as rn_asc
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+)
+SELECT
+    (SELECT AVG(clit_qty_ttl) FROM RankedCompanies WHERE rn_desc <= 5) AS avg_clients_top5,
+    (SELECT AVG(clit_qty_ttl) FROM RankedCompanies WHERE rn_asc <= 5) AS avg_clients_bottom5;
+
+问题：查询所有月份中，单月净利润最高的记录是哪家公司在哪个月份创造的？
+SELECT stas_mon, fut_corp_name, net_prof
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+ORDER BY net_prof DESC
+LIMIT 1;
+
+问题：统计在最近一个月，客户总数超过10万的公司有多少家？
+SELECT COUNT(*)
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND clit_qty_ttl > 100000;
+
+问题：查询最近一个月，营业支出（biz_exp_ttl）低于行业平均水平的公司有哪些？
+SELECT fut_corp_name, biz_exp_ttl
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+AND biz_exp_ttl < (
+    SELECT AVG(biz_exp_ttl)
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = (SELECT MAX(stas_mon) FROM dataqa.fut_corp_prof_clit_stas_tab_mon)
+);
+
+问题：列出在所有统计月份中，从未出现过亏损（即净利润总是正数）的公司。
+SELECT fut_corp_name
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+GROUP BY fut_corp_name
+HAVING MIN(net_prof) >= 0;
+
+问题：查询2025年第一季度，每个地区利润总额（prof_total_ttl）的季度总和排名。
+SELECT area, SUM(prof_total_ttl) AS quarterly_total_profit
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon BETWEEN '202501' AND '202503'
+GROUP BY area
+ORDER BY quarterly_total_profit DESC;

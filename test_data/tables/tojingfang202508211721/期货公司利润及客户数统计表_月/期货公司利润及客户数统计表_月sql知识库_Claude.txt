@@ -1,0 +1,370 @@
+问题：查询各辖区期货公司数量分布及平均净利润情况
+SELECT area,
+       COUNT(*) AS company_count,
+       ROUND(AVG(net_prof), 2) AS avg_net_profit,
+       ROUND(SUM(net_prof), 2) AS total_net_profit,
+       ROUND(STDDEV(net_prof), 2) AS net_profit_std_dev
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+GROUP BY area
+ORDER BY avg_net_profit DESC;
+
+问题：分析期货公司成本控制效率（营业支出/营业收入）排名
+SELECT fut_corp_name, area,
+       biz_incm_ttl,
+       biz_exp_ttl,
+       CASE WHEN biz_incm_ttl > 0 
+            THEN ROUND(biz_exp_ttl / biz_incm_ttl * 100, 2)
+            ELSE NULL 
+       END AS cost_ratio_pct
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND biz_incm_ttl > 0
+ORDER BY cost_ratio_pct ASC
+LIMIT 15;
+
+问题：查询投资收益占营业收入比重最高的前10家期货公司
+SELECT fut_corp_name, area,
+       inv_prof_ttl,
+       biz_incm_ttl,
+       CASE WHEN biz_incm_ttl > 0 
+            THEN ROUND(inv_prof_ttl / biz_incm_ttl * 100, 2)
+            ELSE NULL 
+       END AS investment_income_ratio_pct
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND biz_incm_ttl > 0
+ORDER BY investment_income_ratio_pct DESC
+LIMIT 10;
+
+问题：统计各期货公司近6个月的净利润波动系数分析
+WITH monthly_data AS (
+    SELECT fut_corp_name,
+           stas_mon,
+           net_prof
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon >= '202502' AND stas_mon <= '202507'
+),
+volatility_calc AS (
+    SELECT fut_corp_name,
+           COUNT(*) AS months_count,
+           ROUND(AVG(net_prof), 2) AS avg_net_profit,
+           ROUND(STDDEV(net_prof), 2) AS net_profit_stddev
+    FROM monthly_data
+    GROUP BY fut_corp_name
+    HAVING COUNT(*) >= 6
+)
+SELECT fut_corp_name,
+       avg_net_profit,
+       net_profit_stddev,
+       CASE WHEN avg_net_profit > 0 
+            THEN ROUND(net_profit_stddev / avg_net_profit, 4)
+            ELSE NULL 
+       END AS volatility_coefficient
+FROM volatility_calc
+ORDER BY volatility_coefficient DESC;
+
+问题：查询利息净收入为负值的期货公司及其财务状况
+SELECT fut_corp_name, area,
+       intr_net_incm_ttl,
+       cmsn_fee_and_coms_net_incm_ttl,
+       biz_incm_ttl,
+       net_prof,
+       clit_qty_ttl
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND intr_net_incm_ttl < 0
+ORDER BY intr_net_incm_ttl ASC;
+
+问题：分析各辖区期货公司平均客户规模和盈利能力的关系
+SELECT area,
+       COUNT(*) AS company_count,
+       ROUND(AVG(clit_qty_ttl), 0) AS avg_client_count,
+       ROUND(AVG(net_prof), 2) AS avg_net_profit,
+       ROUND(AVG(net_prof / NULLIF(clit_qty_ttl, 0)), 4) AS profit_per_client
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND clit_qty_ttl > 0
+GROUP BY area
+ORDER BY profit_per_client DESC;
+
+问题：查询手续费及佣金净收入依赖度最高的期货公司（占营业收入比重）
+SELECT fut_corp_name, area,
+       cmsn_fee_and_coms_net_incm_ttl,
+       biz_incm_ttl,
+       CASE WHEN biz_incm_ttl > 0 
+            THEN ROUND(cmsn_fee_and_coms_net_incm_ttl / biz_incm_ttl * 100, 2)
+            ELSE NULL 
+       END AS commission_dependency_pct
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND biz_incm_ttl > 0
+ORDER BY commission_dependency_pct DESC
+LIMIT 10;
+
+问题：统计期货公司客户活跃度分布区间
+WITH activity_analysis AS (
+    SELECT fut_corp_name,
+           clit_qty_ttl,
+           actv_act_ttl,
+           CASE WHEN clit_qty_ttl > 0 
+                THEN ROUND(actv_act_ttl::numeric / clit_qty_ttl * 100, 2)
+                ELSE NULL 
+           END AS activity_rate
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = '202507'
+    AND clit_qty_ttl > 0
+)
+SELECT 
+    CASE 
+        WHEN activity_rate >= 80 THEN '80%-100%'
+        WHEN activity_rate >= 60 THEN '60%-80%'
+        WHEN activity_rate >= 40 THEN '40%-60%'
+        WHEN activity_rate >= 20 THEN '20%-40%'
+        ELSE '0%-20%'
+    END AS activity_range,
+    COUNT(*) AS company_count,
+    ROUND(AVG(activity_rate), 2) AS avg_activity_rate
+FROM activity_analysis
+WHERE activity_rate IS NOT NULL
+GROUP BY 
+    CASE 
+        WHEN activity_rate >= 80 THEN '80%-100%'
+        WHEN activity_rate >= 60 THEN '60%-80%'
+        WHEN activity_rate >= 40 THEN '40%-60%'
+        WHEN activity_rate >= 20 THEN '20%-40%'
+        ELSE '0%-20%'
+    END
+ORDER BY avg_activity_rate DESC;
+
+问题：查询近3个月净利润连续增长的期货公司
+WITH monthly_profits AS (
+    SELECT fut_corp_name,
+           stas_mon,
+           net_prof,
+           LAG(net_prof, 1) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS prev_month_profit,
+           LAG(net_prof, 2) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS two_months_ago_profit
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon IN ('202505', '202506', '202507')
+)
+SELECT fut_corp_name,
+       two_months_ago_profit AS month_1_profit,
+       prev_month_profit AS month_2_profit,
+       net_prof AS month_3_profit
+FROM monthly_profits
+WHERE stas_mon = '202507'
+AND net_prof > prev_month_profit
+AND prev_month_profit > two_months_ago_profit
+AND two_months_ago_profit IS NOT NULL
+ORDER BY net_prof DESC;
+
+问题：分析期货公司规模与盈利效率的相关性（按客户数量分组）
+WITH size_groups AS (
+    SELECT fut_corp_name,
+           clit_qty_ttl,
+           net_prof,
+           CASE 
+               WHEN clit_qty_ttl >= 100000 THEN '大型(10万+)'
+               WHEN clit_qty_ttl >= 50000 THEN '中大型(5-10万)'
+               WHEN clit_qty_ttl >= 20000 THEN '中型(2-5万)'
+               WHEN clit_qty_ttl >= 10000 THEN '小中型(1-2万)'
+               ELSE '小型(<1万)'
+           END AS company_size
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = '202507'
+    AND clit_qty_ttl > 0
+)
+SELECT company_size,
+       COUNT(*) AS company_count,
+       ROUND(AVG(clit_qty_ttl), 0) AS avg_clients,
+       ROUND(AVG(net_prof), 2) AS avg_net_profit,
+       ROUND(AVG(net_prof / clit_qty_ttl), 6) AS avg_profit_per_client
+FROM size_groups
+GROUP BY company_size
+ORDER BY avg_clients DESC;
+
+问题：查询营业利润为正但净利润为负的期货公司及原因分析
+SELECT fut_corp_name, area,
+       biz_prof_ttl,
+       prof_total_ttl,
+       net_prof,
+       (prof_total_ttl - biz_prof_ttl) AS non_operating_impact,
+       (net_prof - prof_total_ttl) AS tax_impact
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND biz_prof_ttl > 0
+AND net_prof < 0
+ORDER BY (biz_prof_ttl - net_prof) DESC;
+
+问题：统计各辖区期货公司休眠账户管理效率对比
+SELECT area,
+       COUNT(*) AS company_count,
+       ROUND(AVG(clit_qty_ttl), 0) AS avg_total_clients,
+       ROUND(AVG(dort_act_ttl), 0) AS avg_dormant_accounts,
+       ROUND(AVG(dort_act_ttl::numeric / NULLIF(clit_qty_ttl, 0) * 100), 2) AS avg_dormant_rate_pct
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND clit_qty_ttl > 0
+GROUP BY area
+ORDER BY avg_dormant_rate_pct ASC;
+
+问题：查询投资收益波动最大的期货公司（近6个月标准差分析）
+WITH investment_volatility AS (
+    SELECT fut_corp_name,
+           COUNT(*) AS months_count,
+           ROUND(AVG(inv_prof_ttl), 2) AS avg_investment_profit,
+           ROUND(STDDEV(inv_prof_ttl), 2) AS investment_stddev,
+           ROUND(MAX(inv_prof_ttl), 2) AS max_investment_profit,
+           ROUND(MIN(inv_prof_ttl), 2) AS min_investment_profit
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon >= '202502' AND stas_mon <= '202507'
+    GROUP BY fut_corp_name
+    HAVING COUNT(*) >= 6
+)
+SELECT fut_corp_name,
+       avg_investment_profit,
+       investment_stddev,
+       max_investment_profit,
+       min_investment_profit,
+       (max_investment_profit - min_investment_profit) AS investment_range
+FROM investment_volatility
+ORDER BY investment_stddev DESC
+LIMIT 10;
+
+问题：分析期货公司财务健康度综合评分（多指标权重计算）
+WITH financial_metrics AS (
+    SELECT fut_corp_name, area,
+           -- 盈利能力指标
+           CASE WHEN biz_incm_ttl > 0 THEN net_prof / biz_incm_ttl ELSE 0 END AS net_margin,
+           -- 成本控制指标
+           CASE WHEN biz_incm_ttl > 0 THEN 1 - (biz_exp_ttl / biz_incm_ttl) ELSE 0 END AS cost_efficiency,
+           -- 客户活跃度指标
+           CASE WHEN clit_qty_ttl > 0 THEN actv_act_ttl::numeric / clit_qty_ttl ELSE 0 END AS client_activity,
+           -- 收入多元化指标
+           CASE WHEN biz_incm_ttl > 0 
+                THEN 1 - ABS(cmsn_fee_and_coms_net_incm_ttl / biz_incm_ttl - 0.7) 
+                ELSE 0 END AS income_diversity
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = '202507'
+)
+SELECT fut_corp_name, area,
+       ROUND(net_margin * 100, 2) AS net_margin_pct,
+       ROUND(cost_efficiency * 100, 2) AS cost_efficiency_pct,
+       ROUND(client_activity * 100, 2) AS client_activity_pct,
+       ROUND(income_diversity * 100, 2) AS income_diversity_pct,
+       ROUND((net_margin * 0.3 + cost_efficiency * 0.25 + client_activity * 0.25 + income_diversity * 0.2) * 100, 2) AS comprehensive_score
+FROM financial_metrics
+ORDER BY comprehensive_score DESC
+LIMIT 20;
+
+问题：查询各期货公司近12个月营业收入增长趋势分析
+WITH revenue_trend AS (
+    SELECT fut_corp_name,
+           stas_mon,
+           biz_incm_ttl,
+           LAG(biz_incm_ttl, 1) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS prev_month_revenue,
+           LAG(biz_incm_ttl, 12) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS year_ago_revenue
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon >= '201908' AND stas_mon <= '202507'
+)
+SELECT fut_corp_name,
+       biz_incm_ttl AS current_revenue,
+       prev_month_revenue,
+       year_ago_revenue,
+       CASE WHEN prev_month_revenue > 0 
+            THEN ROUND((biz_incm_ttl - prev_month_revenue) / prev_month_revenue * 100, 2)
+            ELSE NULL END AS mom_growth_pct,
+       CASE WHEN year_ago_revenue > 0 
+            THEN ROUND((biz_incm_ttl - year_ago_revenue) / year_ago_revenue * 100, 2)
+            ELSE NULL END AS yoy_growth_pct
+FROM revenue_trend
+WHERE stas_mon = '202507'
+AND year_ago_revenue IS NOT NULL
+ORDER BY yoy_growth_pct DESC;
+
+问题：统计各辖区期货公司盈利集中度分析（基尼系数思想）
+WITH area_profit_analysis AS (
+    SELECT area, fut_corp_name, net_prof,
+           SUM(net_prof) OVER (PARTITION BY area) AS area_total_profit,
+           COUNT(*) OVER (PARTITION BY area) AS area_company_count
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon = '202507'
+    AND net_prof > 0
+),
+profit_shares AS (
+    SELECT area, fut_corp_name,
+           net_prof / area_total_profit AS profit_share,
+           area_company_count
+    FROM area_profit_analysis
+)
+SELECT area,
+       area_company_count,
+       ROUND(MAX(profit_share) * 100, 2) AS max_company_share_pct,
+       ROUND(STDDEV(profit_share) * 100, 2) AS profit_concentration_stddev,
+       COUNT(CASE WHEN profit_share >= 0.1 THEN 1 END) AS companies_above_10pct_share
+FROM profit_shares
+GROUP BY area
+ORDER BY profit_concentration_stddev DESC;
+
+问题：查询客户数量与各类收入的相关性分析
+SELECT 
+    CORR(clit_qty_ttl, cmsn_fee_and_coms_net_incm_ttl) AS commission_correlation,
+    CORR(clit_qty_ttl, intr_net_incm_ttl) AS interest_correlation,
+    CORR(clit_qty_ttl, inv_prof_ttl) AS investment_correlation,
+    CORR(clit_qty_ttl, biz_incm_ttl) AS total_revenue_correlation,
+    COUNT(*) AS sample_size
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND clit_qty_ttl > 0;
+
+问题：分析期货公司经营杠杆效应（营业利润变化/营业收入变化）
+WITH leverage_analysis AS (
+    SELECT fut_corp_name,
+           LAG(biz_incm_ttl, 1) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS prev_revenue,
+           LAG(biz_prof_ttl, 1) OVER (PARTITION BY fut_corp_name ORDER BY stas_mon) AS prev_operating_profit,
+           biz_incm_ttl AS current_revenue,
+           biz_prof_ttl AS current_operating_profit,
+           stas_mon
+    FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+    WHERE stas_mon IN ('202506', '202507')
+)
+SELECT fut_corp_name,
+       prev_revenue,
+       current_revenue,
+       prev_operating_profit,
+       current_operating_profit,
+       CASE WHEN prev_revenue > 0 
+            THEN ROUND((current_revenue - prev_revenue) / prev_revenue * 100, 2)
+            ELSE NULL END AS revenue_change_pct,
+       CASE WHEN prev_operating_profit != 0 
+            THEN ROUND((current_operating_profit - prev_operating_profit) / ABS(prev_operating_profit) * 100, 2)
+            ELSE NULL END AS operating_profit_change_pct,
+       CASE WHEN prev_revenue > 0 AND prev_operating_profit != 0 AND (current_revenue - prev_revenue) != 0
+            THEN ROUND(((current_operating_profit - prev_operating_profit) / ABS(prev_operating_profit)) / 
+                      ((current_revenue - prev_revenue) / prev_revenue), 2)
+            ELSE NULL END AS operating_leverage
+FROM leverage_analysis
+WHERE stas_mon = '202507'
+AND prev_revenue IS NOT NULL
+ORDER BY ABS(operating_leverage) DESC;
+
+问题：查询期货公司账户管理效率评估（活跃账户创收能力）
+SELECT fut_corp_name, area,
+       clit_qty_ttl,
+       actv_act_ttl,
+       dort_act_ttl,
+       biz_incm_ttl,
+       CASE WHEN actv_act_ttl > 0 
+            THEN ROUND(biz_incm_ttl / actv_act_ttl, 2)
+            ELSE NULL END AS revenue_per_active_account,
+       CASE WHEN clit_qty_ttl > 0 
+            THEN ROUND(actv_act_ttl::numeric / clit_qty_ttl * 100, 2)
+            ELSE NULL END AS activation_rate_pct,
+       CASE WHEN clit_qty_ttl > 0 
+            THEN ROUND(dort_act_ttl::numeric / clit_qty_ttl * 100, 2)
+            ELSE NULL END AS dormancy_rate_pct
+FROM dataqa.fut_corp_prof_clit_stas_tab_mon
+WHERE stas_mon = '202507'
+AND actv_act_ttl > 0
+ORDER BY revenue_per_active_account DESC
+LIMIT 15;

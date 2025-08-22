@@ -1,0 +1,274 @@
+问题：查询纽约商品交易所(NYMEX)近月合约中收盘价超过昨收盘价的合约数量
+SELECT COUNT(*) AS rising_contracts,
+       COUNT(CASE WHEN NEAR_MON_COMD_LOGO = 'Y' THEN 1 END) AS near_month_rising
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'NYMEX'
+AND TRD_DT = '2025-07-02'
+AND CLOS_PRC > L_CLOS_PRC;
+
+问题：分析各交易所主力合约的平均日内波动率（最高价-最低价)/开盘价
+SELECT EXCH_CODE_DESC,
+       COUNT(*) AS main_contract_count,
+       ROUND(AVG((HIGHEST_PRC - LOWEST_PRC) / NULLIF(OPN_QN_PRC, 0) * 100), 4) AS avg_intraday_volatility_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND is_main_comd = 'Y'
+AND OPN_QN_PRC > 0
+GROUP BY EXCH_CODE_DESC
+ORDER BY avg_intraday_volatility_pct DESC;
+
+问题：查询ICE交易所所有商品的主力合约与非主力合约成交额对比
+SELECT prod_name,
+       is_main_comd,
+       COUNT(*) AS contract_count,
+       SUM(TRD_AMT) AS total_amount,
+       ROUND(AVG(TRD_AMT), 2) AS avg_amount_per_contract
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'ICE'
+AND TRD_DT = '2025-07-02'
+GROUP BY prod_name, is_main_comd
+ORDER BY prod_name, is_main_comd;
+
+问题：统计各商品昨结算价与今日结算价差异超过5%的合约数量
+SELECT prod_name,
+       COUNT(*) AS significant_change_contracts,
+       ROUND(AVG(ABS((CLR_PRC - L_CLR_PRC) / NULLIF(L_CLR_PRC, 0)) * 100), 2) AS avg_settlement_change_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND L_CLR_PRC > 0
+AND ABS((CLR_PRC - L_CLR_PRC) / L_CLR_PRC) > 0.05
+GROUP BY prod_name
+ORDER BY significant_change_contracts DESC;
+
+问题：查询芝加哥期货交易所(CBOT)成交额最大的5个合约及其价格表现
+SELECT COMD_CODE, prod_name,
+       TRD_AMT,
+       OPN_QN_PRC,
+       CLOS_PRC,
+       CLR_PRC,
+       (CLOS_PRC - OPN_QN_PRC) AS price_change,
+       ROUND((CLOS_PRC - OPN_QN_PRC) / NULLIF(OPN_QN_PRC, 0) * 100, 2) AS price_change_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'CBOT'
+AND TRD_DT = '2025-07-02'
+ORDER BY TRD_AMT DESC
+LIMIT 5;
+
+问题：分析马来西亚衍生品交易所(BMD)各商品近月合约与非近月合约的持仓量分布
+SELECT prod_name,
+       NEAR_MON_COMD_LOGO,
+       COUNT(*) AS contract_count,
+       SUM(HLD_QTY) AS total_position,
+       ROUND(AVG(HLD_QTY), 2) AS avg_position_per_contract
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'BMD'
+AND TRD_DT = '2025-07-02'
+GROUP BY prod_name, NEAR_MON_COMD_LOGO
+ORDER BY prod_name, NEAR_MON_COMD_LOGO;
+
+问题：查询近7天内持仓量增长最快的前10个主力合约
+WITH position_change AS (
+    SELECT COMD_CODE, prod_name, EXCH_CODE_DESC,
+           TRD_DT,
+           HLD_QTY,
+           LAG(HLD_QTY, 1) OVER (PARTITION BY COMD_CODE ORDER BY TRD_DT) AS prev_position
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT >= '2025-07-02'::date - INTERVAL '7 days'
+    AND is_main_comd = 'Y'
+)
+SELECT COMD_CODE, prod_name, EXCH_CODE_DESC,
+       MAX(HLD_QTY) - MIN(HLD_QTY) AS position_growth,
+       ROUND((MAX(HLD_QTY) - MIN(HLD_QTY)) / NULLIF(MIN(HLD_QTY), 0) * 100, 2) AS growth_rate_pct
+FROM position_change
+WHERE prev_position IS NOT NULL
+GROUP BY COMD_CODE, prod_name, EXCH_CODE_DESC
+ORDER BY position_growth DESC
+LIMIT 10;
+
+问题：统计各交易所当日开盘价与昨收盘价差异的极值情况
+SELECT EXCH_CODE_DESC,
+       COUNT(*) AS total_contracts,
+       ROUND(MAX((OPN_QN_PRC - L_CLOS_PRC) / NULLIF(L_CLOS_PRC, 0) * 100), 2) AS max_gap_up_pct,
+       ROUND(MIN((OPN_QN_PRC - L_CLOS_PRC) / NULLIF(L_CLOS_PRC, 0) * 100), 2) AS max_gap_down_pct,
+       ROUND(AVG(ABS((OPN_QN_PRC - L_CLOS_PRC) / NULLIF(L_CLOS_PRC, 0)) * 100), 2) AS avg_gap_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND L_CLOS_PRC > 0
+GROUP BY EXCH_CODE_DESC
+ORDER BY avg_gap_pct DESC;
+
+问题：查询CME Group集团下成交量与持仓量比值（活跃度）最高的商品排名
+SELECT prod_name,
+       SUM(TRD_QTY) AS total_volume,
+       SUM(HLD_QTY) AS total_position,
+       ROUND(SUM(TRD_QTY) / NULLIF(SUM(HLD_QTY), 0), 4) AS activity_ratio
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'CME Group'
+AND TRD_DT = '2025-07-02'
+GROUP BY prod_name
+HAVING SUM(HLD_QTY) > 0
+ORDER BY activity_ratio DESC;
+
+问题：分析各商品主力合约的价格发现效率（结算价与收盘价的偏离度）
+SELECT prod_name, EXCH_CODE_DESC,
+       COMD_CODE,
+       CLOS_PRC,
+       CLR_PRC,
+       ABS(CLR_PRC - CLOS_PRC) AS price_deviation,
+       ROUND(ABS(CLR_PRC - CLOS_PRC) / NULLIF(CLOS_PRC, 0) * 100, 4) AS deviation_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND is_main_comd = 'Y'
+AND CLOS_PRC > 0
+ORDER BY deviation_pct DESC;
+
+问题：查询近一个月小麦商品各合约的价格波动区间统计
+SELECT COMD_CODE,
+       COUNT(DISTINCT TRD_DT) AS trading_days,
+       ROUND(MAX(HIGHEST_PRC), 2) AS period_high,
+       ROUND(MIN(LOWEST_PRC), 2) AS period_low,
+       ROUND(MAX(HIGHEST_PRC) - MIN(LOWEST_PRC), 2) AS price_range,
+       ROUND(AVG(TRD_QTY), 2) AS avg_daily_volume
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name = '小麦'
+AND TRD_DT >= '2025-07-02'::date - INTERVAL '1 month'
+GROUP BY COMD_CODE
+ORDER BY price_range DESC;
+
+问题：统计各交易所当日无成交（成交量为0）的合约数量及占比
+SELECT EXCH_CODE_DESC,
+       COUNT(*) AS total_contracts,
+       COUNT(CASE WHEN TRD_QTY = 0 THEN 1 END) AS zero_volume_contracts,
+       ROUND(COUNT(CASE WHEN TRD_QTY = 0 THEN 1 END) * 100.0 / COUNT(*), 2) AS zero_volume_ratio_pct
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+GROUP BY EXCH_CODE_DESC
+ORDER BY zero_volume_ratio_pct DESC;
+
+问题：查询堪萨斯城期货交易所当日最高成交额的合约详细信息
+SELECT COMD_CODE, prod_name,
+       OPN_QN_PRC, HIGHEST_PRC, LOWEST_PRC, CLOS_PRC, CLR_PRC,
+       TRD_QTY, TRD_AMT, HLD_QTY,
+       is_main_comd, NEAR_MON_COMD_LOGO
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = '堪萨斯城期货交易所'
+AND TRD_DT = '2025-07-02'
+ORDER BY TRD_AMT DESC
+LIMIT 1;
+
+问题：分析各商品非主力合约中成交最活跃的合约分布
+WITH ranked_non_main AS (
+    SELECT prod_name, COMD_CODE, EXCH_CODE_DESC, TRD_QTY,
+           ROW_NUMBER() OVER (PARTITION BY prod_name ORDER BY TRD_QTY DESC) AS volume_rank
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT = '2025-07-02'
+    AND is_main_comd = 'N'
+    AND TRD_QTY > 0
+)
+SELECT prod_name, EXCH_CODE_DESC,
+       COUNT(*) AS active_non_main_contracts,
+       MAX(TRD_QTY) AS max_volume_non_main
+FROM ranked_non_main
+WHERE volume_rank <= 3
+GROUP BY prod_name, EXCH_CODE_DESC
+ORDER BY active_non_main_contracts DESC;
+
+问题：查询近15天内各交易所日均成交额变化趋势
+SELECT TRD_DT, EXCH_CODE_DESC,
+       SUM(TRD_AMT) AS daily_total_amount,
+       COUNT(*) AS active_contracts,
+       ROUND(SUM(TRD_AMT) / COUNT(*), 2) AS avg_amount_per_contract
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT >= '2025-07-02'::date - INTERVAL '15 days'
+AND TRD_AMT > 0
+GROUP BY TRD_DT, EXCH_CODE_DESC
+ORDER BY TRD_DT DESC, daily_total_amount DESC;
+
+问题：统计各商品在不同交易所的合约数量分布和价格差异
+SELECT prod_name,
+       COUNT(DISTINCT EXCH_CODE) AS exchange_count,
+       STRING_AGG(DISTINCT EXCH_CODE_DESC, ', ') AS exchanges,
+       COUNT(*) AS total_contracts,
+       ROUND(MAX(CLOS_PRC) - MIN(CLOS_PRC), 2) AS price_spread,
+       ROUND(STDDEV(CLOS_PRC), 2) AS price_std_dev
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND CLOS_PRC > 0
+GROUP BY prod_name
+HAVING COUNT(DISTINCT EXCH_CODE) > 1
+ORDER BY price_spread DESC;
+
+问题：查询各交易所主力合约昨结算价与昨收盘价差异最大的合约
+WITH price_diff AS (
+    SELECT EXCH_CODE_DESC, COMD_CODE, prod_name,
+           L_CLR_PRC, L_CLOS_PRC,
+           ABS(L_CLR_PRC - L_CLOS_PRC) AS settlement_close_diff,
+           ROW_NUMBER() OVER (PARTITION BY EXCH_CODE_DESC ORDER BY ABS(L_CLR_PRC - L_CLOS_PRC) DESC) AS diff_rank
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT = '2025-07-02'
+    AND is_main_comd = 'Y'
+    AND L_CLR_PRC > 0
+    AND L_CLOS_PRC > 0
+)
+SELECT EXCH_CODE_DESC, COMD_CODE, prod_name,
+       L_CLR_PRC, L_CLOS_PRC,
+       ROUND(settlement_close_diff, 4) AS price_difference
+FROM price_diff
+WHERE diff_rank = 1
+ORDER BY settlement_close_diff DESC;
+
+问题：分析近一周各商品主力合约的价格连续性（是否出现跳空）
+WITH price_gaps AS (
+    SELECT COMD_CODE, prod_name, TRD_DT,
+           OPN_QN_PRC, L_CLOS_PRC,
+           ABS(OPN_QN_PRC - L_CLOS_PRC) AS gap_size,
+           CASE WHEN ABS(OPN_QN_PRC - L_CLOS_PRC) / NULLIF(L_CLOS_PRC, 0) > 0.02 
+                THEN 'Y' ELSE 'N' END AS has_significant_gap
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT >= '2025-07-02'::date - INTERVAL '7 days'
+    AND is_main_comd = 'Y'
+    AND L_CLOS_PRC > 0
+)
+SELECT prod_name,
+       COUNT(DISTINCT TRD_DT) AS trading_days,
+       COUNT(CASE WHEN has_significant_gap = 'Y' THEN 1 END) AS gap_days,
+       ROUND(AVG(gap_size), 4) AS avg_gap_size,
+       ROUND(MAX(gap_size), 4) AS max_gap_size
+FROM price_gaps
+GROUP BY prod_name
+ORDER BY gap_days DESC, max_gap_size DESC;
+
+问题：查询当日各交易所成交额前三名合约的集中度分析
+WITH exchange_ranking AS (
+    SELECT EXCH_CODE_DESC, COMD_CODE, prod_name, TRD_AMT,
+           ROW_NUMBER() OVER (PARTITION BY EXCH_CODE_DESC ORDER BY TRD_AMT DESC) AS amount_rank,
+           SUM(TRD_AMT) OVER (PARTITION BY EXCH_CODE_DESC) AS exchange_total_amount
+    FROM dataqa.ovs_fut_quot_tab
+    WHERE TRD_DT = '2025-07-02'
+    AND TRD_AMT > 0
+),
+top3_concentration AS (
+    SELECT EXCH_CODE_DESC,
+           SUM(TRD_AMT) AS top3_total_amount,
+           MAX(exchange_total_amount) AS exchange_total_amount
+    FROM exchange_ranking
+    WHERE amount_rank <= 3
+    GROUP BY EXCH_CODE_DESC
+)
+SELECT EXCH_CODE_DESC,
+       ROUND(top3_total_amount, 2) AS top3_amount,
+       ROUND(exchange_total_amount, 2) AS total_amount,
+       ROUND(top3_total_amount / exchange_total_amount * 100, 2) AS concentration_ratio_pct
+FROM top3_concentration
+ORDER BY concentration_ratio_pct DESC;
+
+问题：统计各商品近月合约与非近月合约的换手率对比
+SELECT prod_name, NEAR_MON_COMD_LOGO,
+       COUNT(*) AS contract_count,
+       ROUND(AVG(TRD_QTY / NULLIF(HLD_QTY, 0)), 4) AS avg_turnover_ratio,
+       ROUND(SUM(TRD_QTY) / NULLIF(SUM(HLD_QTY), 0), 4) AS total_turnover_ratio
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = '2025-07-02'
+AND HLD_QTY > 0
+GROUP BY prod_name, NEAR_MON_COMD_LOGO
+ORDER BY prod_name, NEAR_MON_COMD_LOGO;

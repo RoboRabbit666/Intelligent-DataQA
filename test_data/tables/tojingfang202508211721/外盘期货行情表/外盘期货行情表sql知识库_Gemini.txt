@@ -1,0 +1,136 @@
+问题：查询指定日期（例如2025-07-02），芝加哥商业交易所（CME）所有主力合约（is_main_comd = 'Y'）的行情信息。
+SELECT prod_name, COMD_CODE, OPN_QN_PRC, HIGHEST_PRC, LOWEST_PRC, CLOS_PRC, TRD_QTY
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'CME' AND is_main_comd = 'Y' AND TRD_DT = '2025-07-02';
+
+问题：找出在最近一个交易日，日内振幅（最高价 - 最低价）最大的前5个合约是什么？
+SELECT COMD_CODE, prod_name, EXCH_CODE_DESC, (HIGHEST_PRC - LOWEST_PRC) AS price_swing
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+ORDER BY price_swing DESC
+LIMIT 5;
+
+问题：统计在纽约商品交易所（NYMEX），最近一个交易日每个商品的合约数量和总成交量。
+SELECT prod_name, COUNT(COMD_CODE) AS contract_count, SUM(TRD_QTY) AS total_volume
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'NYMEX' AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+GROUP BY prod_name
+ORDER BY total_volume DESC;
+
+问题：查询最近一个交易日中，所有收盘价高于开盘价（即当天上涨）的“原油”相关合约。
+SELECT COMD_CODE, prod_name, OPN_QN_PRC, CLOS_PRC
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name LIKE '%原油%' AND CLOS_PRC > OPN_QN_PRC
+AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab);
+
+问题：计算在最近一个交易日，每个交易所主力合约的平均持仓量（OPN_INTS_QTY）是多少？
+SELECT EXCH_CODE_DESC, AVG(OPN_INTS_QTY) AS avg_open_interest
+FROM dataqa.ovs_fut_quot_tab
+WHERE is_main_comd = 'Y' AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+GROUP BY EXCH_CODE_DESC;
+
+问题：查询过去7天内，“黄金”主力合约的每日收盘价走势。
+SELECT TRD_DT, prod_name, CLOS_PRC
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name LIKE '%黄金%' AND is_main_comd = 'Y'
+AND TRD_DT >= (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab) - INTERVAL '7 day'
+ORDER BY TRD_DT ASC;
+
+问题：找出在最近一个交易日，哪些合约的成交量为0但持仓量不为0（即无交易的休眠合约）？
+SELECT COMD_CODE, prod_name, OPN_INTS_QTY
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_QTY = 0 AND OPN_INTS_QTY > 0
+AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab);
+
+问题：统计每个商品在最近一个交易日的近月合约（NEAR_MON_COMD_LOGO = 'Y'）和主力合约（is_main_comd = 'Y'）是否为同一个合约。
+SELECT prod_name,
+       CASE WHEN NEAR_MON_COMD_LOGO = is_main_comd THEN '是' ELSE '否' END AS is_near_mon_main
+FROM dataqa.ovs_fut_quot_tab
+WHERE (NEAR_MON_COMD_LOGO = 'Y' OR is_main_comd = 'Y')
+AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+GROUP BY prod_name, is_near_mon_main;
+
+问题：查询最近一个交易日，所有交易所中“农产品”类（如小麦、玉米、大豆）合约的总成交量排名。
+SELECT EXCH_CODE_DESC, SUM(TRD_QTY) AS total_agri_volume
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name IN ('小麦', '玉米', '大豆') AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+GROUP BY EXCH_CODE_DESC
+ORDER BY total_agri_volume DESC;
+
+问题：找出那些在过去一个月内，有超过5天收盘价创下月度新高的合约。
+WITH MonthlyHighs AS (
+    SELECT COMD_CODE, prod_name, TRD_DT, CLOS_PRC,
+           MAX(CLOS_PRC) OVER (PARTITION BY COMD_CODE ORDER BY TRD_DT ROWS BETWEEN 30 PRECEDING AND CURRENT ROW) AS rolling_30d_high
+    FROM dataqa.ovs_fut_quot_tab
+)
+SELECT COMD_CODE, prod_name, COUNT(*) AS new_high_days
+FROM MonthlyHighs
+WHERE CLOS_PRC = rolling_30d_high
+AND TRD_DT >= (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab) - INTERVAL '30 day'
+GROUP BY COMD_CODE, prod_name
+HAVING COUNT(*) > 5;
+
+问题：查询指定日期（2025-07-02），所有合约的收盘价与其昨结算价的涨跌幅百分比。
+SELECT COMD_CODE, prod_name, L_CLR_PRC, CLOS_PRC,
+       ((CLOS_PRC - L_CLR_PRC) / L_CLR_PRC) * 100 AS price_change_percentage
+FROM dataqa.ovs_fut_quot_tab
+WHERE L_CLR_PRC > 0 AND TRD_DT = '2025-07-02'
+ORDER BY price_change_percentage DESC;
+
+问题：在最近一个交易日，持仓量（OPN_INTS_QTY）排名前10的合约是哪些？
+SELECT COMD_CODE, prod_name, EXCH_CODE_DESC, OPN_INTS_QTY
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+ORDER BY OPN_INTS_QTY DESC
+LIMIT 10;
+
+问题：查询马来西亚衍生品交易所（BMD）的“棕榈油”合约在过去一个月的平均开盘价和平均收盘价。
+SELECT prod_name, AVG(OPN_QN_PRC) AS avg_open, AVG(CLOS_PRC) AS avg_close
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'BMD' AND prod_name LIKE '%棕榈油%'
+AND TRD_DT >= (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab) - INTERVAL '30 day'
+GROUP BY prod_name;
+
+问题：统计在最近一个交易日，每个交易所的上市合约总数。
+SELECT EXCH_CODE_DESC, COUNT(DISTINCT COMD_CODE) AS total_contracts
+FROM dataqa.ovs_fut_quot_tab
+WHERE TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+GROUP BY EXCH_CODE_DESC
+ORDER BY total_contracts DESC;
+
+问题：找出在最近一个交易日，哪些合约的开盘价即为当日最低价。
+SELECT COMD_CODE, prod_name, OPN_QN_PRC, LOWEST_PRC
+FROM dataqa.ovs_fut_quot_tab
+WHERE OPN_QN_PRC = LOWEST_PRC AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab);
+
+问题：查询过去10天，“白银”主力合约的成交量与其持仓量的比率（活跃度指标）。
+SELECT TRD_DT, (TRD_QTY / OPN_INTS_QTY) AS volume_to_oi_ratio
+FROM dataqa.ovs_fut_quot_tab
+WHERE prod_name LIKE '%白银%' AND is_main_comd = 'Y' AND OPN_INTS_QTY > 0
+AND TRD_DT >= (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab) - INTERVAL '10 day'
+ORDER BY TRD_DT;
+
+问题：列出所有在芝加哥期货交易所（CBOT）交易的商品名称。
+SELECT DISTINCT prod_name
+FROM dataqa.ovs_fut_quot_tab
+WHERE EXCH_CODE = 'CBOT';
+
+问题：查询最近一个交易日，所有合约中结算价（CLR_PRC）为空或为0的记录。
+SELECT *
+FROM dataqa.ovs_fut_quot_tab
+WHERE (CLR_PRC IS NULL OR CLR_PRC = 0)
+AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab);
+
+问题：比较“布伦特原油”和“WTI原油”主力合约在最近一个交易日的收盘价差异。
+SELECT t1.prod_name, t1.CLOS_PRC, t2.prod_name, t2.CLOS_PRC, (t1.CLOS_PRC - t2.CLOS_PRC) AS price_spread
+FROM dataqa.ovs_fut_quot_tab t1, dataqa.ovs_fut_quot_tab t2
+WHERE t1.prod_name LIKE '%布伦特原油%' AND t1.is_main_comd = 'Y'
+AND t2.prod_name LIKE '%WTI原油%' AND t2.is_main_comd = 'Y'
+AND t1.TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab)
+AND t1.TRD_DT = t2.TRD_DT;
+
+问题：查询最近一个交易日，所有合约代码以“2503”结尾（代表2025年3月到期）的合约行情。
+SELECT COMD_CODE, prod_name, CLOS_PRC, TRD_QTY
+FROM dataqa.ovs_fut_quot_tab
+WHERE COMD_CODE LIKE '%2503'
+AND TRD_DT = (SELECT MAX(TRD_DT) FROM dataqa.ovs_fut_quot_tab);

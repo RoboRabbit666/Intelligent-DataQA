@@ -1,0 +1,306 @@
+问题：查询各品种中既是主产区又是保税仓库的交割仓库信息
+SELECT CLAS_CODE, CLAS_ABBR, DLV_WH_CODE, WH_ABBR, WH_NAME,
+       APRD_WH_CPY, PROD_CPY, PCK_UP_PONT_abbr
+FROM dataqa.wh_clas_info_tab
+WHERE IS_MAIN_PROA = 'Y' AND IS_BND_WH = 'Y'
+AND stas_DT = '2025-07-02'
+ORDER BY CLAS_CODE, APRD_WH_CPY DESC;
+
+问题：统计各品种的仓库类型分布情况及平均核定库容
+SELECT CLAS_ABBR, WH_TYPE,
+       COUNT(*) AS warehouse_count,
+       ROUND(AVG(APRD_WH_CPY), 2) AS avg_approved_capacity,
+       SUM(APRD_WH_CPY) AS total_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+AND APRD_WH_CPY IS NOT NULL
+GROUP BY CLAS_ABBR, WH_TYPE
+ORDER BY CLAS_ABBR, warehouse_count DESC;
+
+问题：查询需要交割预报审批但不可发布交割预报的矛盾配置仓库
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, CLAS_CODE, CLAS_ABBR,
+       IS_NEED_APRV, IS_PBL_DLV_PRCT
+FROM dataqa.wh_clas_info_tab
+WHERE IS_NEED_APRV = 'Y' AND IS_PBL_DLV_PRCT = 'N'
+AND stas_DT = '2025-07-02'
+ORDER BY CLAS_CODE, WH_ABBR;
+
+问题：分析各品种厂库的送货比例和平均生产能力
+SELECT CLAS_ABBR,
+       COUNT(*) AS total_factory_warehouses,
+       COUNT(CASE WHEN IS_DLV = 'Y' THEN 1 END) AS delivery_warehouses,
+       ROUND(COUNT(CASE WHEN IS_DLV = 'Y' THEN 1 END) * 100.0 / COUNT(*), 2) AS delivery_ratio_pct,
+       ROUND(AVG(PROD_CPY), 2) AS avg_production_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE WH_TYPE LIKE '%厂库%'
+AND stas_DT = '2025-07-02'
+GROUP BY CLAS_ABBR
+ORDER BY delivery_ratio_pct DESC;
+
+问题：查询核定库容与生产能力比值最不合理的厂库仓库
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, CLAS_CODE, CLAS_ABBR,
+       APRD_WH_CPY, PROD_CPY,
+       CASE WHEN PROD_CPY > 0 
+            THEN ROUND(APRD_WH_CPY / PROD_CPY, 4)
+            ELSE NULL END AS capacity_production_ratio
+FROM dataqa.wh_clas_info_tab
+WHERE WH_TYPE LIKE '%厂库%'
+AND stas_DT = '2025-07-02'
+AND APRD_WH_CPY > 0 AND PROD_CPY > 0
+ORDER BY capacity_production_ratio DESC
+LIMIT 10;
+
+问题：统计各品种可公布仓单日报的仓库占比及分布
+SELECT CLAS_ABBR,
+       COUNT(*) AS total_warehouses,
+       COUNT(CASE WHEN IS_PBL_WH_DLY_RPT = 'Y' THEN 1 END) AS daily_report_warehouses,
+       ROUND(COUNT(CASE WHEN IS_PBL_WH_DLY_RPT = 'Y' THEN 1 END) * 100.0 / COUNT(*), 2) AS daily_report_ratio_pct,
+       STRING_AGG(CASE WHEN IS_PBL_WH_DLY_RPT = 'Y' THEN WH_ABBR END, ', ') AS report_warehouse_list
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY CLAS_ABBR
+ORDER BY daily_report_ratio_pct DESC;
+
+问题：查询同一仓库代码下支持多个品种且功能配置不一致的情况
+WITH warehouse_varieties AS (
+    SELECT DLV_WH_CODE, WH_ABBR, WH_NAME,
+           COUNT(DISTINCT CLAS_CODE) AS variety_count,
+           COUNT(DISTINCT IS_PBL_DLV_PRCT) AS delivery_report_configs,
+           COUNT(DISTINCT IS_NEED_APRV) AS approval_configs,
+           COUNT(DISTINCT IS_BND_WH) AS bonded_configs
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    GROUP BY DLV_WH_CODE, WH_ABBR, WH_NAME
+)
+SELECT w.DLV_WH_CODE, w.WH_ABBR, w.WH_NAME,
+       w.variety_count,
+       STRING_AGG(t.CLAS_ABBR, ', ') AS supported_varieties
+FROM warehouse_varieties w
+JOIN dataqa.wh_clas_info_tab t ON w.DLV_WH_CODE = t.DLV_WH_CODE
+WHERE w.variety_count > 1 
+AND (w.delivery_report_configs > 1 OR w.approval_configs > 1 OR w.bonded_configs > 1)
+AND t.stas_DT = '2025-07-02'
+GROUP BY w.DLV_WH_CODE, w.WH_ABBR, w.WH_NAME, w.variety_count
+ORDER BY w.variety_count DESC;
+
+问题：分析各品种主产区仓库的核定库容集中度
+WITH variety_capacity AS (
+    SELECT CLAS_ABBR,
+           COUNT(*) AS total_warehouses,
+           COUNT(CASE WHEN IS_MAIN_PROA = 'Y' THEN 1 END) AS main_area_warehouses,
+           SUM(APRD_WH_CPY) AS total_capacity,
+           SUM(CASE WHEN IS_MAIN_PROA = 'Y' THEN APRD_WH_CPY ELSE 0 END) AS main_area_capacity
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND APRD_WH_CPY IS NOT NULL
+    GROUP BY CLAS_ABBR
+)
+SELECT CLAS_ABBR,
+       total_warehouses,
+       main_area_warehouses,
+       ROUND(main_area_warehouses * 100.0 / total_warehouses, 2) AS main_area_warehouse_ratio_pct,
+       ROUND(main_area_capacity * 100.0 / NULLIF(total_capacity, 0), 2) AS main_area_capacity_ratio_pct
+FROM variety_capacity
+ORDER BY main_area_capacity_ratio_pct DESC;
+
+问题：查询提货点简称信息最丰富的仓库品种组合
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, CLAS_CODE, CLAS_ABBR,
+       PCK_UP_PONT_abbr,
+       CHAR_LENGTH(PCK_UP_PONT_abbr) AS pickup_info_length,
+       ARRAY_LENGTH(STRING_TO_ARRAY(PCK_UP_PONT_abbr, ','), 1) AS pickup_point_count
+FROM dataqa.wh_clas_info_tab
+WHERE PCK_UP_PONT_abbr IS NOT NULL 
+AND PCK_UP_PONT_abbr != ''
+AND stas_DT = '2025-07-02'
+ORDER BY pickup_point_count DESC, pickup_info_length DESC
+LIMIT 15;
+
+问题：统计保税仓库在各品种中的核定库容占比情况
+WITH bonded_analysis AS (
+    SELECT CLAS_ABBR,
+           SUM(APRD_WH_CPY) AS total_capacity,
+           SUM(CASE WHEN IS_BND_WH = 'Y' THEN APRD_WH_CPY ELSE 0 END) AS bonded_capacity,
+           COUNT(*) AS total_warehouses,
+           COUNT(CASE WHEN IS_BND_WH = 'Y' THEN 1 END) AS bonded_warehouses
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND APRD_WH_CPY IS NOT NULL
+    GROUP BY CLAS_ABBR
+)
+SELECT CLAS_ABBR,
+       total_warehouses,
+       bonded_warehouses,
+       ROUND(bonded_warehouses * 100.0 / total_warehouses, 2) AS bonded_warehouse_ratio_pct,
+       ROUND(bonded_capacity * 100.0 / NULLIF(total_capacity, 0), 2) AS bonded_capacity_ratio_pct
+FROM bonded_analysis
+WHERE bonded_warehouses > 0
+ORDER BY bonded_capacity_ratio_pct DESC;
+
+问题：查询功能配置最齐全的仓库（可发布预报+可公布日报+不需审批）
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, CLAS_CODE, CLAS_ABBR,
+       WH_TYPE, IS_MAIN_PROA, IS_BND_WH,
+       APRD_WH_CPY, PROD_CPY
+FROM dataqa.wh_clas_info_tab
+WHERE IS_PBL_DLV_PRCT = 'Y' 
+AND IS_PBL_WH_DLY_RPT = 'Y'
+AND IS_NEED_APRV = 'N'
+AND stas_DT = '2025-07-02'
+ORDER BY CLAS_CODE, APRD_WH_CPY DESC;
+
+问题：分析仓库类型与各项功能配置的相关性
+SELECT WH_TYPE,
+       COUNT(*) AS total_count,
+       ROUND(AVG(CASE WHEN IS_PBL_DLV_PRCT = 'Y' THEN 1 ELSE 0 END) * 100, 2) AS delivery_report_ratio,
+       ROUND(AVG(CASE WHEN IS_PBL_WH_DLY_RPT = 'Y' THEN 1 ELSE 0 END) * 100, 2) AS daily_report_ratio,
+       ROUND(AVG(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) * 100, 2) AS need_approval_ratio,
+       ROUND(AVG(CASE WHEN IS_MAIN_PROA = 'Y' THEN 1 ELSE 0 END) * 100, 2) AS main_area_ratio,
+       ROUND(AVG(CASE WHEN IS_BND_WH = 'Y' THEN 1 ELSE 0 END) * 100, 2) AS bonded_ratio
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY WH_TYPE
+ORDER BY total_count DESC;
+
+问题：查询品种代码与品种简称映射异常的数据
+SELECT DISTINCT CLAS_CODE, CLAS_ABBR,
+       COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY CLAS_CODE, CLAS_ABBR
+HAVING COUNT(DISTINCT 
+    CASE WHEN CLAS_CODE = 'SR' AND CLAS_ABBR != '白糖' THEN 1
+         WHEN CLAS_CODE = 'CF' AND CLAS_ABBR != '棉花' THEN 1
+         WHEN CLAS_CODE = 'MA' AND CLAS_ABBR != '甲醇' THEN 1
+         WHEN CLAS_CODE = 'TA' AND CLAS_ABBR != 'PTA' THEN 1
+         WHEN CLAS_CODE = 'RM' AND CLAS_ABBR != '菜粕' THEN 1
+    END) > 0
+ORDER BY CLAS_CODE;
+
+问题：统计各品种仓库在核定库容规模上的分级分布
+WITH capacity_levels AS (
+    SELECT CLAS_ABBR, DLV_WH_CODE, WH_ABBR, APRD_WH_CPY,
+           CASE 
+               WHEN APRD_WH_CPY >= 10000 THEN '特大型(1万+)'
+               WHEN APRD_WH_CPY >= 5000 THEN '大型(5千-1万)'
+               WHEN APRD_WH_CPY >= 2000 THEN '中型(2千-5千)'
+               WHEN APRD_WH_CPY >= 1000 THEN '小型(1千-2千)'
+               ELSE '微型(<1千)'
+           END AS capacity_level
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND APRD_WH_CPY IS NOT NULL AND APRD_WH_CPY > 0
+)
+SELECT CLAS_ABBR, capacity_level,
+       COUNT(*) AS warehouse_count,
+       ROUND(AVG(APRD_WH_CPY), 2) AS avg_capacity,
+       ROUND(SUM(APRD_WH_CPY), 2) AS total_capacity
+FROM capacity_levels
+GROUP BY CLAS_ABBR, capacity_level
+ORDER BY CLAS_ABBR, 
+    CASE capacity_level 
+        WHEN '特大型(1万+)' THEN 1
+        WHEN '大型(5千-1万)' THEN 2
+        WHEN '中型(2千-5千)' THEN 3
+        WHEN '小型(1千-2千)' THEN 4
+        ELSE 5 END;
+
+问题：查询厂库生产能力与是否送货的匹配度分析
+SELECT 
+    CASE 
+        WHEN PROD_CPY >= 100000 THEN '超大产能(10万+吨/年)'
+        WHEN PROD_CPY >= 50000 THEN '大产能(5-10万吨/年)'
+        WHEN PROD_CPY >= 20000 THEN '中产能(2-5万吨/年)'
+        WHEN PROD_CPY >= 10000 THEN '小产能(1-2万吨/年)'
+        ELSE '微产能(<1万吨/年)'
+    END AS production_level,
+    IS_DLV,
+    COUNT(*) AS warehouse_count,
+    ROUND(AVG(PROD_CPY), 2) AS avg_production_capacity,
+    STRING_AGG(DISTINCT CLAS_ABBR, ', ') AS supported_varieties
+FROM dataqa.wh_clas_info_tab
+WHERE WH_TYPE LIKE '%厂库%'
+AND stas_DT = '2025-07-02'
+AND PROD_CPY IS NOT NULL AND PROD_CPY > 0
+GROUP BY 
+    CASE 
+        WHEN PROD_CPY >= 100000 THEN '超大产能(10万+吨/年)'
+        WHEN PROD_CPY >= 50000 THEN '大产能(5-10万吨/年)'
+        WHEN PROD_CPY >= 20000 THEN '中产能(2-5万吨/年)'
+        WHEN PROD_CPY >= 10000 THEN '小产能(1-2万吨/年)'
+        ELSE '微产能(<1万吨/年)'
+    END, IS_DLV
+ORDER BY avg_production_capacity DESC;
+
+问题：分析各品种交割预报审批政策的一致性
+WITH approval_consistency AS (
+    SELECT CLAS_ABBR,
+           COUNT(*) AS total_warehouses,
+           COUNT(DISTINCT IS_NEED_APRV) AS approval_policy_variations,
+           SUM(CASE WHEN IS_NEED_APRV = 'Y' THEN 1 ELSE 0 END) AS need_approval_count,
+           SUM(CASE WHEN IS_NEED_APRV = 'N' THEN 1 ELSE 0 END) AS no_approval_count
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    GROUP BY CLAS_ABBR
+)
+SELECT CLAS_ABBR,
+       total_warehouses,
+       need_approval_count,
+       no_approval_count,
+       CASE 
+           WHEN approval_policy_variations = 1 AND need_approval_count = total_warehouses THEN '全部需要审批'
+           WHEN approval_policy_variations = 1 AND no_approval_count = total_warehouses THEN '全部不需审批'
+           ELSE '政策不一致'
+       END AS approval_policy_status,
+       ROUND(need_approval_count * 100.0 / total_warehouses, 2) AS approval_ratio_pct
+FROM approval_consistency
+ORDER BY approval_policy_status, approval_ratio_pct DESC;
+
+问题：查询单一仓库支持品种数量最多的TOP10仓库
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME,
+       COUNT(DISTINCT CLAS_CODE) AS variety_count,
+       STRING_AGG(DISTINCT CLAS_ABBR ORDER BY CLAS_ABBR, ', ') AS supported_varieties,
+       ROUND(AVG(APRD_WH_CPY), 2) AS avg_approved_capacity,
+       SUM(APRD_WH_CPY) AS total_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY DLV_WH_CODE, WH_ABBR, WH_NAME
+ORDER BY variety_count DESC, total_approved_capacity DESC
+LIMIT 10;
+
+问题：统计各品种在保税和非保税仓库间的核定库容分配均衡性
+WITH bonded_balance AS (
+    SELECT CLAS_ABBR,
+           SUM(CASE WHEN IS_BND_WH = 'Y' THEN APRD_WH_CPY ELSE 0 END) AS bonded_capacity,
+           SUM(CASE WHEN IS_BND_WH = 'N' THEN APRD_WH_CPY ELSE 0 END) AS non_bonded_capacity,
+           SUM(APRD_WH_CPY) AS total_capacity
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND APRD_WH_CPY IS NOT NULL
+    GROUP BY CLAS_ABBR
+)
+SELECT CLAS_ABBR,
+       bonded_capacity,
+       non_bonded_capacity,
+       total_capacity,
+       ROUND(bonded_capacity * 100.0 / NULLIF(total_capacity, 0), 2) AS bonded_ratio_pct,
+       ROUND(non_bonded_capacity * 100.0 / NULLIF(total_capacity, 0), 2) AS non_bonded_ratio_pct,
+       ABS(50 - (bonded_capacity * 100.0 / NULLIF(total_capacity, 0))) AS balance_deviation
+FROM bonded_balance
+WHERE total_capacity > 0
+ORDER BY balance_deviation ASC;
+
+问题：查询交割仓库编码规律分析及异常编码识别
+SELECT DLV_WH_CODE,
+       WH_ABBR,
+       WH_NAME,
+       COUNT(DISTINCT CLAS_CODE) AS variety_count,
+       CHAR_LENGTH(DLV_WH_CODE) AS code_length,
+       CASE 
+           WHEN DLV_WH_CODE ~ '^[0-9]+$' THEN '纯数字'
+           WHEN DLV_WH_CODE ~ '^[A-Z]+[0-9]+$' THEN '字母+数字'
+           WHEN DLV_WH_CODE ~ '^[0-9]+[A-Z]+$' THEN '数字+字母'
+           ELSE '其他格式'
+       END AS code_format
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY DLV_WH_CODE, WH_ABBR, WH_NAME
+ORDER BY code_format, code_length, DLV_WH_CODE;

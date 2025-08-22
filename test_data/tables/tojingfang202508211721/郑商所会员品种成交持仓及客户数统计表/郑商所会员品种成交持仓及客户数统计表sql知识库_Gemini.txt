@@ -1,0 +1,164 @@
+问题：查询在最近一个交易日，哪个品种的期权（fut_opt_flag = 'O'）行权量（exer_qty）最高？
+SELECT clas_code, SUM(exer_qty) AS total_exercise_volume
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'O' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY clas_code
+ORDER BY total_exercise_volume DESC
+LIMIT 1;
+
+问题：按会员类型（mem_type_code_desc）统计，各类会员在最近交易日的总成交额（trd_turn）分别是多少？
+SELECT mem_type_code_desc, SUM(trd_turn) AS total_turnover
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_type_code_desc
+ORDER BY total_turnover DESC;
+
+问题：查询在“白糖”期货（clas_code = 'SR', fut_opt_flag = 'F'）市场中，套期保值持仓（hdg_hld_qty）占总持仓（hld_qty）比例最高的会员是哪家？
+SELECT mem_name, (SUM(hdg_hld_qty) / SUM(hld_qty)) * 100 AS hedge_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE clas_code = 'SR' AND fut_opt_flag = 'F'
+AND hld_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_name
+ORDER BY hedge_ratio DESC
+LIMIT 1;
+
+问题：找出在最近一个交易日，所有品种中买入持仓量（buy_hld_qty）与卖出持仓量（sell_hld_qty）差距最大的会员。
+SELECT mem_name, SUM(buy_hld_qty) AS total_buy, SUM(sell_hld_qty) AS total_sell, ABS(SUM(buy_hld_qty) - SUM(sell_hld_qty)) AS spread
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_name
+ORDER BY spread DESC
+LIMIT 1;
+
+问题：计算在最近交易日，每个品种的“客户活跃度”（交易客户数 / 持仓客户数）。
+SELECT clas_code, SUM(trd_clit_qty) * 1.0 / SUM(hld_clit_qty) AS client_activity_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE hld_clit_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY clas_code
+ORDER BY client_activity_ratio DESC;
+
+问题：查询过去一个月，境外客户交易数（ovs_trd_clit_qty）增长最快的会员是哪家？
+WITH MonthlyData AS (
+    SELECT mem_name,
+           SUM(CASE WHEN biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab) THEN ovs_trd_clit_qty ELSE 0 END) as latest_day_clients,
+           SUM(CASE WHEN biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab) - INTERVAL '1 month' THEN ovs_trd_clit_qty ELSE 0 END) as month_ago_clients
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt IN ((SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab), (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab) - INTERVAL '1 month')
+    GROUP BY mem_name
+)
+SELECT mem_name, (latest_day_clients - month_ago_clients) as client_growth
+FROM MonthlyData
+WHERE month_ago_clients > 0
+ORDER BY client_growth DESC
+LIMIT 1;
+
+问题：在最近交易日，哪些会员在超过5个不同的期货品种上都有交易？
+SELECT mem_name, COUNT(DISTINCT clas_code) AS distinct_products_traded
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'F' AND trd_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_name
+HAVING COUNT(DISTINCT clas_code) > 5
+ORDER BY distinct_products_traded DESC;
+
+问题：统计所有期货品种中，投机持仓（spe_hld_qty）与套利持仓（cmb_hld_qty）的总量对比。
+SELECT
+    SUM(spe_hld_qty) AS total_speculation_oi,
+    SUM(cmb_hld_qty) AS total_arbitrage_oi
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab);
+
+问题：查询在最近交易日，哪个会员的“平均每客户成交量”（总成交量 / 总交易客户数）最高？
+SELECT mem_name, SUM(trd_qty) / SUM(trd_clit_qty) AS avg_volume_per_client
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE trd_clit_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_name
+ORDER BY avg_volume_per_client DESC
+LIMIT 1;
+
+问题：找出在最近交易日，有持仓客户（hld_clit_qty > 0）但没有任何交易客户（trd_clit_qty = 0）的会员和品种组合。
+SELECT mem_name, clas_code, hld_clit_qty
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE hld_clit_qty > 0 AND trd_clit_qty = 0
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab);
+
+问题：查询“PTA”品种的期货和期权在最近交易日的总成交量和总持仓量分别是多少？
+SELECT fut_opt_flag, SUM(trd_qty) AS total_volume, SUM(hld_qty) AS total_open_interest
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE clas_code = 'TA' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY fut_opt_flag;
+
+问题：列出在最近交易日，所有品种持仓量排名前5的会员及其市场份额（占市场总持仓量的百分比）。
+WITH MemberOI AS (
+    SELECT mem_name, SUM(hld_qty) AS member_total_oi
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+    GROUP BY mem_name
+),
+TotalMarketOI AS (
+    SELECT SUM(hld_qty) AS market_total_oi
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+)
+SELECT mem_name, member_total_oi, (member_total_oi / market_total_oi) * 100 AS market_share
+FROM MemberOI, TotalMarketOI
+ORDER BY member_total_oi DESC
+LIMIT 5;
+
+问题：查询过去一周“甲醇”（MA）期货的每日总成交量和总持仓量变化趋势。
+SELECT biz_dt, SUM(trd_qty) AS daily_volume, SUM(hld_qty) AS daily_open_interest
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE clas_code = 'MA' AND fut_opt_flag = 'F'
+AND biz_dt >= (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab) - INTERVAL '7 day'
+GROUP BY biz_dt
+ORDER BY biz_dt;
+
+问题：统计在最近交易日，有多少会员单位参与了期权交易？
+SELECT COUNT(DISTINCT mem_name)
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'O' AND trd_qty > 0
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab);
+
+问题：查询所有会员中，套利持仓额（cmb_hld_amt）最高的会员是哪家？
+SELECT mem_name, SUM(cmb_hld_amt) AS total_arbitrage_amount
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY mem_name
+ORDER BY total_arbitrage_amount DESC
+LIMIT 1;
+
+问题：比较所有期货品种在最近交易日的买入套保（buy_hdg_hld_qty）和卖出套保（sell_hdg_hld_qty）的总量。
+SELECT
+    SUM(buy_hdg_hld_qty) AS total_buy_hedge,
+    SUM(sell_hdg_hld_qty) AS total_sell_hedge
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab);
+
+问题：查询在最近交易日，哪个品种的报单客户数（ord_clit_qty）最多？
+SELECT clas_code, SUM(ord_clit_qty) AS total_order_clients
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY clas_code
+ORDER BY total_order_clients DESC
+LIMIT 1;
+
+问题：查询“国泰君安”这家会员在最近交易日所有参与品种的成交量排名。
+SELECT clas_code, fut_opt_flag, SUM(trd_qty) AS total_volume
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE mem_name LIKE '%国泰君安%' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY clas_code, fut_opt_flag
+ORDER BY total_volume DESC;
+
+问题：查询最近交易日，哪个期货品种的多头（买持仓）和空头（卖持仓）客户数最接近？
+SELECT clas_code, SUM(buy_hld_clit_qty) AS buy_clients, SUM(sell_hld_clit_qty) AS sell_clients, ABS(SUM(buy_hld_clit_qty) - SUM(sell_hld_clit_qty)) AS client_diff
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab)
+GROUP BY clas_code
+ORDER BY client_diff ASC
+LIMIT 1;
+
+问题：统计过去一个月，所有品种的境外交易客户总数的变化情况。
+SELECT biz_dt, SUM(ovs_trd_clit_qty) AS daily_overseas_clients
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt >= (SELECT MAX(biz_dt) FROM dataqa.mem_clas_trd_hld_clit_stas_tab) - INTERVAL '1 month'
+GROUP BY biz_dt
+ORDER BY biz_dt;

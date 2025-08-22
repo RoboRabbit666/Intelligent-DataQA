@@ -1,0 +1,135 @@
+问题：查询在最近一个交易日，哪个期货品种的成交持仓比（trd_hld_rate）最高，表明其市场活跃度最强？
+SELECT clas_name, trd_hld_rate
+FROM dataqa.clas_info_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY trd_hld_rate DESC
+LIMIT 1;
+
+问题：按品种统计，比较看涨期权（cp_flag='C'）与看跌期权（cp_flag='P'）的总持仓客户数。
+SELECT clas_name, cp_flag_desc, SUM(hld_clit_qty) AS total_holding_clients
+FROM dataqa.clas_info_stas_tab
+WHERE fut_opt_flag = 'O' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+GROUP BY clas_name, cp_flag_desc
+ORDER BY clas_name, cp_flag_desc;
+
+问题：找出在最近交易日，主力合约成交量（main_comd_trd_qty）占该品种总成交量（trd_qty）90%以上的品种。
+SELECT clas_name, main_comd, (main_comd_trd_qty * 100.0 / trd_qty) AS main_contract_vol_ratio
+FROM dataqa.clas_info_stas_tab
+WHERE trd_qty > 0 AND (main_comd_trd_qty * 1.0 / trd_qty) >= 0.9
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY main_contract_vol_ratio DESC;
+
+问题：查询哪个品种的基差（spot_prc - near_mon_comd_clr_prc）绝对值最大？
+SELECT clas_name, spot_prc, near_mon_comd_clr_prc, ABS(spot_prc - near_mon_comd_clr_prc) AS basis
+FROM dataqa.clas_info_stas_tab
+WHERE spot_prc IS NOT NULL AND near_mon_comd_clr_prc IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY basis DESC
+LIMIT 1;
+
+问题：统计在最近交易日，所有期货品种中，交易客户数（trd_clit_qty）与持仓客户数（hld_clit_qty）的差异。
+SELECT clas_name, trd_clit_qty, hld_clit_qty, (trd_clit_qty - hld_clit_qty) AS client_diff
+FROM dataqa.clas_info_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY client_diff DESC;
+
+问题：查询所有品种中，交割手续费标准（dlv_cmsn_fee_std）最高的品种是什么？
+SELECT clas_name, fut_opt_flag_desc, dlv_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE dlv_cmsn_fee_std IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY dlv_cmsn_fee_std DESC
+LIMIT 1;
+
+问题：比较“PTA”和“甲醇”这两个品种的主力合约结算价在过去30天的走势。
+SELECT biz_dt, clas_name, main_comd_clr_prc
+FROM dataqa.clas_info_stas_tab
+WHERE clas_code IN ('TA', 'MA') AND fut_opt_flag = 'F'
+AND biz_dt >= (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab) - INTERVAL '30 days'
+ORDER BY biz_dt, clas_name;
+
+问题：找出那些近月合约成交量（near_mon_comd_trd_qty）为0，但主力合约成交量大于0的品种。
+SELECT clas_name, near_mon_comd, main_comd
+FROM dataqa.clas_info_stas_tab
+WHERE near_mon_comd_trd_qty = 0 AND main_comd_trd_qty > 0
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab);
+
+问题：按品种统计，计算每个品种的平均每客户持仓量（总持仓量 / 持仓客户数）。
+SELECT clas_name, fut_opt_flag_desc, hld_qty * 1.0 / hld_clit_qty AS avg_oi_per_client
+FROM dataqa.clas_info_stas_tab
+WHERE hld_clit_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY avg_oi_per_client DESC;
+
+问题：查询在最近交易日，哪些品种的期货和期权都有交易（即两个记录都存在）？
+SELECT clas_name
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+GROUP BY clas_name
+HAVING COUNT(DISTINCT fut_opt_flag) = 2;
+
+问题：查询所有品种中，是否存在主力合约与近月合约是同一个合约的情况？
+SELECT clas_name, main_comd
+FROM dataqa.clas_info_stas_tab
+WHERE main_comd = near_mon_comd
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab);
+
+问题：统计总成交额（trd_amt）排名前五的品种。
+SELECT clas_name, fut_opt_flag_desc, SUM(trd_amt) AS total_turnover
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+GROUP BY clas_name, fut_opt_flag_desc
+ORDER BY total_turnover DESC
+LIMIT 5;
+
+问题：查询“棉花”（CF）的期货、看涨期权、看跌期权在最近交易日的总持仓量分别是多少？
+SELECT clas_name, fut_opt_flag_desc, cp_flag_desc, hld_qty
+FROM dataqa.clas_info_stas_tab
+WHERE clas_code = 'CF' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab);
+
+问题：找出所有现货价格（spot_prc）信息缺失的品种。
+SELECT clas_name, fut_opt_flag_desc
+FROM dataqa.clas_info_stas_tab
+WHERE spot_prc IS NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab);
+
+问题：查询哪个品种的主力合约持仓客户数最多？
+SELECT clas_name, fut_opt_flag_desc, main_comd_hld_clit_qty
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY main_comd_hld_clit_qty DESC
+LIMIT 1;
+
+问题：列出所有品种的交易手续费、平今仓手续费和交割手续费标准。
+SELECT DISTINCT clas_name, fut_opt_flag_desc, trd_cmsn_fee_std, cth_cmsn_fee_std, dlv_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY clas_name;
+
+问题：查询最近交易日，哪些品种的主力合约结算价触及了涨/跌停板价（prc_lim）？
+SELECT clas_name, main_comd, main_comd_clr_prc, prc_lim
+FROM dataqa.clas_info_stas_tab
+WHERE main_comd_clr_prc >= prc_lim -- 假设prc_lim是涨停价
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab);
+
+问题：计算每个品种主力合约的流动性（主力合约成交量 / 主力合约持仓量）。
+SELECT clas_name, main_comd, main_comd_trd_qty * 1.0 / main_comd_hld_qty AS liquidity_ratio
+FROM dataqa.clas_info_stas_tab
+WHERE main_comd_hld_qty > 0 AND fut_opt_flag = 'F'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY liquidity_ratio DESC;
+
+问题：查询所有期货品种中，近月合约和主力合约价差最大的品种是哪个？
+SELECT clas_name, main_comd_clr_prc, near_mon_comd_clr_prc,
+       ABS(main_comd_clr_prc - near_mon_comd_clr_prc) AS price_spread
+FROM dataqa.clas_info_stas_tab
+WHERE fut_opt_flag = 'F' AND near_mon_comd_clr_prc IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+ORDER BY price_spread DESC
+LIMIT 1;
+
+问题：统计在最近交易日，持仓客户数超过10000的品种有哪些？
+SELECT clas_name, fut_opt_flag_desc, SUM(hld_clit_qty) AS total_holding_clients
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.clas_info_stas_tab)
+GROUP BY clas_name, fut_opt_flag_desc
+HAVING SUM(hld_clit_qty) > 10000;

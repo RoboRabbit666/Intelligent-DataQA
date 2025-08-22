@@ -1,0 +1,130 @@
+问题：按省份（reg_addr_prvc_desc）统计，查询每个省份的正常（mem_status_code = 'N'）会员数量。
+SELECT reg_addr_prvc_desc, COUNT(*) AS member_count
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'N' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY reg_addr_prvc_desc
+ORDER BY member_count DESC;
+
+问题：统计不同企业性质（corp_own）的会员数量，并计算各类会员的平均注册资本（reg_capi）。
+SELECT corp_own, COUNT(*) AS member_count, AVG(CAST(reg_capi AS NUMERIC)) AS avg_registered_capital
+FROM dataqa.mem_base_info_tab
+WHERE reg_capi IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY corp_own
+ORDER BY member_count DESC;
+
+问题：查询会员中，哪些会员的入会时长（join_dt至今）超过20年？
+SELECT mem_name, join_dt, (biz_dt - join_dt) / 365 AS years_as_member
+FROM dataqa.mem_base_info_tab
+WHERE (biz_dt - join_dt) / 365 > 20
+AND mem_status_code = 'N' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+ORDER BY years_as_member DESC;
+
+问题：统计会员评级（grade）为'A'、'AA'、'AAA'的会员分别有多少家？
+SELECT grade, COUNT(*) AS member_count
+FROM dataqa.mem_base_info_tab
+WHERE grade IN ('A', 'AA', 'AAA') AND mem_status_code = 'N' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY grade
+ORDER BY grade;
+
+问题：找出注册资本最高的10家期货会员（mem_type_code = 'N'）是哪些？
+SELECT mem_name, reg_capi
+FROM dataqa.mem_base_info_tab
+WHERE mem_type_code = 'N' AND reg_capi IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+ORDER BY CAST(reg_capi AS NUMERIC) DESC
+LIMIT 10;
+
+问题：查询所有已经退会（ret_dt不为空）的会员及其存续时长（ret_dt - join_dt）。
+SELECT mem_name, join_dt, ret_dt, (ret_dt - join_dt) AS membership_duration_days
+FROM dataqa.mem_base_info_tab
+WHERE ret_dt IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+ORDER BY membership_duration_days DESC;
+
+问题：在“上海市”，评级为'AA'的会员有哪些？
+SELECT mem_name, grade
+FROM dataqa.mem_base_info_tab
+WHERE reg_addr_city_desc = '上海市' AND grade = 'AA'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：统计有多少会员没有提供公司网址（corp_web_url）信息？
+SELECT COUNT(*)
+FROM dataqa.mem_base_info_tab
+WHERE (corp_web_url IS NULL OR corp_web_url = '')
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：按入会年份统计，每年有多少新会员加入？
+SELECT EXTRACT(YEAR FROM join_dt) AS join_year, COUNT(*) AS new_members_count
+FROM dataqa.mem_base_info_tab
+WHERE join_dt IS NOT NULL
+GROUP BY join_year
+ORDER BY join_year DESC;
+
+问题：比较不同会员类型（期货会员/非期货会员）的平均保证基金费率（grd_fee_rate）。
+SELECT mem_type_code_desc, AVG(grd_fee_rate) AS avg_fee_rate
+FROM dataqa.mem_base_info_tab
+WHERE grd_fee_rate IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY mem_type_code_desc;
+
+问题：查询注册币种不是人民币（CNY）的会员有哪些？
+SELECT mem_name, reg_crrc, reg_capi
+FROM dataqa.mem_base_info_tab
+WHERE reg_crrc <> 'CNY' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：找出法人代表（legal_rep）重名的会员单位。
+SELECT legal_rep, COUNT(*) AS name_count, STRING_AGG(mem_name, '; ') AS members
+FROM dataqa.mem_base_info_tab
+WHERE legal_rep IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY legal_rep
+HAVING COUNT(*) > 1
+ORDER BY name_count DESC;
+
+问题：按城市（reg_addr_city_desc）统计，哪个城市的会员注册资本总和最高？
+SELECT reg_addr_city_desc, SUM(CAST(reg_capi AS NUMERIC)) AS total_capital
+FROM dataqa.mem_base_info_tab
+WHERE reg_capi IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY reg_addr_city_desc
+ORDER BY total_capital DESC
+LIMIT 1;
+
+问题：查询会员状态为“注销”（mem_status_code = 'C'）的会员总数。
+SELECT COUNT(*)
+FROM dataqa.mem_base_info_tab
+WHERE mem_status_code = 'C'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：列出所有“国有企业”（corp_own）性质的会员，并按入会日期排序。
+SELECT mem_name, corp_own, join_dt
+FROM dataqa.mem_base_info_tab
+WHERE corp_own = '国有企业'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+ORDER BY join_dt;
+
+问题：查询联系人邮箱（ctc_eml）使用常见免费邮箱（如163.com, qq.com, gmail.com）的会员。
+SELECT mem_name, ctc_name, ctc_eml
+FROM dataqa.mem_base_info_tab
+WHERE (ctc_eml LIKE '%@163.com' OR ctc_eml LIKE '%@qq.com' OR ctc_eml LIKE '%@gmail.com')
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：统计正常会员中，评级信息（grade）缺失的会员数量。
+SELECT COUNT(*)
+FROM dataqa.mem_base_info_tab
+WHERE (grade IS NULL OR grade = '') AND mem_status_code = 'N'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：查询注册地在“北京”且会员类型为“非期货会员”的单位。
+SELECT mem_name, mem_type_code_desc, reg_addr_city_desc
+FROM dataqa.mem_base_info_tab
+WHERE reg_addr_prvc_desc = '北京市' AND mem_type_code = 'U'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);
+
+问题：按保证基金费率（grd_fee_rate）分组，统计每个费率等级有多少家会员公司。
+SELECT grd_fee_rate, COUNT(*) AS member_count
+FROM dataqa.mem_base_info_tab
+WHERE grd_fee_rate IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab)
+GROUP BY grd_fee_rate
+ORDER BY grd_fee_rate;
+
+问题：查询经营范围（biz_rng）中包含“资产管理”的会员。
+SELECT mem_name, biz_rng
+FROM dataqa.mem_base_info_tab
+WHERE biz_rng LIKE '%资产管理%'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_base_info_tab);

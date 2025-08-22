@@ -1,0 +1,151 @@
+问题：查询指定日期（例如2025-07-02）上海期货交易所所有品种的总注册仓单量是多少？
+SELECT SUM(reg_rcpt_qty) AS total_registered_receipts
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_NAME = '上海期货交易所' AND BIZ_DT = '2025-07-02';
+
+问题：最近一个业务日，哪个仓库的“铝”品种的当日结存量最高？
+SELECT wh_abbr, tday_bal_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name = '铝' AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+ORDER BY tday_bal_qty DESC
+LIMIT 1;
+
+问题：统计在2025年7月，大连商品交易所每日的总入库量和总出库量。
+SELECT BIZ_DT, SUM(ined_wh_qty) AS total_in_warehouse, SUM(out_wh_qty) AS total_out_warehouse
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'DCE' AND BIZ_DT >= '2025-07-01' AND BIZ_DT <= '2025-07-31'
+GROUP BY BIZ_DT
+ORDER BY BIZ_DT;
+
+问题：查询所有仓库中，同时存放“螺纹钢”和“热轧卷板”的仓库有哪些？
+SELECT wh_abbr
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name IN ('螺纹钢', '热轧卷板') AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY wh_abbr
+HAVING COUNT(DISTINCT clas_name) = 2;
+
+问题：找出在最近一个业务日，所有品种中仓单量日增减量（chg_qty）最大的前5个仓库和品种组合。
+SELECT wh_abbr, clas_name, chg_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+ORDER BY chg_qty DESC
+LIMIT 5;
+
+问题：查询郑州商品交易所的“棉花”品种，在过去30天内，每日的注册仓单量和注销仓单量。
+SELECT BIZ_DT, clas_name, SUM(reg_rcpt_qty) AS registered, SUM(cncl_rcpt_qty) AS canceled
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' AND clas_name = '棉花' AND BIZ_DT >= (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab) - INTERVAL '30 day'
+GROUP BY BIZ_DT, clas_name
+ORDER BY BIZ_DT DESC;
+
+问题：在最近一个业务日，哪些品种的总注册仓单量超过了100000？
+SELECT clas_name, SUM(TOT_REG_RCPT_QTY) as total_receipts
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY clas_name
+HAVING SUM(TOT_REG_RCPT_QTY) > 100000
+ORDER BY total_receipts DESC;
+
+问题：查询每个交易所，在最近一个业务日，平均每个品种的注册仓单量是多少？
+SELECT EXCH_NAME, AVG(reg_rcpt_qty) AS avg_receipt_per_product
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY EXCH_NAME;
+
+问题：列出在上海国际能源交易中心，最近一个业务日仓单量发生变化（chg_qty不为0）的所有品种和仓库。
+SELECT wh_abbr, clas_name, chg_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'INE' AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab) AND chg_qty <> 0;
+
+问题：统计每个仓库在最近一个业务日存放了多少个不同种类的商品？
+SELECT wh_abbr, COUNT(DISTINCT clas_name) AS product_variety_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY wh_abbr
+ORDER BY product_variety_count DESC;
+
+问题：查询2025年第二季度（4月至6月），每个月的总入库量冠军品种是什么？
+WITH MonthlyTotals AS (
+    SELECT
+        EXTRACT(MONTH FROM BIZ_DT) as month,
+        clas_name,
+        SUM(ined_wh_qty) as total_in_qty,
+        ROW_NUMBER() OVER(PARTITION BY EXTRACT(MONTH FROM BIZ_DT) ORDER BY SUM(ined_wh_qty) DESC) as rn
+    FROM dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE EXTRACT(YEAR FROM BIZ_DT) = 2025 AND EXTRACT(QUARTER FROM BIZ_DT) = 2
+    GROUP BY EXTRACT(MONTH FROM BIZ_DT), clas_name
+)
+SELECT month, clas_name, total_in_qty
+FROM MonthlyTotals
+WHERE rn = 1;
+
+问题：查询最近一个业务日，所有“铜”品种的仓单信息，按注册仓单量从高到低排序。
+SELECT wh_abbr, clas_name, reg_rcpt_qty, tday_bal_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name LIKE '%铜%' AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+ORDER BY reg_rcpt_qty DESC;
+
+问题：查询哪些仓库在最近的业务日没有任何出库量记录？
+SELECT DISTINCT wh_abbr
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+  AND wh_abbr NOT IN (
+    SELECT DISTINCT wh_abbr
+    FROM dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab) AND out_wh_qty > 0
+);
+
+问题：统计每个交易所下，注册仓单量排名前三的品种是哪些？
+WITH RankedProducts AS (
+    SELECT
+        EXCH_NAME,
+        clas_name,
+        SUM(reg_rcpt_qty) as total_registered,
+        ROW_NUMBER() OVER(PARTITION BY EXCH_NAME ORDER BY SUM(reg_rcpt_qty) DESC) as rank_num
+    FROM dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+    GROUP BY EXCH_NAME, clas_name
+)
+SELECT EXCH_NAME, clas_name, total_registered
+FROM RankedProducts
+WHERE rank_num <= 3;
+
+问题：查询过去一周，每日的仓单总量变化（TOT_CHG_QTY）趋势。
+SELECT BIZ_DT, SUM(TOT_CHG_QTY) AS daily_total_change
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT >= (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab) - INTERVAL '7 day'
+GROUP BY BIZ_DT
+ORDER BY BIZ_DT;
+
+问题：查询“天然橡胶”在所有仓库的注册仓单量分布情况。
+SELECT wh_abbr, SUM(reg_rcpt_qty) AS rubber_receipts
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE clas_name = '天然橡胶' AND BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY wh_abbr
+ORDER BY rubber_receipts DESC;
+
+问题：找出那些只在一个交易所进行仓储的仓库列表。
+SELECT wh_abbr
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY wh_abbr
+HAVING COUNT(DISTINCT EXCH_NAME) = 1;
+
+问题：查询所有品种中，昨日结存量（yest_bal_qty）和今日结存量（tday_bal_qty）相差最大的记录。
+SELECT BIZ_DT, wh_abbr, clas_name, yest_bal_qty, tday_bal_qty, (tday_bal_qty - yest_bal_qty) AS diff
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+ORDER BY ABS(tday_bal_qty - yest_bal_qty) DESC
+LIMIT 1;
+
+问题：按计量单位（msr_unt）分类，统计各类商品的总注册仓单量。
+SELECT msr_unt, SUM(reg_rcpt_qty) AS total_by_unit
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab)
+GROUP BY msr_unt
+ORDER BY total_by_unit DESC;
+
+问题：查询在最近一个业务日，哪些品种的注销仓单量（cncl_rcpt_qty）大于其注册仓单量（reg_rcpt_qty）？
+SELECT wh_abbr, clas_name, reg_rcpt_qty, cncl_rcpt_qty
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = (SELECT MAX(BIZ_DT) FROM dataqa.fut_makt_wh_rcpt_stas_tab) AND cncl_rcpt_qty > reg_rcpt_qty;

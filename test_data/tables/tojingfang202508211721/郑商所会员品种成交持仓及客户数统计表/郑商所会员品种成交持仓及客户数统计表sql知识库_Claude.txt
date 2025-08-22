@@ -1,0 +1,517 @@
+问题：分析各品种期货与期权的交易活跃度对比及客户参与度差异
+WITH futures_options_comparison AS (
+    SELECT clas_code, clas_abbr, fut_opt_flag,
+           SUM(trd_qty) AS total_volume,
+           SUM(trd_amt) AS total_amount,
+           SUM(hld_qty) AS total_position,
+           SUM(trd_clit_qty) AS total_trade_clients,
+           SUM(hld_clit_qty) AS total_hold_clients,
+           COUNT(DISTINCT mem_no) AS participating_members,
+           ROUND(AVG(trd_qty / NULLIF(trd_clit_qty, 0)), 2) AS avg_volume_per_client
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_code, clas_abbr, fut_opt_flag
+)
+SELECT clas_abbr,
+       SUM(CASE WHEN fut_opt_flag = 'F' THEN total_volume END) AS futures_volume,
+       SUM(CASE WHEN fut_opt_flag = 'O' THEN total_volume END) AS options_volume,
+       SUM(CASE WHEN fut_opt_flag = 'F' THEN total_trade_clients END) AS futures_clients,
+       SUM(CASE WHEN fut_opt_flag = 'O' THEN total_trade_clients END) AS options_clients,
+       ROUND(SUM(CASE WHEN fut_opt_flag = 'O' THEN total_volume END) * 100.0 / 
+             NULLIF(SUM(CASE WHEN fut_opt_flag = 'F' THEN total_volume END), 0), 2) AS options_futures_volume_ratio,
+       ROUND(SUM(CASE WHEN fut_opt_flag = 'O' THEN total_trade_clients END) * 100.0 / 
+             NULLIF(SUM(CASE WHEN fut_opt_flag = 'F' THEN total_trade_clients END), 0), 2) AS options_futures_client_ratio
+FROM futures_options_comparison
+GROUP BY clas_abbr
+HAVING SUM(CASE WHEN fut_opt_flag = 'F' THEN total_volume END) > 0
+ORDER BY options_futures_volume_ratio DESC;
+
+问题：查询会员交易策略偏好分析（套保、投机、套利比例）及风险分散度评估
+WITH member_strategy_analysis AS (
+    SELECT mem_name, mem_type_code_desc,
+           SUM(hdg_trd_qty) AS hedge_volume,
+           SUM(spe_trd_qty) AS speculation_volume,
+           SUM(cmb_trd_qty) AS arbitrage_volume,
+           SUM(trd_qty) AS total_volume,
+           COUNT(DISTINCT clas_code) AS varieties_traded,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'F' THEN clas_code END) AS futures_varieties,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'O' THEN clas_code END) AS options_varieties
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY mem_name, mem_type_code_desc
+    HAVING SUM(trd_qty) > 0
+)
+SELECT mem_name, mem_type_code_desc,
+       total_volume,
+       varieties_traded,
+       ROUND(hedge_volume * 100.0 / total_volume, 2) AS hedge_ratio,
+       ROUND(speculation_volume * 100.0 / total_volume, 2) AS speculation_ratio,
+       ROUND(arbitrage_volume * 100.0 / total_volume, 2) AS arbitrage_ratio,
+       CASE 
+           WHEN varieties_traded >= 10 THEN '多元化交易'
+           WHEN varieties_traded >= 5 THEN '适度分散'
+           WHEN varieties_traded >= 3 THEN '集中交易'
+           ELSE '单一品种'
+       END AS diversification_level,
+       CASE 
+           WHEN hedge_volume * 100.0 / total_volume >= 60 THEN '套保主导'
+           WHEN speculation_volume * 100.0 / total_volume >= 60 THEN '投机主导'
+           WHEN arbitrage_volume * 100.0 / total_volume >= 30 THEN '套利活跃'
+           ELSE '均衡交易'
+       END AS strategy_preference
+FROM member_strategy_analysis
+WHERE total_volume >= 1000
+ORDER BY total_volume DESC;
+
+问题：分析期权交易的看涨看跌偏好及会员参与度分布
+SELECT clas_abbr, cp_flag,
+       COUNT(DISTINCT mem_no) AS participating_members,
+       SUM(trd_qty) AS total_volume,
+       SUM(trd_amt) AS total_amount,
+       SUM(hld_qty) AS total_position,
+       SUM(trd_clit_qty) AS total_clients,
+       ROUND(AVG(trd_amt / NULLIF(trd_qty, 0)), 2) AS avg_price_per_lot,
+       ROUND(SUM(trd_qty) * 100.0 / 
+             SUM(SUM(trd_qty)) OVER (PARTITION BY clas_abbr), 2) AS volume_share_in_variety
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE' 
+AND fut_opt_flag = 'O'
+AND cp_flag IS NOT NULL
+GROUP BY clas_abbr, cp_flag
+ORDER BY clas_abbr, cp_flag;
+
+问题：统计各会员类型的资金使用效率和客户服务质量指标
+SELECT mem_type_code_desc,
+       COUNT(DISTINCT mem_no) AS member_count,
+       SUM(trd_amt) AS total_trading_amount,
+       SUM(hld_amt) AS total_position_amount,
+       SUM(trd_clit_qty) AS total_trading_clients,
+       SUM(hld_clit_qty) AS total_holding_clients,
+       ROUND(SUM(trd_amt) / COUNT(DISTINCT mem_no), 2) AS avg_trading_amount_per_member,
+       ROUND(SUM(trd_clit_qty) / COUNT(DISTINCT mem_no), 2) AS avg_clients_per_member,
+       ROUND(SUM(trd_amt) / NULLIF(SUM(trd_clit_qty), 0), 2) AS avg_amount_per_client,
+       ROUND(SUM(hld_amt) / NULLIF(SUM(hld_clit_qty), 0), 2) AS avg_position_per_client
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+GROUP BY mem_type_code_desc
+ORDER BY avg_trading_amount_per_member DESC;
+
+问题：查询买卖力量对比失衡的品种及潜在市场风险预警
+WITH buy_sell_analysis AS (
+    SELECT clas_code, clas_abbr, fut_opt_flag,
+           SUM(buy_trd_qty) AS total_buy_volume,
+           SUM(sell_trd_qty) AS total_sell_volume,
+           SUM(buy_hld_qty) AS total_buy_position,
+           SUM(sell_hld_qty) AS total_sell_position,
+           SUM(buy_trd_amt) AS total_buy_amount,
+           SUM(sell_trd_amt) AS total_sell_amount
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_code, clas_abbr, fut_opt_flag
+)
+SELECT clas_abbr, fut_opt_flag,
+       total_buy_volume, total_sell_volume,
+       total_buy_position, total_sell_position,
+       ROUND(ABS(total_buy_volume - total_sell_volume) * 100.0 / 
+             NULLIF(total_buy_volume + total_sell_volume, 0), 2) AS volume_imbalance_pct,
+       ROUND(ABS(total_buy_position - total_sell_position) * 100.0 / 
+             NULLIF(total_buy_position + total_sell_position, 0), 2) AS position_imbalance_pct,
+       CASE 
+           WHEN ABS(total_buy_volume - total_sell_volume) * 100.0 / 
+                NULLIF(total_buy_volume + total_sell_volume, 0) > 20 THEN '高风险'
+           WHEN ABS(total_buy_volume - total_sell_volume) * 100.0 / 
+                NULLIF(total_buy_volume + total_sell_volume, 0) > 10 THEN '中风险'
+           ELSE '正常'
+       END AS risk_level
+FROM buy_sell_analysis
+WHERE total_buy_volume + total_sell_volume > 0
+ORDER BY volume_imbalance_pct DESC;
+
+问题：分析境外客户参与度及其对市场影响力评估
+WITH overseas_participation AS (
+    SELECT clas_abbr, fut_opt_flag,
+           SUM(trd_clit_qty) AS total_trading_clients,
+           SUM(ovs_trd_clit_qty) AS overseas_trading_clients,
+           SUM(hld_clit_qty) AS total_holding_clients,
+           SUM(ovs_hld_clit_qty) AS overseas_holding_clients,
+           SUM(trd_qty) AS total_volume,
+           SUM(hld_qty) AS total_position
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_abbr, fut_opt_flag
+)
+SELECT clas_abbr, fut_opt_flag,
+       total_trading_clients,
+       overseas_trading_clients,
+       total_holding_clients,
+       overseas_holding_clients,
+       ROUND(overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0), 2) AS overseas_trading_ratio,
+       ROUND(overseas_holding_clients * 100.0 / NULLIF(total_holding_clients, 0), 2) AS overseas_holding_ratio,
+       CASE 
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) >= 20 THEN '高参与度'
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) >= 10 THEN '中参与度'
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) > 0 THEN '低参与度'
+           ELSE '无境外参与'
+       END AS participation_level
+FROM overseas_participation
+WHERE total_trading_clients > 0
+ORDER BY overseas_trading_ratio DESC;
+
+问题：查询客户转化率分析（报单→交易→持仓的转化漏斗）
+SELECT mem_name, clas_abbr,
+       SUM(drd_clit_qty) AS order_clients,
+       SUM(trd_clit_qty) AS trading_clients,
+       SUM(hld_clit_qty) AS holding_clients,
+       ROUND(SUM(trd_clit_qty) * 100.0 / NULLIF(SUM(drd_clit_qty), 0), 2) AS order_to_trade_conversion,
+       ROUND(SUM(hld_clit_qty) * 100.0 / NULLIF(SUM(trd_clit_qty), 0), 2) AS trade_to_hold_conversion,
+       ROUND(SUM(hld_clit_qty) * 100.0 / NULLIF(SUM(drd_clit_qty), 0), 2) AS order_to_hold_conversion
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+GROUP BY mem_name, clas_abbr
+HAVING SUM(drd_clit_qty) >= 10
+ORDER BY order_to_trade_conversion DESC;
+
+问题：统计各品种套保业务的市场集中度和会员分布情况
+WITH hedging_concentration AS (
+    SELECT clas_abbr,
+           COUNT(DISTINCT mem_no) AS hedging_members,
+           SUM(hdg_trd_qty) AS total_hedge_volume,
+           SUM(hdg_hld_qty) AS total_hedge_position,
+           MAX(hdg_trd_qty) AS max_member_hedge_volume,
+           SUM(hdg_trd_amt) AS total_hedge_amount
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'F'
+    AND hdg_trd_qty > 0
+    GROUP BY clas_abbr
+)
+SELECT clas_abbr,
+       hedging_members,
+       total_hedge_volume,
+       total_hedge_position,
+       ROUND(max_member_hedge_volume * 100.0 / total_hedge_volume, 2) AS max_member_concentration,
+       ROUND(total_hedge_amount / NULLIF(total_hedge_volume, 0), 2) AS avg_hedge_price,
+       CASE 
+           WHEN max_member_hedge_volume * 100.0 / total_hedge_volume >= 50 THEN '高集中度'
+           WHEN max_member_hedge_volume * 100.0 / total_hedge_volume >= 25 THEN '中集中度'
+           ELSE '分散度好'
+       END AS concentration_level
+FROM hedging_concentration
+ORDER BY max_member_concentration DESC;
+
+问题：分析各会员的交易效率指标（成交额/成交量比值）和定价能力
+SELECT mem_name, mem_type_code_desc,
+       SUM(trd_qty) AS total_volume,
+       SUM(trd_amt) AS total_amount,
+       SUM(hld_qty) AS total_position,
+       COUNT(DISTINCT clas_code) AS varieties_count,
+       ROUND(SUM(trd_amt) / NULLIF(SUM(trd_qty), 0), 2) AS avg_transaction_price,
+       ROUND(SUM(hld_amt) / NULLIF(SUM(hld_qty), 0), 2) AS avg_position_value,
+       ROUND(SUM(trd_qty) / COUNT(DISTINCT clas_code), 2) AS avg_volume_per_variety
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+GROUP BY mem_name, mem_type_code_desc
+HAVING SUM(trd_qty) >= 1000
+ORDER BY avg_transaction_price DESC;
+
+问题：查询期权行权活跃度及其对应的会员和客户分布
+SELECT clas_abbr, cp_flag,
+       COUNT(DISTINCT mem_no) AS exercising_members,
+       SUM(exer_clit_qty) AS total_exercise_clients,
+       SUM(ovs_exer_clit_qty) AS overseas_exercise_clients,
+       ROUND(SUM(ovs_exer_clit_qty) * 100.0 / NULLIF(SUM(exer_clit_qty), 0), 2) AS overseas_exercise_ratio,
+       SUM(hld_qty) AS total_option_positions,
+       ROUND(SUM(exer_clit_qty) * 100.0 / NULLIF(SUM(hld_clit_qty), 0), 2) AS exercise_to_position_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'O'
+AND exer_clit_qty > 0
+GROUP BY clas_abbr, cp_flag
+ORDER BY total_exercise_clients DESC;
+
+问题：统计各品种投机交易的风险分散度和会员参与结构
+WITH speculation_analysis AS (
+    SELECT clas_abbr,
+           COUNT(DISTINCT mem_no) AS speculating_members,
+           SUM(spe_trd_qty) AS total_spec_volume,
+           SUM(spe_hld_qty) AS total_spec_position,
+           SUM(spe_trd_amt) AS total_spec_amount,
+           STDDEV(spe_trd_qty) AS volume_std_dev,
+           MAX(spe_trd_qty) AS max_member_spec_volume
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'F'
+    AND spe_trd_qty > 0
+    GROUP BY clas_abbr
+)
+SELECT clas_abbr,
+       speculating_members,
+       total_spec_volume,
+       total_spec_position,
+       ROUND(volume_std_dev, 2) AS volume_volatility,
+       ROUND(max_member_spec_volume * 100.0 / total_spec_volume, 2) AS max_member_share,
+       ROUND(total_spec_amount / NULLIF(total_spec_volume, 0), 2) AS avg_spec_price,
+       CASE 
+           WHEN speculating_members >= 50 THEN '广泛参与'
+           WHEN speculating_members >= 20 THEN '适度参与'
+           ELSE '集中参与'
+       END AS participation_breadth
+FROM speculation_analysis
+ORDER BY total_spec_volume DESC;
+
+问题：分析各会员套利交易策略的复杂度和盈利能力评估
+SELECT mem_name,
+       COUNT(DISTINCT clas_code) AS arbitrage_varieties,
+       SUM(cmb_trd_qty) AS total_arbitrage_volume,
+       SUM(cmb_hld_qty) AS total_arbitrage_position,
+       SUM(cmb_trd_amt) AS total_arbitrage_amount,
+       SUM(cmb_hld_amt) AS total_arbitrage_position_value,
+       ROUND(SUM(cmb_trd_amt) / NULLIF(SUM(cmb_trd_qty), 0), 2) AS avg_arbitrage_price,
+       ROUND(SUM(cmb_hld_amt) / NULLIF(SUM(cmb_hld_qty), 0), 2) AS avg_position_value,
+       ROUND((SUM(cmb_hld_amt) - SUM(cmb_trd_amt)) / NULLIF(SUM(cmb_trd_amt), 0) * 100, 2) AS unrealized_pnl_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND cmb_trd_qty > 0
+GROUP BY mem_name
+HAVING SUM(cmb_trd_qty) >= 100
+ORDER BY total_arbitrage_volume DESC;
+
+问题：查询客户活跃度分层分析（高中低频交易客户分布）
+WITH client_activity_analysis AS (
+    SELECT mem_name, 
+           SUM(trd_clit_qty) AS total_trading_clients,
+           SUM(hld_clit_qty) AS total_holding_clients,
+           SUM(actv_prtk_clit_qty) AS total_active_clients,
+           SUM(drd_clit_qty) AS total_order_clients,
+           SUM(trd_qty) AS total_volume,
+           SUM(trd_amt) AS total_amount
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY mem_name
+)
+SELECT mem_name,
+       total_trading_clients,
+       total_active_clients,
+       total_volume,
+       total_amount,
+       ROUND(total_volume / NULLIF(total_trading_clients, 0), 2) AS avg_volume_per_client,
+       ROUND(total_amount / NULLIF(total_trading_clients, 0), 2) AS avg_amount_per_client,
+       CASE 
+           WHEN total_volume / NULLIF(total_trading_clients, 0) >= 1000 THEN '高频客户为主'
+           WHEN total_volume / NULLIF(total_trading_clients, 0) >= 300 THEN '中频客户为主'
+           ELSE '低频客户为主'
+       END AS client_activity_profile
+FROM client_activity_analysis
+WHERE total_trading_clients > 0
+ORDER BY avg_volume_per_client DESC;
+
+问题：统计各品种持仓集中度风险和市场流动性指标
+WITH position_concentration AS (
+    SELECT clas_abbr, fut_opt_flag,
+           COUNT(DISTINCT mem_no) AS holding_members,
+           SUM(hld_qty) AS total_positions,
+           SUM(trd_qty) AS total_volume,
+           MAX(hld_qty) AS max_member_position,
+           SUM(hld_amt) AS total_position_value,
+           SUM(trd_amt) AS total_trading_value
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_abbr, fut_opt_flag
+)
+SELECT clas_abbr, fut_opt_flag,
+       holding_members,
+       total_positions,
+       total_volume,
+       ROUND(max_member_position * 100.0 / total_positions, 2) AS max_position_concentration,
+       ROUND(total_volume / NULLIF(total_positions, 0), 2) AS turnover_ratio,
+       ROUND(total_trading_value / NULLIF(total_position_value, 0), 2) AS liquidity_ratio,
+       CASE 
+           WHEN max_member_position * 100.0 / total_positions >= 30 THEN '高集中风险'
+           WHEN max_member_position * 100.0 / total_positions >= 15 THEN '中集中风险'
+           ELSE '风险分散'
+       END AS concentration_risk
+FROM position_concentration
+WHERE total_positions > 0
+ORDER BY max_position_concentration DESC;
+
+问题：分析会员业务结构多元化程度和专业化特征
+WITH business_diversification AS (
+    SELECT mem_name,
+           COUNT(DISTINCT clas_code) AS variety_count,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'F' THEN clas_code END) AS futures_varieties,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'O' THEN clas_code END) AS options_varieties,
+           SUM(CASE WHEN hdg_trd_qty > 0 THEN 1 ELSE 0 END) AS hedging_varieties,
+           SUM(CASE WHEN spe_trd_qty > 0 THEN 1 ELSE 0 END) AS speculation_varieties,
+           SUM(CASE WHEN cmb_trd_qty > 0 THEN 1 ELSE 0 END) AS arbitrage_varieties,
+           SUM(trd_qty) AS total_volume
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY mem_name
+)
+SELECT mem_name,
+       variety_count,
+       futures_varieties,
+       options_varieties,
+       hedging_varieties,
+       speculation_varieties,
+       arbitrage_varieties,
+       total_volume,
+       ROUND(options_varieties * 100.0 / NULLIF(variety_count, 0), 2) AS options_coverage_ratio,
+       CASE 
+           WHEN variety_count >= 15 THEN '高度多元化'
+           WHEN variety_count >= 8 THEN '适度多元化'
+           WHEN variety_count >= 4 THEN '部分多元化'
+           ELSE '专业化经营'
+       END AS diversification_level,
+       CASE 
+           WHEN hedging_varieties >= arbitrage_varieties AND hedging_varieties >= speculation_varieties THEN '套保专业'
+           WHEN arbitrage_varieties >= speculation_varieties THEN '套利专业'
+           ELSE '投机主导'
+       END AS business_specialty
+FROM business_diversification
+WHERE total_volume >= 100
+ORDER BY variety_count DESC;
+
+问题：查询期货期权联动效应分析（相同品种的期货期权相关性）
+WITH futures_options_linkage AS (
+    SELECT clas_code, clas_abbr,
+           SUM(CASE WHEN fut_opt_flag = 'F' THEN trd_qty END) AS futures_volume,
+           SUM(CASE WHEN fut_opt_flag = 'O' THEN trd_qty END) AS options_volume,
+           SUM(CASE WHEN fut_opt_flag = 'F' THEN hld_qty END) AS futures_position,
+           SUM(CASE WHEN fut_opt_flag = 'O' THEN hld_qty END) AS options_position,
+           SUM(CASE WHEN fut_opt_flag = 'F' THEN trd_clit_qty END) AS futures_clients,
+           SUM(CASE WHEN fut_opt_flag = 'O' THEN trd_clit_qty END) AS options_clients,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'F' THEN mem_no END) AS futures_members,
+           COUNT(DISTINCT CASE WHEN fut_opt_flag = 'O' THEN mem_no END) AS options_members
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_code, clas_abbr
+    HAVING SUM(CASE WHEN fut_opt_flag = 'F' THEN trd_qty END) > 0
+)
+SELECT clas_abbr,
+       futures_volume,
+       options_volume,
+       futures_position,
+       options_position,
+       futures_clients,
+       options_clients,
+       ROUND(options_volume * 100.0 / NULLIF(futures_volume, 0), 2) AS options_futures_volume_ratio,
+       ROUND(options_clients * 100.0 / NULLIF(futures_clients, 0), 2) AS options_futures_client_ratio,
+       CASE 
+           WHEN options_volume * 100.0 / NULLIF(futures_volume, 0) >= 50 THEN '期权高活跃'
+           WHEN options_volume * 100.0 / NULLIF(futures_volume, 0) >= 20 THEN '期权中活跃'
+           WHEN options_volume * 100.0 / NULLIF(futures_volume, 0) > 0 THEN '期权低活跃'
+           ELSE '无期权交易'
+       END AS options_activity_level
+FROM futures_options_linkage
+ORDER BY options_futures_volume_ratio DESC;
+
+问题：分析特别会员、期货会员、非期货会员的业务特征差异
+SELECT mem_type_code_desc,
+       COUNT(DISTINCT mem_no) AS member_count,
+       SUM(trd_qty) AS total_volume,
+       SUM(hld_qty) AS total_position,
+       SUM(trd_amt) AS total_amount,
+       SUM(hdg_trd_qty) AS hedge_volume,
+       SUM(spe_trd_qty) AS speculation_volume,
+       SUM(cmb_trd_qty) AS arbitrage_volume,
+       SUM(trd_clit_qty) AS total_clients,
+       ROUND(SUM(trd_qty) / COUNT(DISTINCT mem_no), 2) AS avg_volume_per_member,
+       ROUND(SUM(trd_clit_qty) / COUNT(DISTINCT mem_no), 2) AS avg_clients_per_member,
+       ROUND(SUM(hdg_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS hedge_ratio,
+       ROUND(SUM(spe_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS speculation_ratio,
+       ROUND(SUM(cmb_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS arbitrage_ratio
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+GROUP BY mem_type_code_desc
+ORDER BY total_volume DESC;
+
+问题：查询各品种的做市商效应评估（买卖双向持仓平衡度分析）
+WITH market_making_analysis AS (
+    SELECT clas_abbr, mem_name,
+           SUM(buy_hld_qty) AS total_buy_positions,
+           SUM(sell_hld_qty) AS total_sell_positions,
+           SUM(buy_trd_qty) AS total_buy_volume,
+           SUM(sell_trd_qty) AS total_sell_volume,
+           ABS(SUM(buy_hld_qty) - SUM(sell_hld_qty)) AS position_imbalance,
+           ABS(SUM(buy_trd_qty) - SUM(sell_trd_qty)) AS volume_imbalance
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'F'
+    GROUP BY clas_abbr, mem_name
+    HAVING SUM(buy_hld_qty) + SUM(sell_hld_qty) > 0
+)
+SELECT clas_abbr,
+       COUNT(*) AS participating_members,
+       ROUND(AVG(position_imbalance / NULLIF(total_buy_positions + total_sell_positions, 0) * 100), 2) AS avg_position_imbalance_pct,
+       ROUND(AVG(volume_imbalance / NULLIF(total_buy_volume + total_sell_volume, 0) * 100), 2) AS avg_volume_imbalance_pct,
+       COUNT(CASE WHEN position_imbalance / NULLIF(total_buy_positions + total_sell_positions, 0) < 0.1 THEN 1 END) AS balanced_position_members,
+       ROUND(COUNT(CASE WHEN position_imbalance / NULLIF(total_buy_positions + total_sell_positions, 0) < 0.1 THEN 1 END) * 100.0 / COUNT(*), 2) AS market_making_ratio
+FROM market_making_analysis
+GROUP BY clas_abbr
+ORDER BY market_making_ratio DESC;
+
+问题：统计各会员客户资源质量分析（活跃客户占比和客户价值评估）
+SELECT mem_name,
+       SUM(trd_clit_qty) AS trading_clients,
+       SUM(hld_clit_qty) AS holding_clients,
+       SUM(actv_prtk_clit_qty) AS active_clients,
+       SUM(drd_clit_qty) AS order_clients,
+       SUM(trd_amt) AS total_trading_value,
+       SUM(hld_amt) AS total_position_value,
+       ROUND(SUM(actv_prtk_clit_qty) * 100.0 / NULLIF(SUM(drd_clit_qty), 0), 2) AS client_activation_ratio,
+       ROUND(SUM(trd_amt) / NULLIF(SUM(trd_clit_qty), 0), 2) AS avg_value_per_trading_client,
+       ROUND(SUM(hld_amt) / NULLIF(SUM(hld_clit_qty), 0), 2) AS avg_value_per_holding_client,
+       CASE 
+           WHEN SUM(trd_amt) / NULLIF(SUM(trd_clit_qty), 0) >= 100000 THEN '高价值客户群'
+           WHEN SUM(trd_amt) / NULLIF(SUM(trd_clit_qty), 0) >= 50000 THEN '中价值客户群'
+           ELSE '普通客户群'
+       END AS client_value_tier
+FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+GROUP BY mem_name
+HAVING SUM(trd_clit_qty) >= 10
+ORDER BY avg_value_per_trading_client DESC;
+
+问题：分析各品种的国际化程度和境外资金参与情况
+WITH internationalization_analysis AS (
+    SELECT clas_abbr, fut_opt_flag,
+           SUM(trd_clit_qty) AS total_trading_clients,
+           SUM(ovs_trd_clit_qty) AS overseas_trading_clients,
+           SUM(hld_clit_qty) AS total_holding_clients,
+           SUM(ovs_hld_clit_qty) AS overseas_holding_clients,
+           SUM(trd_qty) AS total_volume,
+           SUM(hld_qty) AS total_position,
+           COUNT(DISTINCT mem_no) AS total_members,
+           COUNT(DISTINCT CASE WHEN ovs_trd_clit_qty > 0 THEN mem_no END) AS members_with_overseas_clients
+    FROM dataqa.mem_clas_trd_hld_clit_stas_tab
+    WHERE biz_dt = '2025-07-02' AND exch_code = 'CZCE'
+    GROUP BY clas_abbr, fut_opt_flag
+)
+SELECT clas_abbr, fut_opt_flag,
+       total_trading_clients,
+       overseas_trading_clients,
+       total_volume,
+       total_position,
+       ROUND(overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0), 2) AS overseas_client_ratio,
+       ROUND(overseas_holding_clients * 100.0 / NULLIF(total_holding_clients, 0), 2) AS overseas_holding_ratio,
+       ROUND(members_with_overseas_clients * 100.0 / total_members, 2) AS member_internationalization_ratio,
+       CASE 
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) >= 15 THEN '高国际化'
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) >= 5 THEN '中国际化'
+           WHEN overseas_trading_clients * 100.0 / NULLIF(total_trading_clients, 0) > 0 THEN '低国际化'
+           ELSE '无国际化'
+       END AS internationalization_level
+FROM internationalization_analysis
+WHERE total_trading_clients > 0
+ORDER BY overseas_client_ratio DESC;

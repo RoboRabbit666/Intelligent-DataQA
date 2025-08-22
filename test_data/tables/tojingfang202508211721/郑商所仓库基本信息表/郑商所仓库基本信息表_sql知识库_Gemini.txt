@@ -1,0 +1,148 @@
+问题：按仓库性质（WH_OWN）分类，统计各类仓库的总数和总库容（TTL_WH_CPY）分别是多少？
+SELECT WH_OWN, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count, SUM(TTL_WH_CPY) AS total_capacity
+FROM dataqa.wh_base_info_tab
+WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY WH_OWN
+ORDER BY warehouse_count DESC;
+
+问题：找出哪些仓库的交割库容（DLV_WH_CPY）占其总库容（TTL_WH_CPY）的比例低于50%？
+SELECT WH_NAME, TTL_WH_CPY, DLV_WH_CPY, (DLV_WH_CPY / TTL_WH_CPY) * 100 AS delivery_capacity_ratio
+FROM dataqa.wh_base_info_tab
+WHERE TTL_WH_CPY > 0 AND (DLV_WH_CPY / TTL_WH_CPY) < 0.5
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+ORDER BY delivery_capacity_ratio;
+
+问题：哪个省份（PRVC）的仓库平均总库容最大？
+SELECT PRVC, AVG(TTL_WH_CPY) AS avg_total_capacity
+FROM dataqa.wh_base_info_tab
+WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY PRVC
+ORDER BY avg_total_capacity DESC
+LIMIT 1;
+
+问题：查询同时拥有铁路站点（TRN_STATION）和码头（DOCK）的仓库有哪些？
+SELECT WH_NAME, TRN_STATION, DOCK
+FROM dataqa.wh_base_info_tab
+WHERE TRN_STATION IS NOT NULL AND TRN_STATION <> ''
+AND DOCK IS NOT NULL AND DOCK <> ''
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：按城市（CITY）统计，列出每个城市的仓库数量，并按数量降序排列。
+SELECT CITY, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM dataqa.wh_base_info_tab
+WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY CITY
+ORDER BY warehouse_count DESC;
+
+问题：找出注册资本（REG_CAPI）最高的前5家仓库是哪些？
+SELECT WH_NAME, REG_CAPI
+FROM dataqa.wh_base_info_tab
+WHERE REG_CAPI IS NOT NULL
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+ORDER BY CAST(REG_CAPI AS NUMERIC) DESC
+LIMIT 5;
+
+问题：比较“央企”和“民营”两类仓库的平均总资产（AST）规模。
+SELECT WH_OWN, AVG(CAST(AST AS NUMERIC)) as average_assets
+FROM dataqa.wh_base_info_tab
+WHERE WH_OWN IN ('央企', '民营') AND AST IS NOT NULL
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY WH_OWN;
+
+问题：查询所有仓库中，仓库全称（WH_NAME）和简称（WH_ABBR）字符长度差异最大的记录。
+SELECT WH_NAME, WH_ABBR, LENGTH(WH_NAME) - LENGTH(WH_ABBR) AS name_length_diff
+FROM dataqa.wh_base_info_tab
+WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+ORDER BY name_length_diff DESC
+LIMIT 1;
+
+问题：查询在“河南省”内，哪些城市的交割库容总和超过了10000？
+SELECT CITY, SUM(DLV_WH_CPY) as total_delivery_capacity
+FROM dataqa.wh_base_info_tab
+WHERE PRVC = '河南省' AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY CITY
+HAVING SUM(DLV_WH_CPY) > 10000
+ORDER BY total_delivery_capacity DESC;
+
+问题：找出那些地理坐标（LAT, LON）信息缺失的仓库。
+SELECT WH_NAME, DTL_ADDR
+FROM dataqa.wh_base_info_tab
+WHERE (LAT IS NULL OR LON IS NULL)
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：统计拥有铁路站点的仓库主要分布在哪些省份？
+SELECT PRVC, COUNT(DISTINCT DLV_WH_CODE) as warehouse_with_rail_count
+FROM dataqa.wh_base_info_tab
+WHERE TRN_STATION IS NOT NULL AND TRN_STATION <> ''
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY PRVC
+ORDER BY warehouse_with_rail_count DESC;
+
+问题：查询仓库总库容（TTL_WH_CPY）在10000到20000之间的所有“民营”仓库。
+SELECT WH_NAME, TTL_WH_CPY, WH_OWN
+FROM dataqa.wh_base_info_tab
+WHERE WH_OWN = '民营' AND TTL_WH_CPY BETWEEN 10000 AND 20000
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：列出每个省份中，交割库容最大的仓库是哪个？
+WITH RankedWarehouses AS (
+    SELECT PRVC, WH_NAME, DLV_WH_CPY,
+           ROW_NUMBER() OVER(PARTITION BY PRVC ORDER BY DLV_WH_CPY DESC) as rn
+    FROM dataqa.wh_base_info_tab
+    WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+)
+SELECT PRVC, WH_NAME, DLV_WH_CPY
+FROM RankedWarehouses
+WHERE rn = 1;
+
+问题：查询是否有仓库的注册资本低于其总资产？
+SELECT WH_NAME, REG_CAPI, AST
+FROM dataqa.wh_base_info_tab
+WHERE CAST(REG_CAPI AS NUMERIC) < CAST(AST AS NUMERIC)
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：统计不同仓库性质（WH_OWN）的仓库，其交割库容占总库容的平均比例。
+SELECT WH_OWN, AVG(DLV_WH_CPY / TTL_WH_CPY) * 100 AS avg_delivery_ratio
+FROM dataqa.wh_base_info_tab
+WHERE TTL_WH_CPY > 0 AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY WH_OWN
+ORDER BY avg_delivery_ratio DESC;
+
+问题：查询详细地址（DTL_ADDR）中包含“港”字的仓库，但码头（DOCK）信息却为空的记录。
+SELECT WH_NAME, DTL_ADDR
+FROM dataqa.wh_base_info_tab
+WHERE DTL_ADDR LIKE '%港%' AND (DOCK IS NULL OR DOCK = '')
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：找出所有仓库中总库容（TTL_WH_CPY）和交割库容（DLV_WH_CPY）完全相等的仓库。
+SELECT WH_NAME, TTL_WH_CPY
+FROM dataqa.wh_base_info_tab
+WHERE TTL_WH_CPY = DLV_WH_CPY
+AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab);
+
+问题：按总资产（AST）规模，将仓库分为“小于1亿”、“1-5亿”、“5亿以上”三个等级，并统计各等级的仓库数量。
+SELECT
+    CASE
+        WHEN CAST(AST AS NUMERIC) < 10000 THEN '小于1亿'
+        WHEN CAST(AST AS NUMERIC) BETWEEN 10000 AND 50000 THEN '1-5亿'
+        ELSE '5亿以上'
+    END AS asset_level,
+    COUNT(DISTINCT DLV_WH_CODE) as warehouse_count
+FROM dataqa.wh_base_info_tab
+WHERE AST IS NOT NULL AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY asset_level;
+
+问题：查询哪些城市既有“央企”仓库，又有“民营”仓库？
+SELECT CITY
+FROM dataqa.wh_base_info_tab
+WHERE WH_OWN IN ('央企', '民营') AND stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY CITY
+HAVING COUNT(DISTINCT WH_OWN) = 2;
+
+问题：查询全国总库容排名前10的城市是哪些？
+SELECT CITY, SUM(TTL_WH_CPY) AS city_total_capacity
+FROM dataqa.wh_base_info_tab
+WHERE stas_dt = (SELECT MAX(stas_dt) FROM dataqa.wh_base_info_tab)
+GROUP BY CITY
+ORDER BY city_total_capacity DESC
+LIMIT 10;

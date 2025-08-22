@@ -1,0 +1,154 @@
+问题：按省份（prvc）统计，查询每个省份正常运营（is_opn = 'Y' AND brh_org_status = 'N'）的分支机构数量。
+SELECT prvc, COUNT(*) AS active_branch_count
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'Y' AND brh_org_status = 'N' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY prvc
+ORDER BY active_branch_count DESC;
+
+问题：统计不同机构类型（brh_org_type：子公司/营业部/分公司）的数量分别是多少？
+SELECT brh_org_type,
+       CASE
+           WHEN brh_org_type = 'SS' THEN '子公司'
+           WHEN brh_org_type = 'SD' THEN '营业部'
+           WHEN brh_org_type = 'BO' THEN '分公司'
+           ELSE '未知'
+       END AS type_name,
+       COUNT(*) AS count_by_type
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY brh_org_type
+ORDER BY count_by_type DESC;
+
+问题：找出在2024年新开业（opn_dt 在2024年）的分支机构有哪些？
+SELECT mem_name, brh_org_name, opn_dt
+FROM dataqa.mem_brh_org_tab
+WHERE EXTRACT(YEAR FROM opn_dt) = 2024
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+ORDER BY opn_dt;
+
+问题：查询哪些会员（mem_name）在“上海市”拥有的分支机构数量最多？
+SELECT mem_name, COUNT(*) AS branch_count_in_shanghai
+FROM dataqa.mem_brh_org_tab
+WHERE city = '上海市' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY mem_name
+ORDER BY branch_count_in_shanghai DESC
+LIMIT 5;
+
+问题：列出所有分支机构中，运营时间最长（即开业最早）的前5个分支机构。
+SELECT mem_name, brh_org_name, opn_dt
+FROM dataqa.mem_brh_org_tab
+WHERE is_opn = 'Y' AND opn_dt IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+ORDER BY opn_dt ASC
+LIMIT 5;
+
+问题：统计有多少分支机构的详细地址（brh_org_site）信息是缺失的？
+SELECT COUNT(*)
+FROM dataqa.mem_brh_org_tab
+WHERE (brh_org_site IS NULL OR brh_org_site = '')
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：查询机构状态为正常（brh_org_status = 'N'）但并未开业（is_opn = 'N'）的分支机构。
+SELECT mem_name, brh_org_name, brh_org_status, is_opn
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_status = 'N' AND is_opn = 'N'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：按城市（city）统计，计算每个城市的平均分支机构注册时长（从注册日到当前业务日的天数）。
+SELECT city, AVG(biz_dt - rgst_dt) AS avg_registration_days
+FROM dataqa.mem_brh_org_tab
+WHERE rgst_dt IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY city
+ORDER BY avg_registration_days DESC;
+
+问题：找出那些所有分支机构都集中在同一个省份的会员单位。
+WITH MemberProvinces AS (
+    SELECT mem_name, COUNT(DISTINCT prvc) as province_count
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+    GROUP BY mem_name
+)
+SELECT mem_name
+FROM MemberProvinces
+WHERE province_count = 1;
+
+问题：查询“中信期货有限公司”旗下所有“分公司”（BO）类型的分支机构列表。
+SELECT brh_org_name, brh_org_site
+FROM dataqa.mem_brh_org_tab
+WHERE mem_name = '中信期货有限公司' AND brh_org_type = 'BO'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：统计提供了电子邮箱（brh_org_eml）的分支机构占总数的比例。
+SELECT
+    (SUM(CASE WHEN brh_org_eml IS NOT NULL AND brh_org_eml <> '' THEN 1 ELSE 0 END) * 100.0) / COUNT(*) AS percentage_with_email
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：查询在最近一个业务日，注册（rgst_dt）和开业（opn_dt）在同一天的分支机构。
+SELECT mem_name, brh_org_name, rgst_dt
+FROM dataqa.mem_brh_org_tab
+WHERE rgst_dt = opn_dt AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：列出所有已停业（clos_dt不为空）的分支机构及其运营时长（停业日期 - 开业日期）。
+SELECT mem_name, brh_org_name, (clos_dt - opn_dt) AS operating_days
+FROM dataqa.mem_brh_org_tab
+WHERE clos_dt IS NOT NULL AND opn_dt IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+ORDER BY operating_days DESC;
+
+问题：查询哪些会员既有“营业部”（SD）又有“分公司”（BO）？
+SELECT mem_name
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_type IN ('SD', 'BO') AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY mem_name
+HAVING COUNT(DISTINCT brh_org_type) = 2;
+
+问题：统计分支机构名称中包含“财富管理”字样的机构数量。
+SELECT COUNT(*)
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_name LIKE '%财富管理%'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：查询所有分支机构中，负责人（brh_org_ctc_prsn）重名的情况。
+SELECT brh_org_ctc_prsn, COUNT(*) as name_count, STRING_AGG(mem_name || '-' || brh_org_name, '; ') as branches
+FROM dataqa.mem_brh_org_tab
+WHERE brh_org_ctc_prsn IS NOT NULL AND brh_org_ctc_prsn <> '' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY brh_org_ctc_prsn
+HAVING COUNT(*) > 1
+ORDER BY name_count DESC;
+
+问题：按年份统计，每年新注册的分支机构数量变化趋势。
+SELECT EXTRACT(YEAR FROM rgst_dt) as registration_year, COUNT(*) as new_branches
+FROM dataqa.mem_brh_org_tab
+WHERE rgst_dt IS NOT NULL
+GROUP BY registration_year
+ORDER BY registration_year;
+
+问题：查询分支机构地址（brh_org_site）中，出现频率最高的城市是哪个？
+SELECT city, COUNT(*) AS branch_count
+FROM dataqa.mem_brh_org_tab
+WHERE city IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY city
+ORDER BY branch_count DESC
+LIMIT 1;
+
+问题：找出那些统一社会信用代码（scil_crdt_code）为空或者格式明显不正确（如长度不为18位）的机构。
+SELECT mem_name, brh_org_name, scil_crdt_code
+FROM dataqa.mem_brh_org_tab
+WHERE (scil_crdt_code IS NULL OR LENGTH(scil_crdt_code) <> 18)
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab);
+
+问题：查询分支机构数量排名前10的会员，他们在全国的省份覆盖率如何？
+WITH TopMembers AS (
+    SELECT mem_name, COUNT(*) as branch_count
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+    GROUP BY mem_name
+    ORDER BY branch_count DESC
+    LIMIT 10
+)
+SELECT tm.mem_name, tm.branch_count, COUNT(DISTINCT t.prvc) AS province_coverage
+FROM TopMembers tm
+JOIN dataqa.mem_brh_org_tab t ON tm.mem_name = t.mem_name
+WHERE t.biz_dt = (SELECT MAX(biz_dt) FROM dataqa.mem_brh_org_tab)
+GROUP BY tm.mem_name, tm.branch_count
+ORDER BY tm.branch_count DESC;

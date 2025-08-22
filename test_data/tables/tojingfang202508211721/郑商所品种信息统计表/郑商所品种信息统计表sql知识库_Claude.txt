@@ -1,0 +1,236 @@
+问题：查询当前成交持仓比超过0.5的品种，按成交持仓比降序排列
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, cp_flag, trd_hld_rate
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_hld_rate > 0.5
+ORDER BY trd_hld_rate DESC;
+
+问题：统计当前郑商所农产品和非农产品的成交量分布
+SELECT IS_PROD,
+    CASE WHEN IS_PROD = 'Y' THEN '农产品' ELSE '非农产品' END AS 产品类型,
+    SUM(trd_qty) AS 总成交量,
+    COUNT(DISTINCT CLAS_CODE) AS 品种数量
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+GROUP BY IS_PROD
+ORDER BY 总成交量 DESC;
+
+问题：查询当前单腿定单手数占总定单手数比例最高的前5个品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, 
+    sngl_ord_lot,
+    ord_lot,
+    ROUND(sngl_ord_lot * 100.0 / NULLIF(ord_lot, 0), 2) AS 单腿定单占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ord_lot > 0
+ORDER BY 单腿定单占比_百分比 DESC
+LIMIT 5;
+
+问题：查询当前行权客户数大于10的期权品种及其行权量
+SELECT BIZ_DT, CLAS_NAME, cp_flag, opt_exer_clit_qty, opt_exer_qty, opt_exer_amt
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'O'
+AND opt_exer_clit_qty > 10
+ORDER BY opt_exer_qty DESC;
+
+问题：统计各品种当前的平均撤单率
+SELECT CLAS_NAME, fut_opt_flag,
+    AVG(ROUND(cancel_order_lot * 100.0 / NULLIF(ord_lot, 0), 2)) AS 平均撤单率_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ord_lot > 0
+GROUP BY CLAS_NAME, fut_opt_flag
+ORDER BY 平均撤单率_百分比 DESC;
+
+问题：查询当前组合持仓量占总持仓量比例超过20%的品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, cp_flag,
+    cmb_hld_qty,
+    hld_qty,
+    ROUND(cmb_hld_qty * 100.0 / NULLIF(hld_qty, 0), 2) AS 组合持仓占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND hld_qty > 0
+AND (cmb_hld_qty * 100.0 / hld_qty) > 20
+ORDER BY 组合持仓占比_百分比 DESC;
+
+问题：比较当前主力合约成交均价与持仓均价的差额
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, main_comd,
+    main_comd_trd_avg_prc AS 主力合约成交均价,
+    main_comd_hld_avg_prc AS 主力合约持仓均价,
+    (main_comd_trd_avg_prc - main_comd_hld_avg_prc) AS 成交持仓均价差额
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND main_comd_trd_avg_prc IS NOT NULL
+AND main_comd_hld_avg_prc IS NOT NULL
+ORDER BY ABS(成交持仓均价差额) DESC;
+
+问题：查询当前有成交订单笔数占总订单笔数比例最低的5个品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag,
+    have_trd_ord_cnt AS 有成交订单笔数,
+    ord_cnt AS 总订单笔数,
+    ROUND(have_trd_ord_cnt * 100.0 / NULLIF(ord_cnt, 0), 2) AS 成交订单占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ord_cnt > 0
+ORDER BY 成交订单占比_百分比 ASC
+LIMIT 5;
+
+问题：统计当前各产地的品种数量及总成交量
+SELECT PRON_NAME AS 产地名称,
+    COUNT(DISTINCT CLAS_CODE) AS 品种数量,
+    SUM(trd_qty) AS 总成交量,
+    SUM(trd_amt) AS 总成交额
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND PRON_NAME IS NOT NULL
+GROUP BY PRON_NAME
+ORDER BY 总成交量 DESC;
+
+问题：查询当前期权行权手续费标准高于5元/手的品种
+SELECT DISTINCT BIZ_DT, CLAS_NAME, fut_opt_flag, opt_exer_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'O'
+AND opt_exer_cmsn_fee_std > 5
+ORDER BY opt_exer_cmsn_fee_std DESC;
+
+问题：分析当前持仓客户数与交易客户数的比值
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag,
+    trd_clit_qty AS 交易客户数,
+    hld_clit_qty AS 持仓客户数,
+    ROUND(hld_clit_qty * 1.0 / NULLIF(trd_clit_qty, 0), 2) AS 持仓交易客户比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND trd_clit_qty > 0
+ORDER BY 持仓交易客户比 DESC;
+
+问题：查询当前组合订单笔数占总订单笔数比例超过30%的品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag,
+    cmb_ord_cnt AS 组合订单笔数,
+    ord_cnt AS 总订单笔数,
+    ROUND(cmb_ord_cnt * 100.0 / NULLIF(ord_cnt, 0), 2) AS 组合订单占比_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND ord_cnt > 0
+AND (cmb_ord_cnt * 100.0 / ord_cnt) > 30
+ORDER BY 组合订单占比_百分比 DESC;
+
+问题：统计当前各品种简称的成交笔数分布
+SELECT CLAS_ABBR AS 品种简称,
+    fut_opt_flag,
+    SUM(trd_cnt) AS 总成交笔数,
+    AVG(trd_cnt) AS 平均成交笔数,
+    COUNT(*) AS 记录数
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND CLAS_ABBR IS NOT NULL
+GROUP BY CLAS_ABBR, fut_opt_flag
+ORDER BY 总成交笔数 DESC;
+
+问题：查询当前折抵手续费标准不为空的品种及其标准
+SELECT DISTINCT BIZ_DT, CLAS_NAME, fut_opt_flag, impn_cmsn_fee_std
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND impn_cmsn_fee_std IS NOT NULL
+ORDER BY impn_cmsn_fee_std DESC;
+
+问题：比较当前近月合约与主力合约的成交量差异
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag,
+    main_comd AS 主力合约,
+    near_mon_comd AS 近月合约,
+    main_comd_trd_qty AS 主力合约成交量,
+    near_mon_comd_trd_qty AS 近月合约成交量,
+    (main_comd_trd_qty - near_mon_comd_trd_qty) AS 成交量差额,
+    ROUND((main_comd_trd_qty - near_mon_comd_trd_qty) * 100.0 / NULLIF(near_mon_comd_trd_qty, 0), 2) AS 成交量差异百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND main_comd_trd_qty IS NOT NULL
+AND near_mon_comd_trd_qty IS NOT NULL
+ORDER BY ABS(成交量差异百分比) DESC;
+
+问题：查询当前现货价格来源为"中国棉花信息网"的品种及其期现偏离度
+SELECT BIZ_DT, CLAS_NAME, SPOT_PRC_SRC AS 现货价格来源,
+    SPOT_PRC AS 现货价格,
+    near_mon_comd_clr_prc AS 近月合约结算价,
+    ROUND(prd_spot_prc_ske_rate * 100, 2) AS 期现偏离度_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND SPOT_PRC_SRC LIKE '%中国棉花信息网%'
+ORDER BY ABS(期现偏离度_百分比) DESC;
+
+问题：分析当前各交易类型（套保、投机、套利）的成交额占比
+SELECT BIZ_DT,
+    SUM(hdg_trd_amt) AS 套保总成交额,
+    SUM(spe_trd_amt) AS 投机总成交额,
+    SUM(cmb_trd_amt) AS 套利总成交额,
+    SUM(trd_amt) AS 总成交额,
+    ROUND(SUM(hdg_trd_amt) * 100.0 / SUM(trd_amt), 2) AS 套保成交额占比,
+    ROUND(SUM(spe_trd_amt) * 100.0 / SUM(trd_amt), 2) AS 投机成交额占比,
+    ROUND(SUM(cmb_trd_amt) * 100.0 / SUM(trd_amt), 2) AS 套利成交额占比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+GROUP BY BIZ_DT;
+
+问题：查询当前保证金标准最高的前10个品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, cp_flag,
+    tdy_clr_marg_std AS 当日结算保证金标准_百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND tdy_clr_marg_std IS NOT NULL
+ORDER BY tdy_clr_marg_std DESC
+LIMIT 10;
+
+问题：统计当前期权品种看涨看跌的行权量对比
+SELECT CLAS_NAME,
+    SUM(CASE WHEN cp_flag = 'C' THEN opt_exer_qty ELSE 0 END) AS 看涨期权行权量,
+    SUM(CASE WHEN cp_flag = 'P' THEN opt_exer_qty ELSE 0 END) AS 看跌期权行权量,
+    SUM(CASE WHEN cp_flag = 'C' THEN opt_exer_amt ELSE 0 END) AS 看涨期权行权额,
+    SUM(CASE WHEN cp_flag = 'P' THEN opt_exer_amt ELSE 0 END) AS 看跌期权行权额
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'O'
+GROUP BY CLAS_NAME
+HAVING SUM(opt_exer_qty) > 0
+ORDER BY (SUM(CASE WHEN cp_flag = 'C' THEN opt_exer_qty ELSE 0 END) + 
+          SUM(CASE WHEN cp_flag = 'P' THEN opt_exer_qty ELSE 0 END)) DESC;
+
+问题：查询近月合约持仓均价与近月合约结算价差异最大的品种
+SELECT BIZ_DT, CLAS_NAME, fut_opt_flag, near_mon_comd,
+    near_mon_comd_clr_prc AS 近月合约结算价,
+    near_mon_comd_hld_avg_prc AS 近月合约持仓均价,
+    ABS(near_mon_comd_clr_prc - near_mon_comd_hld_avg_prc) AS 价格差异,
+    ROUND(ABS(near_mon_comd_clr_prc - near_mon_comd_hld_avg_prc) * 100.0 / 
+          NULLIF(near_mon_comd_clr_prc, 0), 2) AS 价格差异百分比
+FROM dataqa.clas_info_stas_tab
+WHERE biz_dt = '2025-07-02'
+AND EXCH_CODE = 'CZCE'
+AND fut_opt_flag = 'F'
+AND near_mon_comd_clr_prc IS NOT NULL
+AND near_mon_comd_hld_avg_prc IS NOT NULL
+ORDER BY 价格差异 DESC
+LIMIT 1;

@@ -1,0 +1,224 @@
+问题：查询上海期货交易所所有仓库的铝品种注册仓单数量排名
+SELECT wh_abbr, reg_rcpt_qty, msr_unt
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'SHFE' AND clas_name = '铝'
+AND BIZ_DT = '2025-07-02'
+ORDER BY reg_rcpt_qty DESC;
+
+问题：统计各交易所品种数量和仓库数量的对比分析
+SELECT EXCH_NAME, 
+       COUNT(DISTINCT clas_name) AS variety_count,
+       COUNT(DISTINCT wh_abbr) AS warehouse_count,
+       ROUND(COUNT(DISTINCT clas_name)::numeric / COUNT(DISTINCT wh_abbr), 2) AS variety_per_warehouse
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY EXCH_NAME
+ORDER BY variety_count DESC;
+
+问题：查询郑商所各品种的交割单位和计量单位信息
+SELECT DISTINCT clas_name, CLAS_ABBR, clas_code, msr_unt, dlv_unt
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' AND dlv_unt IS NOT NULL
+AND BIZ_DT = '2025-07-02'
+ORDER BY clas_name;
+
+问题：分析各仓库的库存净变化量（入库-出库）排名前10
+SELECT wh_abbr, EXCH_NAME,
+       SUM(ined_wh_qty) AS total_in,
+       SUM(out_wh_qty) AS total_out,
+       SUM(ined_wh_qty - out_wh_qty) AS net_change
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY wh_abbr, EXCH_NAME
+ORDER BY net_change DESC
+LIMIT 10;
+
+问题：查询中国金融期货交易所的所有品种及其分布的仓库数量
+SELECT clas_name, COUNT(DISTINCT wh_abbr) AS warehouse_count,
+       STRING_AGG(DISTINCT wh_abbr, ', ') AS warehouse_list
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CFFEX'
+AND BIZ_DT = '2025-07-02'
+GROUP BY clas_name
+ORDER BY warehouse_count DESC;
+
+问题：统计各品种在不同交易所的计量单位分布情况
+SELECT clas_name, EXCH_NAME, msr_unt, COUNT(DISTINCT wh_abbr) AS warehouse_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02' AND msr_unt IS NOT NULL
+GROUP BY clas_name, EXCH_NAME, msr_unt
+ORDER BY clas_name, EXCH_NAME;
+
+问题：查询近30天内所有仓库的平均日入库量和出库量
+SELECT wh_abbr, EXCH_NAME,
+       ROUND(AVG(ined_wh_qty), 2) AS avg_daily_in,
+       ROUND(AVG(out_wh_qty), 2) AS avg_daily_out,
+       COUNT(DISTINCT BIZ_DT) AS trading_days
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT >= '2025-07-02'::date - INTERVAL '30 days'
+GROUP BY wh_abbr, EXCH_NAME
+HAVING COUNT(DISTINCT BIZ_DT) >= 15
+ORDER BY avg_daily_in DESC;
+
+问题：分析郑商所各品种的预报撤销率（预报撤销量/交割预报数量）
+SELECT clas_name, wh_abbr,
+       dlv_prct_qty,
+       pre_remove_qty,
+       CASE WHEN dlv_prct_qty > 0 
+            THEN ROUND((pre_remove_qty::numeric / dlv_prct_qty) * 100, 2)
+            ELSE NULL 
+       END AS cancel_rate_pct
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' AND dlv_prct_qty > 0
+AND BIZ_DT = '2025-07-02'
+ORDER BY cancel_rate_pct DESC NULLS LAST;
+
+问题：查询上海国际能源交易中心各品种的注册仓单集中度分析
+SELECT clas_name,
+       COUNT(DISTINCT wh_abbr) AS warehouse_count,
+       SUM(reg_rcpt_qty) AS total_registered,
+       MAX(reg_rcpt_qty) AS max_warehouse_qty,
+       CASE WHEN SUM(reg_rcpt_qty) > 0 
+            THEN ROUND((MAX(reg_rcpt_qty)::numeric / SUM(reg_rcpt_qty)) * 100, 2)
+            ELSE NULL 
+       END AS concentration_rate_pct
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'INE'
+AND BIZ_DT = '2025-07-02'
+GROUP BY clas_name
+ORDER BY concentration_rate_pct DESC NULLS LAST;
+
+问题：统计各仓库ID对应的仓库简称和所属交易所（仅郑商所）
+SELECT DISTINCT wh_id, wh_abbr, EXCH_NAME, COUNT(DISTINCT clas_name) AS variety_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' AND wh_id IS NOT NULL
+AND BIZ_DT = '2025-07-02'
+GROUP BY wh_id, wh_abbr, EXCH_NAME
+ORDER BY wh_id;
+
+问题：查询大连商品交易所库存周转率最高的前5个仓库
+SELECT wh_abbr,
+       SUM(ined_wh_qty) AS total_inbound,
+       SUM(out_wh_qty) AS total_outbound,
+       CASE WHEN SUM(ined_wh_qty) > 0 
+            THEN ROUND(SUM(out_wh_qty)::numeric / SUM(ined_wh_qty), 3)
+            ELSE NULL 
+       END AS turnover_ratio
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'DCE'
+AND BIZ_DT = '2025-07-02'
+GROUP BY wh_abbr
+HAVING SUM(ined_wh_qty) > 0
+ORDER BY turnover_ratio DESC
+LIMIT 5;
+
+问题：分析各品种简称与品种名称的对应关系（仅郑商所）
+SELECT DISTINCT clas_name, CLAS_ABBR, clas_code,
+       COUNT(DISTINCT wh_abbr) AS warehouse_count
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' AND CLAS_ABBR IS NOT NULL
+AND BIZ_DT = '2025-07-02'
+GROUP BY clas_name, CLAS_ABBR, clas_code
+ORDER BY clas_name;
+
+问题：查询注册仓单量与注销仓单量差值最大的前10个仓库品种组合
+SELECT wh_abbr, clas_name, EXCH_NAME,
+       reg_rcpt_qty,
+       cncl_rcpt_qty,
+       (reg_rcpt_qty - COALESCE(cncl_rcpt_qty, 0)) AS net_registered
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+ORDER BY net_registered DESC
+LIMIT 10;
+
+问题：统计各交易所下仓库的入库量标准差分析
+SELECT EXCH_NAME,
+       COUNT(DISTINCT wh_abbr) AS warehouse_count,
+       ROUND(AVG(ined_wh_qty), 2) AS avg_inbound,
+       ROUND(STDDEV(ined_wh_qty), 2) AS stddev_inbound,
+       ROUND(MAX(ined_wh_qty), 2) AS max_inbound,
+       ROUND(MIN(ined_wh_qty), 2) AS min_inbound
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY EXCH_NAME
+ORDER BY stddev_inbound DESC;
+
+问题：查询郑商所有效预报量为0但交割预报数量大于0的异常情况
+SELECT wh_abbr, clas_name, clas_code,
+       dlv_prct_qty,
+       vald_pre_qty,
+       pre_remove_qty,
+       dlv_unt
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' 
+AND dlv_prct_qty > 0 
+AND (vald_pre_qty = 0 OR vald_pre_qty IS NULL)
+AND BIZ_DT = '2025-07-02'
+ORDER BY dlv_prct_qty DESC;
+
+问题：分析各品种在不同交易所的注册仓单量占比分布
+WITH total_by_variety AS (
+    SELECT clas_name, SUM(reg_rcpt_qty) AS total_variety_qty
+    FROM dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE BIZ_DT = '2025-07-02'
+    GROUP BY clas_name
+)
+SELECT f.clas_name, f.EXCH_NAME,
+       SUM(f.reg_rcpt_qty) AS exchange_qty,
+       t.total_variety_qty,
+       ROUND((SUM(f.reg_rcpt_qty)::numeric / t.total_variety_qty) * 100, 2) AS percentage
+FROM dataqa.fut_makt_wh_rcpt_stas_tab f
+JOIN total_by_variety t ON f.clas_name = t.clas_name
+WHERE f.BIZ_DT = '2025-07-02' AND t.total_variety_qty > 0
+GROUP BY f.clas_name, f.EXCH_NAME, t.total_variety_qty
+ORDER BY f.clas_name, percentage DESC;
+
+问题：查询近一周每日各交易所的总入库量和出库量趋势
+SELECT BIZ_DT, EXCH_NAME,
+       SUM(ined_wh_qty) AS daily_total_in,
+       SUM(out_wh_qty) AS daily_total_out,
+       (SUM(ined_wh_qty) - SUM(out_wh_qty)) AS daily_net_change
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT >= '2025-07-02'::date - INTERVAL '7 days'
+GROUP BY BIZ_DT, EXCH_NAME
+ORDER BY BIZ_DT DESC, EXCH_NAME;
+
+问题：统计各仓库承载品种数量和主要交易所分布
+SELECT wh_abbr,
+       COUNT(DISTINCT clas_name) AS variety_count,
+       COUNT(DISTINCT EXCH_NAME) AS exchange_count,
+       STRING_AGG(DISTINCT EXCH_NAME, ', ') AS exchanges,
+       SUM(reg_rcpt_qty) AS total_registered
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE BIZ_DT = '2025-07-02'
+GROUP BY wh_abbr
+ORDER BY variety_count DESC, total_registered DESC;
+
+问题：查询郑商所注册仓单数量换算成吨数的排名（注册仓单数量×交割单位）
+SELECT wh_abbr, clas_name, 
+       reg_rcpt_qty,
+       dlv_unt,
+       (reg_rcpt_qty * COALESCE(dlv_unt, 1)) AS registered_tons,
+       msr_unt
+FROM dataqa.fut_makt_wh_rcpt_stas_tab
+WHERE EXCH_CODE = 'CZCE' 
+AND BIZ_DT = '2025-07-02'
+AND reg_rcpt_qty > 0
+ORDER BY registered_tons DESC;
+
+问题：分析各品种仓单活跃度（有注册仓单的仓库数/总仓库数）
+WITH variety_warehouses AS (
+    SELECT clas_name,
+           COUNT(DISTINCT wh_abbr) AS total_warehouses,
+           COUNT(DISTINCT CASE WHEN reg_rcpt_qty > 0 THEN wh_abbr END) AS active_warehouses
+    FROM dataqa.fut_makt_wh_rcpt_stas_tab
+    WHERE BIZ_DT = '2025-07-02'
+    GROUP BY clas_name
+)
+SELECT clas_name,
+       total_warehouses,
+       active_warehouses,
+       ROUND((active_warehouses::numeric / total_warehouses) * 100, 2) AS activity_rate_pct
+FROM variety_warehouses
+WHERE total_warehouses > 0
+ORDER BY activity_rate_pct DESC, total_warehouses DESC;

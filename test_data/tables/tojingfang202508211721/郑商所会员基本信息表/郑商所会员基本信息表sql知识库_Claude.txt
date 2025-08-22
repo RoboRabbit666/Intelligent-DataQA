@@ -1,0 +1,465 @@
+问题：分析各企业性质会员的注册资本分布和平均规模
+WITH capital_analysis AS (
+    SELECT corp_own,
+           COUNT(*) AS member_count,
+           ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital,
+           ROUND(STDDEV(CAST(reg_capi AS NUMERIC)), 2) AS capital_std_dev,
+           ROUND(MIN(CAST(reg_capi AS NUMERIC)), 2) AS min_capital,
+           ROUND(MAX(CAST(reg_capi AS NUMERIC)), 2) AS max_capital,
+           ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY CAST(reg_capi AS NUMERIC)), 2) AS median_capital
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND mem_status_code = 'N'
+    AND reg_capi IS NOT NULL 
+    AND reg_capi != ''
+    GROUP BY corp_own
+)
+SELECT corp_own,
+       member_count,
+       avg_capital,
+       median_capital,
+       capital_std_dev,
+       min_capital,
+       max_capital,
+       CASE 
+           WHEN avg_capital >= 100000 THEN '大型企业主导'
+           WHEN avg_capital >= 50000 THEN '中大型企业主导'
+           WHEN avg_capital >= 20000 THEN '中型企业主导'
+           ELSE '小型企业主导'
+       END AS capital_scale_level
+FROM capital_analysis
+ORDER BY avg_capital DESC;
+
+问题：查询会员入会时间分布和发展趋势分析（按季度统计）
+SELECT 
+    EXTRACT(YEAR FROM join_dt) AS join_year,
+    EXTRACT(QUARTER FROM join_dt) AS join_quarter,
+    COUNT(*) AS new_members,
+    STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types,
+    ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital_of_new_members,
+    COUNT(CASE WHEN ret_dt IS NOT NULL THEN 1 END) AS later_left_members
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND join_dt >= '2020-01-01'
+GROUP BY EXTRACT(YEAR FROM join_dt), EXTRACT(QUARTER FROM join_dt)
+ORDER BY join_year DESC, join_quarter DESC;
+
+问题：统计不同评级会员的地域分布和保障基金费率差异
+SELECT grade,
+       COUNT(*) AS member_count,
+       COUNT(DISTINCT reg_addr_prvc) AS province_count,
+       STRING_AGG(DISTINCT reg_addr_prvc, ', ') AS provinces,
+       ROUND(AVG(grd_fee_rate), 4) AS avg_fee_rate,
+       ROUND(MIN(grd_fee_rate), 4) AS min_fee_rate,
+       ROUND(MAX(grd_fee_rate), 4) AS max_fee_rate,
+       ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+AND grade IS NOT NULL
+GROUP BY grade
+ORDER BY 
+    CASE grade 
+        WHEN 'AAA' THEN 1 WHEN 'AA' THEN 2 WHEN 'A' THEN 3
+        WHEN 'BBB' THEN 4 WHEN 'BB' THEN 5 WHEN 'B' THEN 6
+        WHEN 'CCC' THEN 7 WHEN 'CC' THEN 8 WHEN 'C' THEN 9
+        WHEN 'D' THEN 10 WHEN 'Z' THEN 11 ELSE 12 END;
+
+问题：分析会员生命周期管理效率（入会到退会的时间分布）
+WITH member_lifecycle AS (
+    SELECT mem_no, mem_name, mem_type_code_desc,
+           join_dt, ret_dt,
+           CASE WHEN ret_dt IS NOT NULL 
+                THEN ret_dt - join_dt 
+                ELSE NULL END AS membership_duration_days,
+           EXTRACT(YEAR FROM join_dt) AS join_year,
+           EXTRACT(YEAR FROM ret_dt) AS retire_year
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND join_dt IS NOT NULL
+)
+SELECT 
+    CASE 
+        WHEN membership_duration_days IS NULL THEN '仍为会员'
+        WHEN membership_duration_days >= 3650 THEN '10年以上'
+        WHEN membership_duration_days >= 1825 THEN '5-10年'
+        WHEN membership_duration_days >= 1095 THEN '3-5年'
+        WHEN membership_duration_days >= 365 THEN '1-3年'
+        ELSE '不足1年'
+    END AS duration_category,
+    COUNT(*) AS member_count,
+    ROUND(AVG(membership_duration_days), 0) AS avg_duration_days,
+    STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types
+FROM member_lifecycle
+GROUP BY 
+    CASE 
+        WHEN membership_duration_days IS NULL THEN '仍为会员'
+        WHEN membership_duration_days >= 3650 THEN '10年以上'
+        WHEN membership_duration_days >= 1825 THEN '5-10年'
+        WHEN membership_duration_days >= 1095 THEN '3-5年'
+        WHEN membership_duration_days >= 365 THEN '1-3年'
+        ELSE '不足1年'
+    END
+ORDER BY 
+    CASE 
+        WHEN duration_category = '仍为会员' THEN 1
+        WHEN duration_category = '10年以上' THEN 2
+        WHEN duration_category = '5-10年' THEN 3
+        WHEN duration_category = '3-5年' THEN 4
+        WHEN duration_category = '1-3年' THEN 5
+        ELSE 6
+    END;
+
+问题：查询监管机构管辖范围和会员质量分析
+SELECT spvs_org_code,
+       COUNT(*) AS supervised_members,
+       COUNT(CASE WHEN mem_status_code = 'N' THEN 1 END) AS active_members,
+       COUNT(DISTINCT reg_addr_prvc) AS coverage_provinces,
+       ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital,
+       ROUND(COUNT(CASE WHEN mem_status_code = 'N' THEN 1 END) * 100.0 / COUNT(*), 2) AS active_ratio,
+       STRING_AGG(DISTINCT grade, ', ') AS grade_distribution
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND spvs_org_code IS NOT NULL
+GROUP BY spvs_org_code
+ORDER BY supervised_members DESC;
+
+问题：统计联系信息完整度和数据质量评估
+SELECT 
+    CASE 
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') AND
+             (ctc_mbl IS NOT NULL AND ctc_mbl != '') AND
+             (ctc_eml IS NOT NULL AND ctc_eml != '') AND
+             (ctc_fix_tel IS NOT NULL AND ctc_fix_tel != '') THEN '完整'
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') AND
+             (ctc_mbl IS NOT NULL AND ctc_mbl != '') THEN '基本完整'
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') THEN '仅有姓名'
+        ELSE '信息缺失'
+    END AS contact_completeness,
+    COUNT(*) AS member_count,
+    ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) AS percentage,
+    STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+GROUP BY 
+    CASE 
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') AND
+             (ctc_mbl IS NOT NULL AND ctc_mbl != '') AND
+             (ctc_eml IS NOT NULL AND ctc_eml != '') AND
+             (ctc_fix_tel IS NOT NULL AND ctc_fix_tel != '') THEN '完整'
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') AND
+             (ctc_mbl IS NOT NULL AND ctc_mbl != '') THEN '基本完整'
+        WHEN (ctc_name IS NOT NULL AND ctc_name != '') THEN '仅有姓名'
+        ELSE '信息缺失'
+    END
+ORDER BY member_count DESC;
+
+问题：分析注册地址与办公地址一致性和异地经营情况
+WITH address_analysis AS (
+    SELECT mem_no, mem_name, mem_type_code_desc,
+           reg_addr, ofc_addr, reg_addr_prvc,
+           CASE 
+               WHEN reg_addr = ofc_addr THEN '完全一致'
+               WHEN reg_addr_prvc = SUBSTRING(ofc_addr, 1, LENGTH(reg_addr_prvc)) THEN '同省异地'
+               WHEN ofc_addr IS NULL OR ofc_addr = '' THEN '无办公地址'
+               ELSE '跨省经营'
+           END AS address_relationship
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND mem_status_code = 'N'
+)
+SELECT address_relationship,
+       COUNT(*) AS member_count,
+       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) AS percentage,
+       STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types
+FROM address_analysis
+GROUP BY address_relationship
+ORDER BY member_count DESC;
+
+问题：查询保障基金费率历史变动频繁的会员及其变动模式
+WITH fee_rate_changes AS (
+    SELECT mem_no, mem_name,
+           COUNT(DISTINCT grd_fee_rate) AS rate_variations,
+           COUNT(DISTINCT efct_strt_dt) AS change_frequency,
+           ROUND(MIN(grd_fee_rate), 4) AS min_rate,
+           ROUND(MAX(grd_fee_rate), 4) AS max_rate,
+           ROUND(MAX(grd_fee_rate) - MIN(grd_fee_rate), 4) AS rate_range,
+           STRING_AGG(DISTINCT grade, ', ') AS grade_history
+    FROM dataqa.mem_base_info_tab
+    WHERE exch_code = 'CZCE'
+    AND grd_fee_rate IS NOT NULL
+    GROUP BY mem_no, mem_name
+    HAVING COUNT(DISTINCT grd_fee_rate) > 1
+)
+SELECT mem_name,
+       rate_variations,
+       change_frequency,
+       min_rate,
+       max_rate,
+       rate_range,
+       grade_history,
+       CASE 
+           WHEN change_frequency >= 5 THEN '频繁变动'
+           WHEN change_frequency >= 3 THEN '适度变动'
+           ELSE '少量变动'
+       END AS change_pattern
+FROM fee_rate_changes
+ORDER BY rate_range DESC, change_frequency DESC;
+
+问题：统计各省份会员密度和资本集中度分析
+WITH province_analysis AS (
+    SELECT reg_addr_prvc,
+           COUNT(*) AS total_members,
+           COUNT(CASE WHEN mem_status_code = 'N' THEN 1 END) AS active_members,
+           SUM(CAST(reg_capi AS NUMERIC)) AS total_capital,
+           ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital,
+           MAX(CAST(reg_capi AS NUMERIC)) AS max_capital,
+           COUNT(DISTINCT corp_own) AS ownership_diversity
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND reg_capi IS NOT NULL AND reg_capi != ''
+    GROUP BY reg_addr_prvc
+)
+SELECT reg_addr_prvc,
+       active_members,
+       total_capital,
+       avg_capital,
+       ownership_diversity,
+       ROUND(max_capital * 100.0 / total_capital, 2) AS capital_concentration_ratio,
+       CASE 
+           WHEN active_members >= 20 THEN '高密度'
+           WHEN active_members >= 10 THEN '中密度'
+           WHEN active_members >= 5 THEN '低密度'
+           ELSE '稀少分布'
+       END AS member_density
+FROM province_analysis
+ORDER BY active_members DESC;
+
+问题：分析会员评级年份分布和评级稳定性
+SELECT grade_year,
+       COUNT(*) AS graded_members,
+       COUNT(DISTINCT grade) AS grade_varieties,
+       STRING_AGG(DISTINCT grade, ', ') AS grades_assigned,
+       ROUND(AVG(grd_fee_rate), 4) AS avg_fee_rate,
+       COUNT(CASE WHEN grade IN ('AAA', 'AA', 'A') THEN 1 END) AS high_grade_count,
+       COUNT(CASE WHEN grade IN ('BBB', 'BB', 'B') THEN 1 END) AS medium_grade_count,
+       COUNT(CASE WHEN grade IN ('CCC', 'CC', 'C', 'D') THEN 1 END) AS low_grade_count
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+AND grade_year IS NOT NULL
+GROUP BY grade_year
+ORDER BY grade_year DESC;
+
+问题：查询统一社会信用代码规范性和重复性检查
+WITH credit_code_analysis AS (
+    SELECT scil_crdt_code,
+           COUNT(*) AS usage_count,
+           STRING_AGG(mem_name, ', ') AS members_with_code,
+           CHAR_LENGTH(scil_crdt_code) AS code_length,
+           CASE 
+               WHEN scil_crdt_code ~ '^[0-9A-Z]{18}$' THEN '标准18位'
+               WHEN scil_crdt_code ~ '^[0-9]{15}$' THEN '旧15位代码'
+               WHEN scil_crdt_code IS NULL OR scil_crdt_code = '' THEN '缺失'
+               ELSE '格式异常'
+           END AS code_format
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND mem_status_code = 'N'
+    GROUP BY scil_crdt_code
+)
+SELECT code_format,
+       COUNT(*) AS code_count,
+       COUNT(CASE WHEN usage_count > 1 THEN 1 END) AS duplicate_codes,
+       ROUND(AVG(code_length), 1) AS avg_code_length,
+       SUM(usage_count) AS total_member_records
+FROM credit_code_analysis
+GROUP BY code_format
+ORDER BY total_member_records DESC;
+
+问题：分析会员类型结构变化和转换情况
+WITH member_type_analysis AS (
+    SELECT mem_no, mem_name,
+           COUNT(DISTINCT mem_type_code) AS type_variations,
+           STRING_AGG(DISTINCT mem_type_code_desc, ' -> ') AS type_evolution,
+           MIN(join_dt) AS first_join_date,
+           MAX(CASE WHEN ret_dt IS NOT NULL THEN ret_dt ELSE biz_dt END) AS last_active_date
+    FROM dataqa.mem_base_info_tab
+    WHERE exch_code = 'CZCE'
+    GROUP BY mem_no, mem_name
+)
+SELECT 
+    CASE 
+        WHEN type_variations > 1 THEN '类型转换'
+        ELSE '类型稳定'
+    END AS type_stability,
+    COUNT(*) AS member_count,
+    STRING_AGG(DISTINCT type_evolution, '; ') AS common_evolutions,
+    ROUND(AVG(last_active_date - first_join_date), 0) AS avg_membership_days
+FROM member_type_analysis
+GROUP BY 
+    CASE 
+        WHEN type_variations > 1 THEN '类型转换'
+        ELSE '类型稳定'
+    END
+ORDER BY member_count DESC;
+
+问题：查询会员注册币种分布和外资参与情况
+SELECT reg_crrc,
+       COUNT(*) AS member_count,
+       COUNT(CASE WHEN corp_own IN ('310', '320', '330', '340', '210', '220', '230', '240') THEN 1 END) AS foreign_invested,
+       ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital,
+       ROUND(SUM(CAST(reg_capi AS NUMERIC)), 2) AS total_capital,
+       STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+AND reg_crrc IS NOT NULL
+GROUP BY reg_crrc
+ORDER BY member_count DESC;
+
+问题：统计法人代表管理跨度分析（一人担任多家会员法人）
+WITH legal_rep_analysis AS (
+    SELECT legal_rep,
+           COUNT(DISTINCT mem_no) AS companies_managed,
+           STRING_AGG(mem_abbr, ', ') AS company_list,
+           STRING_AGG(DISTINCT grade, ', ') AS grade_range,
+           SUM(CAST(reg_capi AS NUMERIC)) AS total_managed_capital
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND mem_status_code = 'N'
+    AND legal_rep IS NOT NULL AND legal_rep != ''
+    GROUP BY legal_rep
+    HAVING COUNT(DISTINCT mem_no) > 1
+)
+SELECT legal_rep,
+       companies_managed,
+       company_list,
+       grade_range,
+       ROUND(total_managed_capital, 2) AS total_capital,
+       CASE 
+           WHEN companies_managed >= 5 THEN '高管理跨度'
+           WHEN companies_managed >= 3 THEN '中管理跨度'
+           ELSE '低管理跨度'
+       END AS management_span
+FROM legal_rep_analysis
+ORDER BY companies_managed DESC, total_managed_capital DESC;
+
+问题：分析会员网站信息完整度和数字化程度
+SELECT 
+    CASE 
+        WHEN corp_web_url IS NOT NULL AND corp_web_url != '' THEN '有网站'
+        ELSE '无网站'
+    END AS website_status,
+    COUNT(*) AS member_count,
+    ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) AS percentage,
+    STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types,
+    ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+GROUP BY 
+    CASE 
+        WHEN corp_web_url IS NOT NULL AND corp_web_url != '' THEN '有网站'
+        ELSE '无网站'
+    END
+ORDER BY member_count DESC;
+
+问题：查询会员状态异常和数据质量问题识别
+WITH data_quality_check AS (
+    SELECT mem_no, mem_name,
+           CASE 
+               WHEN mem_status_code = 'N' AND ret_dt IS NOT NULL AND ret_dt <= biz_dt THEN '状态退会不一致'
+               WHEN join_dt > biz_dt THEN '加入日期异常'
+               WHEN ret_dt IS NOT NULL AND ret_dt < join_dt THEN '退会早于加入'
+               WHEN reg_capi IS NULL OR reg_capi = '' THEN '注册资本缺失'
+               WHEN scil_crdt_code IS NULL OR scil_crdt_code = '' THEN '信用代码缺失'
+               WHEN legal_rep IS NULL OR legal_rep = '' THEN '法人代表缺失'
+               ELSE '数据正常'
+           END AS data_issue
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+)
+SELECT data_issue,
+       COUNT(*) AS issue_count,
+       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) AS percentage
+FROM data_quality_check
+GROUP BY data_issue
+ORDER BY issue_count DESC;
+
+问题：分析保障基金费率与会员评级的相关性验证
+WITH grade_fee_correlation AS (
+    SELECT grade, grd_fee_rate,
+           COUNT(*) AS member_count,
+           CASE 
+               WHEN grade = 'AAA' AND grd_fee_rate != (SELECT MIN(grd_fee_rate) FROM dataqa.mem_base_info_tab WHERE grade = 'AAA' AND biz_dt = '2025-07-02' AND exch_code = 'CZCE') THEN '费率异常'
+               WHEN grade = 'Z' AND grd_fee_rate != 0 THEN '费率异常'
+               ELSE '费率正常'
+           END AS rate_consistency
+    FROM dataqa.mem_base_info_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND mem_status_code = 'N'
+    AND grade IS NOT NULL
+    AND grd_fee_rate IS NOT NULL
+    GROUP BY grade, grd_fee_rate
+)
+SELECT grade,
+       COUNT(DISTINCT grd_fee_rate) AS rate_varieties,
+       ROUND(MIN(grd_fee_rate), 4) AS min_rate,
+       ROUND(MAX(grd_fee_rate), 4) AS max_rate,
+       SUM(member_count) AS total_members,
+       COUNT(CASE WHEN rate_consistency = '费率异常' THEN 1 END) AS anomaly_records
+FROM grade_fee_correlation
+GROUP BY grade
+ORDER BY 
+    CASE grade 
+        WHEN 'AAA' THEN 1 WHEN 'AA' THEN 2 WHEN 'A' THEN 3
+        WHEN 'BBB' THEN 4 WHEN 'BB' THEN 5 WHEN 'B' THEN 6
+        WHEN 'CCC' THEN 7 WHEN 'CC' THEN 8 WHEN 'C' THEN 9
+        WHEN 'D' THEN 10 WHEN 'Z' THEN 11 ELSE 12 END;
+
+问题：统计各年度会员退会情况和退会原因分析
+SELECT 
+    EXTRACT(YEAR FROM ret_dt) AS retire_year,
+    COUNT(*) AS retired_members,
+    STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types,
+    ROUND(AVG(ret_dt - join_dt), 0) AS avg_membership_duration_days,
+    ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_capital_of_retired,
+    COUNT(CASE WHEN grade IN ('D', 'C', 'CC', 'CCC') THEN 1 END) AS low_grade_retirements
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND ret_dt IS NOT NULL
+AND ret_dt >= '2020-01-01'
+GROUP BY EXTRACT(YEAR FROM ret_dt)
+ORDER BY retire_year DESC;
+
+问题：查询联系人职务分布和管理层结构分析
+SELECT ctc_duty,
+       COUNT(*) AS contact_count,
+       COUNT(DISTINCT mem_no) AS member_count,
+       STRING_AGG(DISTINCT mem_type_code_desc, ', ') AS member_types,
+       ROUND(AVG(CAST(reg_capi AS NUMERIC)), 2) AS avg_member_capital
+FROM dataqa.mem_base_info_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND mem_status_code = 'N'
+AND ctc_duty IS NOT NULL AND ctc_duty != ''
+GROUP BY ctc_duty
+ORDER BY contact_count DESC;

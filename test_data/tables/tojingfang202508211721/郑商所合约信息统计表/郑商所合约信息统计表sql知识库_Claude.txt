@@ -1,0 +1,491 @@
+问题：分析各品种期货与期权的流动性差异和市场结构特征
+WITH liquidity_analysis AS (
+    SELECT clas_code, clas_name, fut_opt_flag,
+           COUNT(*) AS contract_count,
+           SUM(trd_qty) AS total_volume,
+           SUM(hld_qty) AS total_position,
+           SUM(trd_amt) AS total_amount,
+           AVG(trd_hld_rate) AS avg_turnover_ratio,
+           COUNT(CASE WHEN trd_qty > 0 THEN 1 END) AS active_contracts,
+           MAX(trd_qty) AS max_contract_volume,
+           STDDEV(trd_qty) AS volume_volatility
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND l_trade_date > '2025-07-02'
+    GROUP BY clas_code, clas_name, fut_opt_flag
+)
+SELECT clas_name,
+       SUM(CASE WHEN fut_opt_flag = 'F' THEN total_volume END) AS futures_volume,
+       SUM(CASE WHEN fut_opt_flag = 'O' THEN total_volume END) AS options_volume,
+       SUM(CASE WHEN fut_opt_flag = 'F' THEN contract_count END) AS futures_contracts,
+       SUM(CASE WHEN fut_opt_flag = 'O' THEN contract_count END) AS options_contracts,
+       ROUND(SUM(CASE WHEN fut_opt_flag = 'O' THEN total_volume END) * 100.0 / 
+             NULLIF(SUM(CASE WHEN fut_opt_flag = 'F' THEN total_volume END), 0), 2) AS options_futures_volume_ratio,
+       ROUND(AVG(CASE WHEN fut_opt_flag = 'F' THEN avg_turnover_ratio END), 4) AS futures_avg_turnover,
+       ROUND(AVG(CASE WHEN fut_opt_flag = 'O' THEN avg_turnover_ratio END), 4) AS options_avg_turnover
+FROM liquidity_analysis
+GROUP BY clas_name
+ORDER BY options_futures_volume_ratio DESC;
+
+问题：查询期权实平虚值分布及其交易活跃度分析
+SELECT clas_name, cp_flag_desc, ioa_code_desc,
+       COUNT(*) AS contract_count,
+       SUM(trd_qty) AS total_volume,
+       SUM(hld_qty) AS total_position,
+       ROUND(AVG(opt_impl_volt), 4) AS avg_implied_volatility,
+       ROUND(AVG(exec_prc), 2) AS avg_strike_price,
+       COUNT(CASE WHEN trd_qty > 0 THEN 1 END) AS active_contracts,
+       ROUND(SUM(trd_qty) * 100.0 / 
+             SUM(SUM(trd_qty)) OVER (PARTITION BY clas_name), 2) AS volume_share_in_variety
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'O'
+AND l_trade_date > '2025-07-02'
+AND ioa_code_desc IS NOT NULL
+GROUP BY clas_name, cp_flag_desc, ioa_code_desc
+ORDER BY clas_name, cp_flag_desc, 
+    CASE ioa_code_desc 
+        WHEN '实值' THEN 1 
+        WHEN '平值' THEN 2 
+        WHEN '虚值' THEN 3 
+    END;
+
+问题：分析各品种主力合约与近月合约的价格差异和风险特征
+WITH contract_analysis AS (
+    SELECT clas_name, comd_code, comd_name,
+           is_main_comd, near_mon_comd_logo,
+           clr_prc, trd_qty, hld_qty,
+           spr_settlement, ral_hld_qty,
+           llm_status_code_desc, llm_days
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'F'
+    AND (is_main_comd = 'Y' OR near_mon_comd_logo = 'Y')
+)
+SELECT clas_name,
+       MAX(CASE WHEN is_main_comd = 'Y' THEN comd_name END) AS main_contract,
+       MAX(CASE WHEN is_main_comd = 'Y' THEN clr_prc END) AS main_settlement_price,
+       MAX(CASE WHEN is_main_comd = 'Y' THEN trd_qty END) AS main_volume,
+       MAX(CASE WHEN near_mon_comd_logo = 'Y' THEN comd_name END) AS near_contract,
+       MAX(CASE WHEN near_mon_comd_logo = 'Y' THEN clr_prc END) AS near_settlement_price,
+       MAX(CASE WHEN near_mon_comd_logo = 'Y' THEN trd_qty END) AS near_volume,
+       ROUND(MAX(CASE WHEN is_main_comd = 'Y' THEN clr_prc END) - 
+             MAX(CASE WHEN near_mon_comd_logo = 'Y' THEN clr_prc END), 2) AS price_spread,
+       MAX(CASE WHEN is_main_comd = 'Y' THEN llm_status_code_desc END) AS main_limit_status
+FROM contract_analysis
+GROUP BY clas_name
+HAVING MAX(CASE WHEN is_main_comd = 'Y' THEN clr_prc END) IS NOT NULL
+AND MAX(CASE WHEN near_mon_comd_logo = 'Y' THEN clr_prc END) IS NOT NULL
+ORDER BY ABS(price_spread) DESC;
+
+问题：统计连续单边市风险预警和涨跌停分布情况
+SELECT clas_name,
+       COUNT(*) AS total_contracts,
+       COUNT(CASE WHEN llm_status_code = 'U' THEN 1 END) AS limit_up_contracts,
+       COUNT(CASE WHEN llm_status_code = 'D' THEN 1 END) AS limit_down_contracts,
+       COUNT(CASE WHEN llm_days >= 3 THEN 1 END) AS continuous_limit_contracts,
+       MAX(llm_days) AS max_continuous_days,
+       ROUND(AVG(CASE WHEN llm_days > 0 THEN llm_days END), 2) AS avg_limit_days,
+       STRING_AGG(CASE WHEN llm_days >= 3 THEN comd_name END, ', ') AS high_risk_contracts
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+AND l_trade_date > '2025-07-02'
+GROUP BY clas_name
+ORDER BY continuous_limit_contracts DESC, max_continuous_days DESC;
+
+问题：分析期权隐含波动率分布和市场情绪指标
+WITH volatility_analysis AS (
+    SELECT clas_name, opt_ser_code, cp_flag_desc,
+           COUNT(*) AS option_count,
+           ROUND(AVG(opt_impl_volt), 4) AS avg_implied_vol,
+           ROUND(STDDEV(opt_impl_volt), 4) AS vol_std_dev,
+           ROUND(MIN(opt_impl_volt), 4) AS min_implied_vol,
+           ROUND(MAX(opt_impl_volt), 4) AS max_implied_vol,
+           SUM(trd_qty) AS total_volume,
+           SUM(hld_qty) AS total_position
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'O'
+    AND opt_impl_volt IS NOT NULL
+    AND l_trade_date > '2025-07-02'
+    GROUP BY clas_name, opt_ser_code, cp_flag_desc
+)
+SELECT clas_name,
+       COUNT(DISTINCT opt_ser_code) AS option_series_count,
+       ROUND(AVG(avg_implied_vol), 4) AS overall_avg_vol,
+       ROUND(MAX(avg_implied_vol) - MIN(avg_implied_vol), 4) AS vol_range,
+       ROUND(AVG(CASE WHEN cp_flag_desc = '看涨' THEN avg_implied_vol END), 4) AS call_avg_vol,
+       ROUND(AVG(CASE WHEN cp_flag_desc = '看跌' THEN avg_implied_vol END), 4) AS put_avg_vol,
+       SUM(total_volume) AS variety_total_volume,
+       CASE 
+           WHEN AVG(avg_implied_vol) >= 0.3 THEN '高波动'
+           WHEN AVG(avg_implied_vol) >= 0.2 THEN '中波动'
+           ELSE '低波动'
+       END AS volatility_level
+FROM volatility_analysis
+GROUP BY clas_name
+ORDER BY overall_avg_vol DESC;
+
+问题：查询交割月合约的风险监控和交割准备情况
+SELECT clas_name, comd_code, comd_name,
+       lst_dt, l_trade_date,
+       trd_qty, hld_qty, trd_clit_qty, hld_clit_qty,
+       dlv_mch_qty, dlv_clr_prc,
+       clr_prc, l_clr_prc,
+       (l_trade_date - '2025-07-02'::date) AS days_to_expiry,
+       ROUND(hld_qty / NULLIF(trd_qty, 0), 2) AS position_volume_ratio,
+       llm_status_code_desc,
+       CASE 
+           WHEN (l_trade_date - '2025-07-02'::date) <= 5 THEN '即将到期'
+           WHEN (l_trade_date - '2025-07-02'::date) <= 15 THEN '临近到期'
+           ELSE '正常'
+       END AS expiry_risk_level
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+AND EXTRACT(YEAR FROM '2025-07-02'::date) = EXTRACT(YEAR FROM l_trade_date) 
+AND EXTRACT(MONTH FROM '2025-07-02'::date) = EXTRACT(MONTH FROM l_trade_date)
+ORDER BY days_to_expiry ASC, hld_qty DESC;
+
+问题：分析农产品与非农产品的交易模式差异
+SELECT is_prod_desc,
+       COUNT(DISTINCT clas_code) AS variety_count,
+       COUNT(*) AS total_contracts,
+       SUM(trd_qty) AS total_volume,
+       SUM(hld_qty) AS total_position,
+       SUM(trd_amt) AS total_amount,
+       ROUND(AVG(trd_hld_rate), 4) AS avg_turnover_ratio,
+       ROUND(AVG(clr_prc), 2) AS avg_settlement_price,
+       COUNT(CASE WHEN fut_opt_flag = 'F' THEN 1 END) AS futures_contracts,
+       COUNT(CASE WHEN fut_opt_flag = 'O' THEN 1 END) AS options_contracts,
+       ROUND(SUM(hdg_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS hedge_ratio,
+       ROUND(SUM(spe_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS speculation_ratio
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+GROUP BY is_prod_desc
+ORDER BY total_volume DESC;
+
+问题：统计各品种的交易成本结构和手续费分析
+SELECT clas_name, fut_opt_flag,
+       COUNT(*) AS contract_count,
+       ROUND(AVG(trd_cmsn_fee_std), 4) AS avg_trading_fee_std,
+       ROUND(AVG(cth_trd_cmsn_fee), 2) AS avg_intraday_fee,
+       ROUND(AVG(dlv_cmsn_fee_std), 4) AS avg_delivery_fee_std,
+       ROUND(AVG(trd_marg_std), 2) AS avg_margin_std,
+       SUM(trd_cmsn_fee) AS total_trading_fees,
+       SUM(trd_qty) AS total_volume,
+       ROUND(SUM(trd_cmsn_fee) / NULLIF(SUM(trd_qty), 0), 4) AS effective_fee_per_lot
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+AND trd_cmsn_fee_std IS NOT NULL
+GROUP BY clas_name, fut_opt_flag
+ORDER BY clas_name, fut_opt_flag;
+
+问题：查询期权系列的价格发现效率和套利机会识别
+WITH option_series_analysis AS (
+    SELECT opt_ser_code, clas_name,
+           COUNT(*) AS option_count,
+           COUNT(CASE WHEN cp_flag = 'C' THEN 1 END) AS call_count,
+           COUNT(CASE WHEN cp_flag = 'P' THEN 1 END) AS put_count,
+           ROUND(AVG(CASE WHEN cp_flag = 'C' THEN clr_prc END), 2) AS avg_call_price,
+           ROUND(AVG(CASE WHEN cp_flag = 'P' THEN clr_prc END), 2) AS avg_put_price,
+           ROUND(AVG(CASE WHEN cp_flag = 'C' THEN opt_impl_volt END), 4) AS avg_call_vol,
+           ROUND(AVG(CASE WHEN cp_flag = 'P' THEN opt_impl_volt END), 4) AS avg_put_vol,
+           ROUND(MAX(exec_prc) - MIN(exec_prc), 2) AS strike_range,
+           SUM(trd_qty) AS series_volume
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'O'
+    AND opt_ser_code IS NOT NULL
+    AND l_trade_date > '2025-07-02'
+    GROUP BY opt_ser_code, clas_name
+)
+SELECT opt_ser_code, clas_name,
+       option_count, call_count, put_count,
+       avg_call_price, avg_put_price,
+       avg_call_vol, avg_put_vol,
+       ROUND(ABS(avg_call_vol - avg_put_vol), 4) AS vol_skew,
+       strike_range, series_volume,
+       CASE 
+           WHEN ABS(avg_call_vol - avg_put_vol) >= 0.05 THEN '波动率偏斜明显'
+           WHEN ABS(avg_call_vol - avg_put_vol) >= 0.02 THEN '波动率偏斜适中'
+           ELSE '波动率偏斜较小'
+       END AS vol_skew_level
+FROM option_series_analysis
+WHERE call_count > 0 AND put_count > 0
+ORDER BY vol_skew DESC;
+
+问题：分析合约生命周期和退市风险预警
+WITH contract_lifecycle AS (
+    SELECT clas_name, comd_code, comd_name, fut_opt_flag,
+           lst_dt, l_trade_date,
+           (l_trade_date - lst_dt) AS total_lifecycle_days,
+           (l_trade_date - '2025-07-02'::date) AS remaining_days,
+           trd_qty, hld_qty, cont_lqd_qty_days,
+           CASE 
+               WHEN (l_trade_date - '2025-07-02'::date) <= 3 THEN '紧急'
+               WHEN (l_trade_date - '2025-07-02'::date) <= 7 THEN '高风险'
+               WHEN (l_trade_date - '2025-07-02'::date) <= 15 THEN '中风险'
+               WHEN (l_trade_date - '2025-07-02'::date) <= 30 THEN '低风险'
+               ELSE '正常'
+           END AS delisting_risk_level
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND l_trade_date >= '2025-07-02'
+)
+SELECT delisting_risk_level,
+       COUNT(*) AS contract_count,
+       COUNT(CASE WHEN fut_opt_flag = 'F' THEN 1 END) AS futures_count,
+       COUNT(CASE WHEN fut_opt_flag = 'O' THEN 1 END) AS options_count,
+       ROUND(AVG(remaining_days), 1) AS avg_remaining_days,
+       SUM(trd_qty) AS total_volume,
+       SUM(hld_qty) AS total_position,
+       COUNT(CASE WHEN cont_lqd_qty_days > 0 THEN 1 END) AS inactive_contracts
+FROM contract_lifecycle
+GROUP BY delisting_risk_level
+ORDER BY 
+    CASE delisting_risk_level 
+        WHEN '紧急' THEN 1 WHEN '高风险' THEN 2 WHEN '中风险' THEN 3 
+        WHEN '低风险' THEN 4 ELSE 5 END;
+
+问题：查询套保、投机、套利交易结构分析
+SELECT clas_name, fut_opt_flag,
+       SUM(hdg_trd_qty) AS total_hedge_volume,
+       SUM(spe_trd_qty) AS total_speculation_volume,
+       SUM(cmb_trd_qty) AS total_arbitrage_volume,
+       SUM(trd_qty) AS total_volume,
+       ROUND(SUM(hdg_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS hedge_ratio,
+       ROUND(SUM(spe_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS speculation_ratio,
+       ROUND(SUM(cmb_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS arbitrage_ratio,
+       SUM(hdg_hld_qty) AS total_hedge_position,
+       SUM(spe_hld_qty) AS total_speculation_position,
+       SUM(cmb_hld_qty) AS total_arbitrage_position,
+       CASE 
+           WHEN SUM(hdg_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 40 THEN '套保主导'
+           WHEN SUM(spe_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 60 THEN '投机主导'
+           WHEN SUM(cmb_trd_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 20 THEN '套利活跃'
+           ELSE '均衡交易'
+       END AS trading_pattern
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+GROUP BY clas_name, fut_opt_flag
+ORDER BY total_volume DESC;
+
+问题：分析历史价格极值和技术指标
+SELECT clas_name, comd_code, comd_name,
+       clr_prc, hist_highest_prc, hist_lowest_prc,
+       ROUND((clr_prc - hist_lowest_prc) * 100.0 / 
+             NULLIF(hist_highest_prc - hist_lowest_prc, 0), 2) AS price_position_ratio,
+       ROUND((clr_prc - l_clr_prc) * 100.0 / NULLIF(l_clr_prc, 0), 2) AS daily_change_pct,
+       ROUND((hist_highest_prc - hist_lowest_prc) * 100.0 / NULLIF(hist_lowest_prc, 0), 2) AS historical_range_pct,
+       trd_qty, hld_qty, ral_hld_qty,
+       CASE 
+           WHEN (clr_prc - hist_lowest_prc) * 100.0 / NULLIF(hist_highest_prc - hist_lowest_prc, 0) >= 80 THEN '接近历史高位'
+           WHEN (clr_prc - hist_lowest_prc) * 100.0 / NULLIF(hist_highest_prc - hist_lowest_prc, 0) <= 20 THEN '接近历史低位'
+           ELSE '中位运行'
+       END AS price_level_status
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+AND is_main_comd = 'Y'
+AND hist_highest_prc IS NOT NULL 
+AND hist_lowest_prc IS NOT NULL
+ORDER BY price_position_ratio DESC;
+
+问题：统计期权行权和放弃行权的市场行为分析
+SELECT clas_name, cp_flag_desc,
+       COUNT(*) AS option_contracts,
+       SUM(opt_exer_qty) AS total_exercise_volume,
+       SUM(wive_exer_qty) AS total_waiver_volume,
+       SUM(hld_qty) AS total_position,
+       ROUND(SUM(opt_exer_qty) * 100.0 / NULLIF(SUM(hld_qty), 0), 2) AS exercise_ratio,
+       ROUND(SUM(wive_exer_qty) * 100.0 / NULLIF(SUM(hld_qty), 0), 2) AS waiver_ratio,
+       COUNT(CASE WHEN ioa_code_desc = '实值' THEN 1 END) AS in_money_contracts,
+       COUNT(CASE WHEN ioa_code_desc = '虚值' THEN 1 END) AS out_money_contracts,
+       ROUND(AVG(CASE WHEN ioa_code_desc = '实值' THEN opt_exer_qty END), 2) AS avg_itm_exercise,
+       ROUND(AVG(CASE WHEN ioa_code_desc = '虚值' THEN wive_exer_qty END), 2) AS avg_otm_waiver
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'O'
+AND l_trade_date > '2025-07-02'
+AND (opt_exer_qty > 0 OR wive_exer_qty > 0)
+GROUP BY clas_name, cp_flag_desc
+ORDER BY total_exercise_volume DESC;
+
+问题：查询平今仓交易模式和短线投机分析
+SELECT clas_name, fut_opt_flag,
+       COUNT(*) AS contract_count,
+       SUM(trd_qty) AS total_volume,
+       SUM(cth_qty) AS total_intraday_close,
+       SUM(open_trade_qty) AS total_open_volume,
+       SUM(liq_trd_qty) AS total_close_volume,
+       ROUND(SUM(cth_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS intraday_close_ratio,
+       ROUND(SUM(cth_amt) / NULLIF(SUM(cth_qty), 0), 2) AS avg_intraday_price,
+       SUM(cth_trd_cmsn_fee) AS total_intraday_fees,
+       ROUND(SUM(cth_trd_cmsn_fee) / NULLIF(SUM(cth_qty), 0), 4) AS fee_per_intraday_lot,
+       CASE 
+           WHEN SUM(cth_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 50 THEN '高频交易主导'
+           WHEN SUM(cth_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 30 THEN '短线交易活跃'
+           WHEN SUM(cth_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 15 THEN '适度短线交易'
+           ELSE '持仓交易主导'
+       END AS trading_style
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+GROUP BY clas_name, fut_opt_flag
+HAVING SUM(trd_qty) > 0
+ORDER BY intraday_close_ratio DESC;
+
+问题：分析期转现交易和现货市场联动情况
+SELECT clas_name,
+       COUNT(CASE WHEN efp_qty > 0 THEN 1 END) AS efp_active_contracts,
+       SUM(efp_qty) AS total_efp_volume,
+       SUM(efp_amt) AS total_efp_amount,
+       SUM(trd_qty) AS total_trading_volume,
+       SUM(dlv_mch_qty) AS total_delivery_volume,
+       ROUND(SUM(efp_qty) * 100.0 / NULLIF(SUM(trd_qty), 0), 2) AS efp_ratio,
+       ROUND(SUM(efp_amt) / NULLIF(SUM(efp_qty), 0), 2) AS avg_efp_price,
+       ROUND(SUM(dlv_mch_qty) * 100.0 / NULLIF(SUM(hld_qty), 0), 2) AS delivery_ratio,
+       CASE 
+           WHEN SUM(efp_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 5 THEN '期转现活跃'
+           WHEN SUM(efp_qty) * 100.0 / NULLIF(SUM(trd_qty), 0) >= 1 THEN '期转现适中'
+           WHEN SUM(efp_qty) > 0 THEN '期转现较少'
+           ELSE '无期转现'
+       END AS efp_activity_level
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND fut_opt_flag = 'F'
+AND l_trade_date > '2025-07-02'
+GROUP BY clas_name
+ORDER BY total_efp_volume DESC;
+
+问题：查询交易客户参与度和市场集中度分析
+SELECT clas_name, fut_opt_flag,
+       COUNT(*) AS total_contracts,
+       SUM(trd_clit_qty) AS total_trading_clients,
+       SUM(hld_clit_qty) AS total_holding_clients,
+       SUM(have_trd_ord_clit_cnt) AS total_order_clients,
+       SUM(trd_qty) AS total_volume,
+       SUM(hld_qty) AS total_position,
+       ROUND(SUM(trd_qty) / NULLIF(SUM(trd_clit_qty), 0), 2) AS volume_per_client,
+       ROUND(SUM(hld_qty) / NULLIF(SUM(hld_clit_qty), 0), 2) AS position_per_client,
+       ROUND(SUM(trd_clit_qty) * 100.0 / NULLIF(SUM(have_trd_ord_clit_cnt), 0), 2) AS order_conversion_ratio,
+       CASE 
+           WHEN SUM(trd_qty) / NULLIF(SUM(trd_clit_qty), 0) >= 100 THEN '高集中度'
+           WHEN SUM(trd_qty) / NULLIF(SUM(trd_clit_qty), 0) >= 50 THEN '中集中度'
+           ELSE '分散交易'
+       END AS market_concentration
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+AND trd_clit_qty > 0
+GROUP BY clas_name, fut_opt_flag
+ORDER BY volume_per_client DESC;
+
+问题：统计交易限制和风险控制措施执行情况
+SELECT clas_name, fut_opt_flag,
+       COUNT(*) AS contract_count,
+       ROUND(AVG(hld_quta), 0) AS avg_position_limit,
+       ROUND(AVG(trd_quta), 0) AS avg_trading_limit,
+       ROUND(AVG(lmtorder_lmt), 0) AS avg_limit_order_size,
+       ROUND(AVG(mx_mktorder_lmt), 0) AS avg_market_order_size,
+       MAX(hld_qty) AS max_actual_position,
+       MAX(trd_qty) AS max_actual_volume,
+       COUNT(CASE WHEN hld_qty >= hld_quta * 0.8 THEN 1 END) AS near_limit_contracts,
+       ROUND(MAX(hld_qty) * 100.0 / NULLIF(AVG(hld_quta), 0), 2) AS max_position_utilization,
+       CASE 
+           WHEN COUNT(CASE WHEN hld_qty >= hld_quta * 0.8 THEN 1 END) > 0 THEN '接近限额'
+           WHEN MAX(hld_qty) * 100.0 / NULLIF(AVG(hld_quta), 0) >= 60 THEN '中度风险'
+           ELSE '风险较低'
+       END AS risk_level
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+AND hld_quta IS NOT NULL
+GROUP BY clas_name, fut_opt_flag
+ORDER BY max_position_utilization DESC;
+
+问题：分析各品种价格波动幅度和市场稳定性
+WITH price_volatility AS (
+    SELECT clas_name, comd_code,
+           clr_prc, l_clr_prc, 
+           highest_trd_prc, lowest_trd_prc,
+           mx_urng, mx_drng,
+           ABS(spr_settlement) AS abs_settlement_change,
+           (highest_trd_prc - lowest_trd_prc) AS daily_range,
+           ROUND((highest_trd_prc - lowest_trd_prc) * 100.0 / NULLIF(clr_prc, 0), 2) AS daily_volatility_pct,
+           trd_qty, hld_qty
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = '2025-07-02' 
+    AND exch_code = 'CZCE'
+    AND fut_opt_flag = 'F'
+    AND l_trade_date > '2025-07-02'
+    AND highest_trd_prc IS NOT NULL 
+    AND lowest_trd_prc IS NOT NULL
+)
+SELECT clas_name,
+       COUNT(*) AS contract_count,
+       ROUND(AVG(daily_volatility_pct), 2) AS avg_daily_volatility,
+       ROUND(STDDEV(daily_volatility_pct), 2) AS volatility_std_dev,
+       ROUND(MAX(daily_volatility_pct), 2) AS max_daily_volatility,
+       ROUND(AVG(abs_settlement_change), 2) AS avg_settlement_change,
+       SUM(trd_qty) AS total_volume,
+       CASE 
+           WHEN AVG(daily_volatility_pct) >= 5 THEN '高波动'
+           WHEN AVG(daily_volatility_pct) >= 2 THEN '中波动'
+           ELSE '低波动'
+       END AS volatility_level,
+       CASE 
+           WHEN STDDEV(daily_volatility_pct) >= 2 THEN '波动不稳定'
+           WHEN STDDEV(daily_volatility_pct) >= 1 THEN '波动适中'
+           ELSE '波动稳定'
+       END AS stability_level
+FROM price_volatility
+GROUP BY clas_name
+ORDER BY avg_daily_volatility DESC;
+
+问题：查询最小变动价位设置合理性和交易精度分析
+SELECT clas_name, fut_opt_flag,
+       COUNT(DISTINCT tick) AS tick_size_varieties,
+       ROUND(AVG(tick), 4) AS avg_tick_size,
+       ROUND(MIN(tick), 4) AS min_tick_size,
+       ROUND(MAX(tick), 4) AS max_tick_size,
+       ROUND(AVG(clr_prc), 2) AS avg_settlement_price,
+       ROUND(AVG(tick * 100.0 / NULLIF(clr_prc, 0)), 4) AS avg_tick_percentage,
+       COUNT(*) AS contract_count,
+       SUM(trd_qty) AS total_volume,
+       ROUND(SUM(trd_qty) / COUNT(*), 2) AS avg_volume_per_contract,
+       CASE 
+           WHEN AVG(tick * 100.0 / NULLIF(clr_prc, 0)) >= 0.1 THEN '变动幅度较大'
+           WHEN AVG(tick * 100.0 / NULLIF(clr_prc, 0)) >= 0.05 THEN '变动幅度适中'
+           ELSE '变动幅度精细'
+       END AS tick_precision_level
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = '2025-07-02' 
+AND exch_code = 'CZCE'
+AND l_trade_date > '2025-07-02'
+AND tick IS NOT NULL
+AND clr_prc > 0
+GROUP BY clas_name, fut_opt_flag
+ORDER BY avg_tick_percentage DESC;

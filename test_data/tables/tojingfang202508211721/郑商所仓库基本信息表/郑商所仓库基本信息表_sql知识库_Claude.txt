@@ -1,0 +1,314 @@
+问题：分析各省份仓库的资产规模分布和交割库容配置效率
+SELECT PRVC,
+       COUNT(*) AS warehouse_count,
+       ROUND(AVG(CAST(AST AS NUMERIC)), 2) AS avg_assets,
+       ROUND(SUM(CAST(AST AS NUMERIC)), 2) AS total_assets,
+       ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+       ROUND(SUM(DLV_WH_CPY), 2) AS total_delivery_capacity,
+       ROUND(AVG(DLV_WH_CPY / NULLIF(CAST(AST AS NUMERIC), 0)), 4) AS capacity_per_asset_ratio
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND AST IS NOT NULL AND AST != ''
+AND DLV_WH_CPY IS NOT NULL
+GROUP BY PRVC
+ORDER BY capacity_per_asset_ratio DESC;
+
+问题：查询交割库容利用率最高的仓库（交割库容/总库容）排名
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, CITY,
+       TTL_WH_CPY,
+       DLV_WH_CPY,
+       ROUND(DLV_WH_CPY * 100.0 / NULLIF(TTL_WH_CPY, 0), 2) AS delivery_utilization_rate,
+       WH_OWN
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND TTL_WH_CPY > 0 AND DLV_WH_CPY > 0
+ORDER BY delivery_utilization_rate DESC
+LIMIT 15;
+
+问题：统计不同仓库性质的资本结构和规模分析
+SELECT WH_OWN,
+       COUNT(*) AS warehouse_count,
+       ROUND(AVG(CAST(REG_CAPI AS NUMERIC)), 2) AS avg_registered_capital,
+       ROUND(AVG(CAST(AST AS NUMERIC)), 2) AS avg_total_assets,
+       ROUND(AVG(CAST(AST AS NUMERIC) / NULLIF(CAST(REG_CAPI AS NUMERIC), 0)), 2) AS asset_leverage_ratio,
+       ROUND(SUM(DLV_WH_CPY), 0) AS total_delivery_capacity
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND REG_CAPI IS NOT NULL AND REG_CAPI != ''
+AND AST IS NOT NULL AND AST != ''
+GROUP BY WH_OWN
+ORDER BY avg_total_assets DESC;
+
+问题：查询同时具备铁路和水运优势的仓库分布及容量分析
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, CITY,
+       TRN_STATION, DOCK,
+       DLV_WH_CPY, WH_OWN,
+       DTL_ADDR
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND TRN_STATION IS NOT NULL AND TRN_STATION != ''
+AND DOCK IS NOT NULL AND DOCK != ''
+ORDER BY DLV_WH_CPY DESC;
+
+问题：分析各城市仓库集中度和平均规模
+SELECT PRVC, CITY,
+       COUNT(*) AS warehouse_count,
+       ROUND(AVG(TTL_WH_CPY), 2) AS avg_total_capacity,
+       ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+       ROUND(SUM(DLV_WH_CPY), 2) AS city_total_delivery_capacity,
+       STRING_AGG(DISTINCT WH_OWN, ', ') AS ownership_types
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY PRVC, CITY
+HAVING COUNT(*) >= 2
+ORDER BY warehouse_count DESC, city_total_delivery_capacity DESC;
+
+问题：查询资产负债结构异常的仓库（资产小于注册资本）
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, WH_OWN,
+       CAST(REG_CAPI AS NUMERIC) AS registered_capital,
+       CAST(AST AS NUMERIC) AS total_assets,
+       CAST(AST AS NUMERIC) - CAST(REG_CAPI AS NUMERIC) AS asset_capital_diff,
+       LEGAL_REP
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND REG_CAPI IS NOT NULL AND REG_CAPI != ''
+AND AST IS NOT NULL AND AST != ''
+AND CAST(AST AS NUMERIC) < CAST(REG_CAPI AS NUMERIC)
+ORDER BY asset_capital_diff ASC;
+
+问题：统计各省份交通便利性指标（有铁路/码头的仓库占比）
+SELECT PRVC,
+       COUNT(*) AS total_warehouses,
+       COUNT(CASE WHEN TRN_STATION IS NOT NULL AND TRN_STATION != '' THEN 1 END) AS with_railway,
+       COUNT(CASE WHEN DOCK IS NOT NULL AND DOCK != '' THEN 1 END) AS with_dock,
+       COUNT(CASE WHEN (TRN_STATION IS NOT NULL AND TRN_STATION != '') 
+                    OR (DOCK IS NOT NULL AND DOCK != '') THEN 1 END) AS with_transport,
+       ROUND(COUNT(CASE WHEN TRN_STATION IS NOT NULL AND TRN_STATION != '' THEN 1 END) * 100.0 / COUNT(*), 2) AS railway_ratio,
+       ROUND(COUNT(CASE WHEN DOCK IS NOT NULL AND DOCK != '' THEN 1 END) * 100.0 / COUNT(*), 2) AS dock_ratio,
+       ROUND(COUNT(CASE WHEN (TRN_STATION IS NOT NULL AND TRN_STATION != '') 
+                          OR (DOCK IS NOT NULL AND DOCK != '') THEN 1 END) * 100.0 / COUNT(*), 2) AS transport_ratio
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY PRVC
+ORDER BY transport_ratio DESC;
+
+问题：查询联系信息不完整的仓库及其负责人信息
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, CITY,
+       LEGAL_REP, EXCTVS_NAME, OPERR_NAME,
+       CTC_MODE, FAX,
+       CASE 
+           WHEN CTC_MODE IS NULL OR CTC_MODE = '' THEN '缺少电话'
+           ELSE '有电话' 
+       END AS phone_status,
+       CASE 
+           WHEN FAX IS NULL OR FAX = '' THEN '缺少传真'
+           ELSE '有传真' 
+       END AS fax_status
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND ((CTC_MODE IS NULL OR CTC_MODE = '') OR (FAX IS NULL OR FAX = ''))
+ORDER BY PRVC, CITY;
+
+问题：分析仓库代码编码规律和地域分布关系
+SELECT 
+    SUBSTRING(DLV_WH_CODE, 1, 2) AS code_prefix,
+    COUNT(*) AS warehouse_count,
+    STRING_AGG(DISTINCT PRVC, ', ') AS provinces,
+    STRING_AGG(DISTINCT CITY, ', ') AS cities,
+    ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+    MIN(DLV_WH_CODE) AS min_code,
+    MAX(DLV_WH_CODE) AS max_code
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND DLV_WH_CODE IS NOT NULL
+GROUP BY SUBSTRING(DLV_WH_CODE, 1, 2)
+ORDER BY code_prefix;
+
+问题：查询管理团队信息最完整的仓库排名
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, CITY,
+       LEGAL_REP, EXCTVS_NAME, OPERR_NAME,
+       DLV_WH_CPY, WH_OWN,
+       CASE 
+           WHEN LEGAL_REP IS NOT NULL AND LEGAL_REP != '' THEN 1 ELSE 0 
+       END +
+       CASE 
+           WHEN EXCTVS_NAME IS NOT NULL AND EXCTVS_NAME != '' THEN 1 ELSE 0 
+       END +
+       CASE 
+           WHEN OPERR_NAME IS NOT NULL AND OPERR_NAME != '' THEN 1 ELSE 0 
+       END AS management_completeness_score
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+ORDER BY management_completeness_score DESC, DLV_WH_CPY DESC;
+
+问题：统计各仓库性质下的平均库容配置和地域分布
+SELECT WH_OWN,
+       COUNT(*) AS warehouse_count,
+       COUNT(DISTINCT PRVC) AS province_count,
+       COUNT(DISTINCT CITY) AS city_count,
+       ROUND(AVG(TTL_WH_CPY), 2) AS avg_total_capacity,
+       ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+       ROUND(STDDEV(DLV_WH_CPY), 2) AS delivery_capacity_stddev
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+GROUP BY WH_OWN
+ORDER BY avg_delivery_capacity DESC;
+
+问题：查询资产规模与库容配置不匹配的仓库（高资产低库容或低资产高库容）
+WITH asset_capacity_analysis AS (
+    SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC,
+           CAST(AST AS NUMERIC) AS assets,
+           DLV_WH_CPY,
+           WH_OWN,
+           NTILE(4) OVER (ORDER BY CAST(AST AS NUMERIC)) AS asset_quartile,
+           NTILE(4) OVER (ORDER BY DLV_WH_CPY) AS capacity_quartile
+    FROM dataqa.wh_base_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND AST IS NOT NULL AND AST != ''
+    AND DLV_WH_CPY IS NOT NULL
+)
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC,
+       assets, DLV_WH_CPY, WH_OWN,
+       asset_quartile, capacity_quartile,
+       ABS(asset_quartile - capacity_quartile) AS mismatch_score
+FROM asset_capacity_analysis
+WHERE ABS(asset_quartile - capacity_quartile) >= 2
+ORDER BY mismatch_score DESC, assets DESC;
+
+问题：分析同一法人代表管理的多个仓库情况
+SELECT LEGAL_REP,
+       COUNT(*) AS warehouse_count,
+       STRING_AGG(WH_ABBR, ', ') AS warehouse_list,
+       STRING_AGG(DISTINCT PRVC, ', ') AS provinces,
+       SUM(DLV_WH_CPY) AS total_delivery_capacity,
+       STRING_AGG(DISTINCT WH_OWN, ', ') AS ownership_types
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND LEGAL_REP IS NOT NULL AND LEGAL_REP != ''
+GROUP BY LEGAL_REP
+HAVING COUNT(*) > 1
+ORDER BY warehouse_count DESC, total_delivery_capacity DESC;
+
+问题：查询各省份仓库资产集中度和所有制结构分析
+WITH province_ownership AS (
+    SELECT PRVC, WH_OWN,
+           COUNT(*) AS count_by_ownership,
+           SUM(CAST(AST AS NUMERIC)) AS assets_by_ownership,
+           SUM(DLV_WH_CPY) AS capacity_by_ownership
+    FROM dataqa.wh_base_info_tab
+    WHERE stas_DT = '2025-07-02'
+    AND AST IS NOT NULL AND AST != ''
+    GROUP BY PRVC, WH_OWN
+)
+SELECT PRVC,
+       SUM(count_by_ownership) AS total_warehouses,
+       COUNT(DISTINCT WH_OWN) AS ownership_diversity,
+       ROUND(MAX(assets_by_ownership) * 100.0 / SUM(assets_by_ownership), 2) AS max_ownership_asset_share,
+       ROUND(MAX(capacity_by_ownership) * 100.0 / SUM(capacity_by_ownership), 2) AS max_ownership_capacity_share,
+       STRING_AGG(WH_OWN || ':' || count_by_ownership, ', ') AS ownership_distribution
+FROM province_ownership
+GROUP BY PRVC
+ORDER BY ownership_diversity DESC, total_warehouses DESC;
+
+问题：查询地址信息中包含特定关键词的仓库分布
+SELECT 
+    CASE 
+        WHEN DTL_ADDR LIKE '%工业园%' THEN '工业园区'
+        WHEN DTL_ADDR LIKE '%开发区%' THEN '开发区'
+        WHEN DTL_ADDR LIKE '%物流%' THEN '物流园区'
+        WHEN DTL_ADDR LIKE '%港%' THEN '港口区域'
+        WHEN DTL_ADDR LIKE '%站%' THEN '交通枢纽'
+        ELSE '其他区域'
+    END AS location_type,
+    COUNT(*) AS warehouse_count,
+    ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+    STRING_AGG(DISTINCT PRVC, ', ') AS provinces
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND DTL_ADDR IS NOT NULL
+GROUP BY 
+    CASE 
+        WHEN DTL_ADDR LIKE '%工业园%' THEN '工业园区'
+        WHEN DTL_ADDR LIKE '%开发区%' THEN '开发区'
+        WHEN DTL_ADDR LIKE '%物流%' THEN '物流园区'
+        WHEN DTL_ADDR LIKE '%港%' THEN '港口区域'
+        WHEN DTL_ADDR LIKE '%站%' THEN '交通枢纽'
+        ELSE '其他区域'
+    END
+ORDER BY warehouse_count DESC;
+
+问题：统计各城市仓库运输配套设施完善度排名
+WITH transport_analysis AS (
+    SELECT PRVC, CITY,
+           COUNT(*) AS total_warehouses,
+           COUNT(CASE WHEN TRN_STATION IS NOT NULL AND TRN_STATION != '' THEN 1 END) AS railway_warehouses,
+           COUNT(CASE WHEN DOCK IS NOT NULL AND DOCK != '' THEN 1 END) AS dock_warehouses,
+           SUM(DLV_WH_CPY) AS total_capacity
+    FROM dataqa.wh_base_info_tab
+    WHERE stas_DT = '2025-07-02'
+    GROUP BY PRVC, CITY
+)
+SELECT PRVC, CITY,
+       total_warehouses,
+       railway_warehouses,
+       dock_warehouses,
+       total_capacity,
+       ROUND((railway_warehouses + dock_warehouses) * 100.0 / total_warehouses, 2) AS transport_coverage_rate,
+       ROUND(total_capacity / total_warehouses, 2) AS avg_capacity_per_warehouse
+FROM transport_analysis
+WHERE total_warehouses >= 2
+ORDER BY transport_coverage_rate DESC, total_capacity DESC;
+
+问题：查询注册资本与实际资产差异最大的仓库
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, WH_OWN,
+       CAST(REG_CAPI AS NUMERIC) AS registered_capital,
+       CAST(AST AS NUMERIC) AS total_assets,
+       CAST(AST AS NUMERIC) - CAST(REG_CAPI AS NUMERIC) AS capital_growth,
+       ROUND((CAST(AST AS NUMERIC) - CAST(REG_CAPI AS NUMERIC)) * 100.0 / NULLIF(CAST(REG_CAPI AS NUMERIC), 0), 2) AS growth_rate,
+       LEGAL_REP
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND REG_CAPI IS NOT NULL AND REG_CAPI != ''
+AND AST IS NOT NULL AND AST != ''
+AND CAST(REG_CAPI AS NUMERIC) > 0
+ORDER BY ABS(capital_growth) DESC
+LIMIT 10;
+
+问题：分析省级编码与省份名称的一致性检查
+SELECT PRVC_CODE, PRVC,
+       COUNT(*) AS warehouse_count,
+       STRING_AGG(DISTINCT CITY, ', ') AS cities_in_province
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND PRVC_CODE IS NOT NULL
+GROUP BY PRVC_CODE, PRVC
+ORDER BY PRVC_CODE;
+
+问题：查询仓库总库容与交割库容比例异常的仓库（比例过高或过低）
+SELECT DLV_WH_CODE, WH_ABBR, WH_NAME, PRVC, WH_OWN,
+       TTL_WH_CPY, DLV_WH_CPY,
+       ROUND(DLV_WH_CPY * 100.0 / NULLIF(TTL_WH_CPY, 0), 2) AS delivery_ratio,
+       CASE 
+           WHEN DLV_WH_CPY * 100.0 / NULLIF(TTL_WH_CPY, 0) > 80 THEN '交割比例过高'
+           WHEN DLV_WH_CPY * 100.0 / NULLIF(TTL_WH_CPY, 0) < 20 THEN '交割比例过低'
+           ELSE '比例正常'
+       END AS ratio_status
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND TTL_WH_CPY > 0 AND DLV_WH_CPY > 0
+AND (DLV_WH_CPY * 100.0 / TTL_WH_CPY > 80 OR DLV_WH_CPY * 100.0 / TTL_WH_CPY < 20)
+ORDER BY delivery_ratio DESC;
+
+问题：统计国家地区分布及各地区仓库特征对比
+SELECT CNR,
+       COUNT(*) AS warehouse_count,
+       COUNT(DISTINCT PRVC) AS province_count,
+       ROUND(AVG(DLV_WH_CPY), 2) AS avg_delivery_capacity,
+       ROUND(SUM(DLV_WH_CPY), 2) AS total_delivery_capacity,
+       STRING_AGG(DISTINCT WH_OWN, ', ') AS ownership_types,
+       ROUND(AVG(CAST(AST AS NUMERIC)), 2) AS avg_assets
+FROM dataqa.wh_base_info_tab
+WHERE stas_DT = '2025-07-02'
+AND CNR IS NOT NULL
+GROUP BY CNR
+ORDER BY warehouse_count DESC;

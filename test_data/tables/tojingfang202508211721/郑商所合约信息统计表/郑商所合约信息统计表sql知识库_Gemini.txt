@@ -1,0 +1,149 @@
+问题：查询在最近一个交易日，哪个期权合约的隐含波动率（iv）最高？
+SELECT comd_code, comd_name, iv
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'O' AND iv IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY iv DESC
+LIMIT 1;
+
+问题：按品种（clas_code）统计，比较各品种期货与期权的总成交额（trd_amt）。
+SELECT clas_code, fut_opt_flag_desc, SUM(trd_amt) AS total_turnover
+FROM dataqa.comd_info_stas_tab
+WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+GROUP BY clas_code, fut_opt_flag_desc
+ORDER BY clas_code, total_turnover DESC;
+
+问题：找出在最近交易日，日内振幅（最高价 - 最低价）占结算价比例最大的期货合约。
+SELECT comd_code, (highest_prc - lowest_prc) / clr_prc AS volatility_ratio
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'F' AND clr_prc > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY volatility_ratio DESC
+LIMIT 1;
+
+问题：统计在最近交易日，所有期货合约中，套期保值持仓量（hdg_hld_qty）和投机持仓量（spe_hld_qty）的总和对比。
+SELECT SUM(hdg_hld_qty) AS total_hedge_oi, SUM(spe_hld_qty) AS total_speculation_oi
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab);
+
+问题：查询“棉花”期权（clas_code='CF', fut_opt_flag='O'）中，哪些是深度虚值看涨期权（收盘价远低于执行价）？
+SELECT comd_code, clos_prc, exer_prc
+FROM dataqa.comd_info_stas_tab
+WHERE clas_code = 'CF' AND fut_opt_flag = 'O' AND put_call_flag = 'C'
+AND (exer_prc - clos_prc) / clos_prc > 0.1 -- 假设虚值程度超过10%
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY exer_prc DESC;
+
+问题：找出持仓量（hld_qty）相比前一日（l_opn_ints_qty）增幅最大的10个合约。
+SELECT comd_code, l_opn_ints_qty, hld_qty, (hld_qty - l_opn_ints_qty) AS oi_change
+FROM dataqa.comd_info_stas_tab
+WHERE l_opn_ints_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY oi_change DESC
+LIMIT 10;
+
+问题：按交割月份（dlv_mon）分组，统计“PTA”期货（TA）的持仓量分布情况。
+SELECT dlv_mon, SUM(hld_qty) AS total_oi
+FROM dataqa.comd_info_stas_tab
+WHERE clas_code = 'TA' AND fut_opt_flag = 'F'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+GROUP BY dlv_mon
+ORDER BY dlv_mon;
+
+问题：查询哪个期权合约的Delta值最接近0.5（平值期权）？
+SELECT comd_code, comd_name, delta
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'O' AND delta IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY ABS(delta - 0.5)
+LIMIT 1;
+
+问题：统计在最近交易日，发生了期转现（efp_qty > 0）的合约有哪些？
+SELECT comd_code, comd_name, efp_qty, efp_amt
+FROM dataqa.comd_info_stas_tab
+WHERE efp_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY efp_qty DESC;
+
+问题：查询所有看跌期权（put_call_flag = 'P'）中，时间价值（Theta）衰减最快的合约是哪个？
+SELECT comd_code, comd_name, theta
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'O' AND put_call_flag = 'P' AND theta IS NOT NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY theta
+LIMIT 1;
+
+问题：计算“白糖”期货（SR）主力合约（根据持仓量判断）的成交量加权平均价（VWAP）。
+WITH MainContract AS (
+    SELECT comd_code
+    FROM dataqa.comd_info_stas_tab
+    WHERE clas_code = 'SR' AND fut_opt_flag = 'F' AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+    ORDER BY hld_qty DESC
+    LIMIT 1
+)
+SELECT comd_code, SUM(trd_amt) / SUM(trd_qty) AS vwap
+FROM dataqa.comd_info_stas_tab
+WHERE comd_code = (SELECT comd_code FROM MainContract)
+AND trd_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+GROUP BY comd_code;
+
+问题：找出在最近交易日，开盘价即为全天最高价的期货合约。
+SELECT comd_code, comd_name, opn_prc, highest_prc
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'F' AND opn_prc = highest_prc
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab);
+
+问题：按品种统计，查看各品种的期权持仓量与期货持仓量的比值。
+WITH OIData AS (
+    SELECT clas_code,
+           SUM(CASE WHEN fut_opt_flag = 'O' THEN hld_qty ELSE 0 END) AS option_oi,
+           SUM(CASE WHEN fut_opt_flag = 'F' THEN hld_qty ELSE 0 END) AS future_oi
+    FROM dataqa.comd_info_stas_tab
+    WHERE biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+    GROUP BY clas_code
+)
+SELECT clas_code, option_oi / future_oi AS oi_ratio
+FROM OIData
+WHERE future_oi > 0
+ORDER BY oi_ratio DESC;
+
+问题：查询所有期权合约中，Gamma值最大的合约是哪个？（通常意味着价格最不稳定）
+SELECT comd_code, comd_name, gamma
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'O' AND gamma IS NOT NULL AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY gamma DESC
+LIMIT 1;
+
+问题：查询哪些合约在最近交易日的结算价（clr_prc）等于0？
+SELECT comd_code, comd_name
+FROM dataqa.comd_info_stas_tab
+WHERE clr_prc = 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab);
+
+问题：统计所有品种的套利成交量（cmb_trd_qty）占总成交量（trd_qty）的比例。
+SELECT clas_code, SUM(cmb_trd_qty) * 100.0 / SUM(trd_qty) AS arbitrage_volume_ratio
+FROM dataqa.comd_info_stas_tab
+WHERE trd_qty > 0 AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+GROUP BY clas_code
+ORDER BY arbitrage_volume_ratio DESC;
+
+问题：查询距离最后交易日（lst_dt）小于30天的所有期货合约。
+SELECT comd_code, comd_name, lst_dt
+FROM dataqa.comd_info_stas_tab
+WHERE fut_opt_flag = 'F' AND (lst_dt - biz_dt) < 30
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY lst_dt;
+
+问题：找出在最近交易日，有行权量（opt_exer_qty）但成交量（trd_qty）为0的期权合约。
+SELECT comd_code, comd_name, opt_exer_qty
+FROM dataqa.comd_info_stas_tab
+WHERE opt_exer_qty > 0 AND trd_qty = 0
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab);
+
+问题：查询“甲醇”期货（MA）所有合约的持仓量分布，按合约代码排序。
+SELECT comd_code, hld_qty
+FROM dataqa.comd_info_stas_tab
+WHERE clas_code = 'MA' AND fut_opt_flag = 'F'
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab)
+ORDER BY comd_code;
+
+问题：查询所有合约中，昨持仓量（l_opn_ints_qty）和昨结算价（l_clr_prc）都为空的记录。
+SELECT comd_code, comd_name
+FROM dataqa.comd_info_stas_tab
+WHERE l_opn_ints_qty IS NULL AND l_clr_prc IS NULL
+AND biz_dt = (SELECT MAX(biz_dt) FROM dataqa.comd_info_stas_tab);

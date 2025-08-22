@@ -1,0 +1,508 @@
+问题：分析各机构类型的地域分布特征和平均运营时长
+WITH operating_duration AS (
+    SELECT brh_org_type, brh_org_name, mem_name,
+           brh_org_site,
+           opn_dt,
+           CASE WHEN clos_dt IS NOT NULL THEN clos_dt ELSE biz_dt END AS end_date,
+           CASE WHEN clos_dt IS NOT NULL 
+                THEN clos_dt - opn_dt 
+                ELSE biz_dt - opn_dt END AS operating_days,
+           CASE WHEN brh_org_site LIKE '%北京%' THEN '北京'
+                WHEN brh_org_site LIKE '%上海%' THEN '上海'
+                WHEN brh_org_site LIKE '%深圳%' THEN '深圳'
+                WHEN brh_org_site LIKE '%广州%' THEN '广州'
+                WHEN brh_org_site LIKE '%杭州%' THEN '杭州'
+                WHEN brh_org_site LIKE '%南京%' THEN '南京'
+                WHEN brh_org_site LIKE '%成都%' THEN '成都'
+                WHEN brh_org_site LIKE '%重庆%' THEN '重庆'
+                ELSE '其他城市' END AS city_category
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND opn_dt IS NOT NULL
+)
+SELECT brh_org_type,
+       city_category,
+       COUNT(*) AS branch_count,
+       ROUND(AVG(operating_days), 0) AS avg_operating_days,
+       ROUND(AVG(operating_days) / 365.0, 2) AS avg_operating_years
+FROM operating_duration
+GROUP BY brh_org_type, city_category
+ORDER BY brh_org_type, branch_count DESC;
+
+问题：查询会员机构网络覆盖效率分析（总部-分支机构分布合理性）
+WITH member_distribution AS (
+    SELECT mem_no, mem_name, mem_abbr,
+           COUNT(*) AS total_branches,
+           COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) AS active_branches,
+           COUNT(DISTINCT 
+               CASE WHEN brh_org_site LIKE '%北京%' THEN '北京'
+                    WHEN brh_org_site LIKE '%上海%' THEN '上海'
+                    WHEN brh_org_site LIKE '%深圳%' THEN '深圳'
+                    WHEN brh_org_site LIKE '%广州%' THEN '广州'
+                    WHEN brh_org_site LIKE '%杭州%' THEN '杭州'
+                    WHEN brh_org_site LIKE '%成都%' THEN '成都'
+                    WHEN brh_org_site LIKE '%重庆%' THEN '重庆'
+                    ELSE SUBSTRING(brh_org_site, 1, 6) END
+           ) AS city_coverage,
+           COUNT(DISTINCT brh_org_type) AS org_type_diversity
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY mem_no, mem_name, mem_abbr
+)
+SELECT mem_name, mem_abbr,
+       total_branches,
+       active_branches,
+       city_coverage,
+       org_type_diversity,
+       ROUND(active_branches * 100.0 / NULLIF(total_branches, 0), 2) AS active_ratio,
+       ROUND(city_coverage * 1.0 / NULLIF(active_branches, 0), 3) AS coverage_efficiency
+FROM member_distribution
+WHERE total_branches >= 5
+ORDER BY coverage_efficiency DESC, active_branches DESC;
+
+问题：统计各会员分支机构生命周期管理效率（开业-停业周期分析）
+WITH lifecycle_analysis AS (
+    SELECT mem_no, mem_name,
+           brh_org_name,
+           opn_dt,
+           clos_dt,
+           CASE WHEN clos_dt IS NOT NULL 
+                THEN clos_dt - opn_dt
+                ELSE NULL END AS lifecycle_days,
+           EXTRACT(YEAR FROM opn_dt) AS open_year,
+           EXTRACT(YEAR FROM clos_dt) AS close_year
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND opn_dt IS NOT NULL
+)
+SELECT mem_name,
+       COUNT(*) AS total_opened,
+       COUNT(CASE WHEN clos_dt IS NOT NULL THEN 1 END) AS total_closed,
+       ROUND(COUNT(CASE WHEN clos_dt IS NOT NULL THEN 1 END) * 100.0 / COUNT(*), 2) AS closure_rate,
+       ROUND(AVG(lifecycle_days), 0) AS avg_lifecycle_days,
+       ROUND(AVG(lifecycle_days) / 365.0, 2) AS avg_lifecycle_years,
+       MIN(opn_dt) AS earliest_opening,
+       MAX(opn_dt) AS latest_opening
+FROM lifecycle_analysis
+GROUP BY mem_name
+HAVING COUNT(*) >= 3
+ORDER BY closure_rate ASC, avg_lifecycle_years DESC;
+
+问题：查询分支机构负责人管理跨度分析（一人多岗情况统计）
+WITH manager_workload AS (
+    SELECT brh_org_praler_name,
+           COUNT(DISTINCT brh_org_id) AS managed_branches,
+           COUNT(DISTINCT mem_no) AS managed_members,
+           STRING_AGG(DISTINCT mem_abbr, ', ') AS member_list,
+           STRING_AGG(DISTINCT brh_org_type, ', ') AS org_types,
+           STRING_AGG(DISTINCT brh_org_name, ', ') AS branch_list
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND brh_org_praler_name IS NOT NULL AND brh_org_praler_name != ''
+    AND is_opn = 'Y' AND brh_org_status = 'N'
+    GROUP BY brh_org_praler_name
+)
+SELECT brh_org_praler_name,
+       managed_branches,
+       managed_members,
+       member_list,
+       org_types,
+       CASE 
+           WHEN managed_branches >= 5 THEN '高负荷(5+机构)'
+           WHEN managed_branches >= 3 THEN '中负荷(3-4机构)'
+           WHEN managed_branches = 2 THEN '低负荷(2机构)'
+           ELSE '正常(1机构)'
+       END AS workload_level
+FROM manager_workload
+ORDER BY managed_branches DESC, managed_members DESC;
+
+问题：分析机构状态转换异常检测（状态与开业标识不一致）
+SELECT mem_name, brh_org_name, brh_org_id,
+       is_opn, brh_org_status,
+       opn_dt, clos_dt,
+       CASE 
+           WHEN is_opn = 'Y' AND brh_org_status != 'N' THEN '开业但状态非正常'
+           WHEN is_opn = 'N' AND brh_org_status = 'N' THEN '未开业但状态正常'
+           WHEN is_opn = 'Y' AND clos_dt IS NOT NULL AND clos_dt <= biz_dt THEN '已停业但标记为开业'
+           WHEN is_opn = 'N' AND clos_dt IS NULL THEN '未开业但无停业日期'
+           ELSE '其他异常'
+       END AS anomaly_type,
+       brh_org_site
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+AND (
+    (is_opn = 'Y' AND brh_org_status != 'N') OR
+    (is_opn = 'N' AND brh_org_status = 'N') OR
+    (is_opn = 'Y' AND clos_dt IS NOT NULL AND clos_dt <= biz_dt) OR
+    (is_opn = 'N' AND clos_dt IS NULL)
+)
+ORDER BY anomaly_type, mem_name;
+
+问题：统计各省份期货市场分支机构密度和竞争格局
+WITH province_analysis AS (
+    SELECT 
+        CASE WHEN brh_org_site LIKE '%北京%' THEN '北京市'
+             WHEN brh_org_site LIKE '%天津%' THEN '天津市'
+             WHEN brh_org_site LIKE '%上海%' THEN '上海市'
+             WHEN brh_org_site LIKE '%重庆%' THEN '重庆市'
+             WHEN brh_org_site LIKE '%河北%' THEN '河北省'
+             WHEN brh_org_site LIKE '%山西%' THEN '山西省'
+             WHEN brh_org_site LIKE '%辽宁%' THEN '辽宁省'
+             WHEN brh_org_site LIKE '%吉林%' THEN '吉林省'
+             WHEN brh_org_site LIKE '%黑龙江%' THEN '黑龙江省'
+             WHEN brh_org_site LIKE '%江苏%' THEN '江苏省'
+             WHEN brh_org_site LIKE '%浙江%' THEN '浙江省'
+             WHEN brh_org_site LIKE '%安徽%' THEN '安徽省'
+             WHEN brh_org_site LIKE '%福建%' THEN '福建省'
+             WHEN brh_org_site LIKE '%江西%' THEN '江西省'
+             WHEN brh_org_site LIKE '%山东%' THEN '山东省'
+             WHEN brh_org_site LIKE '%河南%' THEN '河南省'
+             WHEN brh_org_site LIKE '%湖北%' THEN '湖北省'
+             WHEN brh_org_site LIKE '%湖南%' THEN '湖南省'
+             WHEN brh_org_site LIKE '%广东%' THEN '广东省'
+             WHEN brh_org_site LIKE '%海南%' THEN '海南省'
+             WHEN brh_org_site LIKE '%四川%' THEN '四川省'
+             WHEN brh_org_site LIKE '%贵州%' THEN '贵州省'
+             WHEN brh_org_site LIKE '%云南%' THEN '云南省'
+             WHEN brh_org_site LIKE '%陕西%' THEN '陕西省'
+             WHEN brh_org_site LIKE '%甘肃%' THEN '甘肃省'
+             WHEN brh_org_site LIKE '%青海%' THEN '青海省'
+             WHEN brh_org_site LIKE '%台湾%' THEN '台湾省'
+             WHEN brh_org_site LIKE '%内蒙古%' THEN '内蒙古自治区'
+             WHEN brh_org_site LIKE '%广西%' THEN '广西壮族自治区'
+             WHEN brh_org_site LIKE '%西藏%' THEN '西藏自治区'
+             WHEN brh_org_site LIKE '%宁夏%' THEN '宁夏回族自治区'
+             WHEN brh_org_site LIKE '%新疆%' THEN '新疆维吾尔自治区'
+             ELSE '其他/海外' END AS province,
+        mem_no, mem_name,
+        is_opn, brh_org_status
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+)
+SELECT province,
+       COUNT(*) AS total_branches,
+       COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) AS active_branches,
+       COUNT(DISTINCT mem_no) AS member_count,
+       ROUND(COUNT(*) * 1.0 / NULLIF(COUNT(DISTINCT mem_no), 0), 2) AS branches_per_member,
+       ROUND(COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) * 100.0 / COUNT(*), 2) AS active_ratio
+FROM province_analysis
+WHERE province != '其他/海外'
+GROUP BY province
+ORDER BY active_branches DESC;
+
+问题：查询分支机构联系信息完整度评估和数据质量分析
+SELECT mem_name,
+       COUNT(*) AS total_branches,
+       COUNT(CASE WHEN brh_org_ctc_mode IS NOT NULL AND brh_org_ctc_mode != '' THEN 1 END) AS has_phone,
+       COUNT(CASE WHEN brh_org_eml IS NOT NULL AND brh_org_eml != '' THEN 1 END) AS has_email,
+       COUNT(CASE WHEN brh_org_praler_name IS NOT NULL AND brh_org_praler_name != '' THEN 1 END) AS has_manager_name,
+       COUNT(CASE WHEN brh_org_praler_mbl IS NOT NULL AND brh_org_praler_mbl != '' THEN 1 END) AS has_manager_mobile,
+       COUNT(CASE WHEN brh_org_praler_eml IS NOT NULL AND brh_org_praler_eml != '' THEN 1 END) AS has_manager_email,
+       COUNT(CASE WHEN brh_org_praler_fix_tel IS NOT NULL AND brh_org_praler_fix_tel != '' THEN 1 END) AS has_manager_tel,
+       ROUND((COUNT(CASE WHEN brh_org_ctc_mode IS NOT NULL AND brh_org_ctc_mode != '' THEN 1 END) +
+              COUNT(CASE WHEN brh_org_eml IS NOT NULL AND brh_org_eml != '' THEN 1 END) +
+              COUNT(CASE WHEN brh_org_praler_name IS NOT NULL AND brh_org_praler_name != '' THEN 1 END) +
+              COUNT(CASE WHEN brh_org_praler_mbl IS NOT NULL AND brh_org_praler_mbl != '' THEN 1 END) +
+              COUNT(CASE WHEN brh_org_praler_eml IS NOT NULL AND brh_org_praler_eml != '' THEN 1 END) +
+              COUNT(CASE WHEN brh_org_praler_fix_tel IS NOT NULL AND brh_org_praler_fix_tel != '' THEN 1 END)
+             ) * 100.0 / (COUNT(*) * 6), 2) AS contact_completeness_score
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+AND is_opn = 'Y' AND brh_org_status = 'N'
+GROUP BY mem_name
+ORDER BY contact_completeness_score ASC;
+
+问题：分析统一社会信用代码规范性和重复性检查
+WITH credit_code_analysis AS (
+    SELECT scil_crdt_code,
+           COUNT(*) AS usage_count,
+           STRING_AGG(DISTINCT mem_name, ', ') AS member_names,
+           STRING_AGG(DISTINCT brh_org_name, ', ') AS branch_names,
+           CHAR_LENGTH(scil_crdt_code) AS code_length,
+           CASE 
+               WHEN scil_crdt_code ~ '^[0-9A-Z]{18}$' THEN '标准格式'
+               WHEN scil_crdt_code ~ '^[0-9]{15}$' THEN '旧组织机构代码'
+               WHEN scil_crdt_code IS NULL OR scil_crdt_code = '' THEN '缺失'
+               ELSE '格式异常'
+           END AS code_format_status
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY scil_crdt_code
+)
+SELECT code_format_status,
+       COUNT(*) AS code_count,
+       COUNT(CASE WHEN usage_count > 1 THEN 1 END) AS duplicate_codes,
+       ROUND(AVG(usage_count), 2) AS avg_usage_per_code,
+       MAX(usage_count) AS max_usage_count
+FROM credit_code_analysis
+GROUP BY code_format_status
+ORDER BY 
+    CASE code_format_status 
+        WHEN '缺失' THEN 1
+        WHEN '格式异常' THEN 2
+        WHEN '旧组织机构代码' THEN 3
+        ELSE 4 END;
+
+问题：查询会员扩张策略分析（近期开业趋势和布局特点）
+WITH expansion_analysis AS (
+    SELECT mem_no, mem_name,
+           COUNT(*) AS total_expansions,
+           COUNT(CASE WHEN opn_dt >= '2024-01-01' THEN 1 END) AS recent_expansions,
+           COUNT(CASE WHEN opn_dt >= '2024-07-01' THEN 1 END) AS very_recent_expansions,
+           STRING_AGG(DISTINCT brh_org_type, ', ') AS expansion_types,
+           COUNT(DISTINCT brh_org_type) AS type_diversity,
+           MIN(opn_dt) AS first_expansion,
+           MAX(opn_dt) AS latest_expansion
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND opn_dt >= '2020-01-01'
+    GROUP BY mem_no, mem_name
+)
+SELECT mem_name,
+       total_expansions,
+       recent_expansions,
+       very_recent_expansions,
+       expansion_types,
+       type_diversity,
+       first_expansion,
+       latest_expansion,
+       CASE 
+           WHEN very_recent_expansions >= 3 THEN '快速扩张'
+           WHEN recent_expansions >= 2 THEN '稳步扩张'
+           WHEN recent_expansions = 1 THEN '缓慢扩张'
+           ELSE '无近期扩张'
+       END AS expansion_strategy
+FROM expansion_analysis
+ORDER BY very_recent_expansions DESC, recent_expansions DESC;
+
+问题：统计分支机构开业时间分布和季节性特征分析
+SELECT 
+    EXTRACT(YEAR FROM opn_dt) AS open_year,
+    EXTRACT(QUARTER FROM opn_dt) AS open_quarter,
+    EXTRACT(MONTH FROM opn_dt) AS open_month,
+    COUNT(*) AS opening_count,
+    STRING_AGG(DISTINCT brh_org_type, ', ') AS org_types,
+    COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) AS still_active
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+AND opn_dt IS NOT NULL
+AND opn_dt >= '2020-01-01'
+GROUP BY EXTRACT(YEAR FROM opn_dt), EXTRACT(QUARTER FROM opn_dt), EXTRACT(MONTH FROM opn_dt)
+ORDER BY open_year DESC, open_quarter, open_month;
+
+问题：查询会员简称与会员名称一致性检验
+WITH name_consistency AS (
+    SELECT mem_no, mem_name, mem_abbr,
+           COUNT(DISTINCT mem_name) AS name_variations,
+           COUNT(DISTINCT mem_abbr) AS abbr_variations,
+           STRING_AGG(DISTINCT mem_name, ' | ') AS all_names,
+           STRING_AGG(DISTINCT mem_abbr, ' | ') AS all_abbrs
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY mem_no
+)
+SELECT mem_no,
+       all_names,
+       all_abbrs,
+       name_variations,
+       abbr_variations,
+       CASE 
+           WHEN name_variations > 1 OR abbr_variations > 1 THEN '不一致'
+           ELSE '一致'
+       END AS consistency_status
+FROM name_consistency
+WHERE name_variations > 1 OR abbr_variations > 1
+ORDER BY name_variations DESC, abbr_variations DESC;
+
+问题：分析机构类型转换和升级路径识别
+WITH org_evolution AS (
+    SELECT brh_org_id, brh_org_name, mem_name,
+           opn_dt, clos_dt,
+           brh_org_type,
+           LAG(brh_org_type) OVER (PARTITION BY brh_org_id ORDER BY opn_dt) AS prev_type,
+           LAG(opn_dt) OVER (PARTITION BY brh_org_id ORDER BY opn_dt) AS prev_open_date
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND opn_dt IS NOT NULL
+)
+SELECT mem_name, brh_org_name,
+       prev_type AS from_type,
+       brh_org_type AS to_type,
+       prev_open_date,
+       opn_dt,
+       opn_dt - prev_open_date AS transformation_days,
+       CASE 
+           WHEN prev_type = 'SD' AND brh_org_type = 'BO' THEN '营业部升级分公司'
+           WHEN prev_type = 'BO' AND brh_org_type = 'SS' THEN '分公司升级子公司'
+           WHEN prev_type = 'SS' AND brh_org_type = 'BO' THEN '子公司降级分公司'
+           WHEN prev_type = 'BO' AND brh_org_type = 'SD' THEN '分公司降级营业部'
+           ELSE '其他转换'
+       END AS transformation_type
+FROM org_evolution
+WHERE prev_type IS NOT NULL AND prev_type != brh_org_type
+ORDER BY mem_name, transformation_days;
+
+问题：查询分支机构地址标准化程度和规范性评估
+WITH address_analysis AS (
+    SELECT brh_org_site,
+           COUNT(*) AS usage_count,
+           CHAR_LENGTH(brh_org_site) AS address_length,
+           CASE 
+               WHEN brh_org_site LIKE '中国%' THEN '包含国家'
+               ELSE '不含国家'
+           END AS country_prefix,
+           CASE 
+               WHEN brh_org_site ~ '省|市|自治区|特别行政区' THEN '含省市信息'
+               ELSE '缺省市信息'
+           END AS province_info,
+           CASE 
+               WHEN brh_org_site ~ '区|县|街道|路|号|楼|室|层' THEN '详细地址'
+               ELSE '简略地址'
+           END AS detail_level
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND brh_org_site IS NOT NULL AND brh_org_site != ''
+    GROUP BY brh_org_site
+)
+SELECT country_prefix, province_info, detail_level,
+       COUNT(*) AS address_count,
+       ROUND(AVG(address_length), 1) AS avg_address_length,
+       MIN(address_length) AS min_length,
+       MAX(address_length) AS max_length
+FROM address_analysis
+GROUP BY country_prefix, province_info, detail_level
+ORDER BY country_prefix, province_info, detail_level;
+
+问题：统计各会员分支机构管理层联系方式完备性排名
+WITH contact_completeness AS (
+    SELECT mem_name, brh_org_name,
+           CASE WHEN brh_org_praler_name IS NOT NULL AND brh_org_praler_name != '' THEN 1 ELSE 0 END +
+           CASE WHEN brh_org_praler_mbl IS NOT NULL AND brh_org_praler_mbl != '' THEN 1 ELSE 0 END +
+           CASE WHEN brh_org_praler_eml IS NOT NULL AND brh_org_praler_eml != '' THEN 1 ELSE 0 END +
+           CASE WHEN brh_org_praler_fix_tel IS NOT NULL AND brh_org_praler_fix_tel != '' THEN 1 ELSE 0 END +
+           CASE WHEN brh_org_ctc_mode IS NOT NULL AND brh_org_ctc_mode != '' THEN 1 ELSE 0 END +
+           CASE WHEN brh_org_eml IS NOT NULL AND brh_org_eml != '' THEN 1 ELSE 0 END AS completeness_score
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    AND is_opn = 'Y' AND brh_org_status = 'N'
+)
+SELECT mem_name,
+       COUNT(*) AS active_branches,
+       ROUND(AVG(completeness_score), 2) AS avg_contact_score,
+       COUNT(CASE WHEN completeness_score = 6 THEN 1 END) AS fully_complete_branches,
+       COUNT(CASE WHEN completeness_score <= 2 THEN 1 END) AS poorly_complete_branches,
+       ROUND(COUNT(CASE WHEN completeness_score = 6 THEN 1 END) * 100.0 / COUNT(*), 2) AS complete_ratio
+FROM contact_completeness
+GROUP BY mem_name
+HAVING COUNT(*) >= 3
+ORDER BY avg_contact_score DESC, complete_ratio DESC;
+
+问题：查询分支机构停业风险预警（基于历史停业模式分析）
+WITH closure_patterns AS (
+    SELECT mem_no, mem_name,
+           COUNT(*) AS total_branches,
+           COUNT(CASE WHEN clos_dt IS NOT NULL THEN 1 END) AS closed_branches,
+           COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) AS active_branches,
+           COUNT(CASE WHEN clos_dt >= '2024-01-01' THEN 1 END) AS recent_closures,
+           ROUND(COUNT(CASE WHEN clos_dt IS NOT NULL THEN 1 END) * 100.0 / COUNT(*), 2) AS historical_closure_rate,
+           AVG(CASE WHEN clos_dt IS NOT NULL AND opn_dt IS NOT NULL 
+                   THEN clos_dt - opn_dt END) AS avg_operation_days
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY mem_no, mem_name
+),
+risk_assessment AS (
+    SELECT *,
+           CASE 
+               WHEN historical_closure_rate >= 50 THEN '高风险'
+               WHEN historical_closure_rate >= 25 THEN '中风险'
+               WHEN historical_closure_rate >= 10 THEN '低风险'
+               ELSE '无风险'
+           END AS risk_level
+    FROM closure_patterns
+)
+SELECT mem_name,
+       total_branches,
+       active_branches,
+       closed_branches,
+       recent_closures,
+       historical_closure_rate,
+       ROUND(avg_operation_days / 365.0, 2) AS avg_operation_years,
+       risk_level
+FROM risk_assessment
+WHERE total_branches >= 5
+ORDER BY historical_closure_rate DESC, recent_closures DESC;
+
+问题：分析会员机构编号规律和分配模式
+WITH member_code_analysis AS (
+    SELECT mem_no,
+           CHAR_LENGTH(mem_no) AS code_length,
+           SUBSTRING(mem_no, 1, 2) AS code_prefix,
+           CASE 
+               WHEN mem_no ~ '^[0-9]+$' THEN '纯数字'
+               WHEN mem_no ~ '^[A-Z]+[0-9]+$' THEN '字母+数字'
+               ELSE '其他格式'
+           END AS code_format,
+           COUNT(*) AS branch_count
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY mem_no
+)
+SELECT code_format,
+       code_length,
+       code_prefix,
+       COUNT(*) AS member_count,
+       SUM(branch_count) AS total_branches,
+       ROUND(AVG(branch_count), 2) AS avg_branches_per_member,
+       MIN(mem_no) AS min_code,
+       MAX(mem_no) AS max_code
+FROM member_code_analysis
+GROUP BY code_format, code_length, code_prefix
+ORDER BY code_format, code_length, code_prefix;
+
+问题：查询跨省经营的会员分支机构分布分析
+WITH cross_province_analysis AS (
+    SELECT mem_no, mem_name,
+           COUNT(DISTINCT 
+               CASE WHEN brh_org_site LIKE '%省%' THEN SUBSTRING(brh_org_site, POSITION('省' IN brh_org_site) - 2, 3)
+                    WHEN brh_org_site LIKE '%市%' THEN SUBSTRING(brh_org_site, POSITION('市' IN brh_org_site) - 2, 3)
+                    WHEN brh_org_site LIKE '%自治区%' THEN SUBSTRING(brh_org_site, POSITION('自治区' IN brh_org_site) - 4, 7)
+                    ELSE '其他'
+               END) AS province_count,
+           COUNT(*) AS total_branches,
+           COUNT(CASE WHEN is_opn = 'Y' AND brh_org_status = 'N' THEN 1 END) AS active_branches,
+           STRING_AGG(DISTINCT brh_org_type, ', ') AS org_types
+    FROM dataqa.mem_brh_org_tab
+    WHERE biz_dt = '2025-07-02'
+    GROUP BY mem_no, mem_name
+)
+SELECT mem_name,
+       province_count,
+       total_branches,
+       active_branches,
+       org_types,
+       CASE 
+           WHEN province_count >= 10 THEN '全国性布局'
+           WHEN province_count >= 5 THEN '多省份布局'
+           WHEN province_count >= 3 THEN '区域性布局'
+           WHEN province_count = 2 THEN '双省布局'
+           ELSE '单省经营'
+       END AS expansion_scope
+FROM cross_province_analysis
+WHERE province_count >= 2
+ORDER BY province_count DESC, active_branches DESC;
+
+问题：统计草稿状态和删除状态机构的处理效率分析
+SELECT mem_name,
+       COUNT(*) AS total_non_normal,
+       COUNT(CASE WHEN brh_org_status = 'T' THEN 1 END) AS draft_count,
+       COUNT(CASE WHEN brh_org_status = 'D' THEN 1 END) AS deleted_count,
+       COUNT(CASE WHEN brh_org_status = 'T' AND opn_dt IS NOT NULL THEN 1 END) AS draft_with_open_date,
+       COUNT(CASE WHEN brh_org_status = 'D' AND clos_dt IS NULL THEN 1 END) AS deleted_without_close_date,
+       MIN(CASE WHEN brh_org_status = 'T' THEN opn_dt END) AS oldest_draft_date,
+       MAX(CASE WHEN brh_org_status = 'D' THEN clos_dt END) AS latest_deletion_date
+FROM dataqa.mem_brh_org_tab
+WHERE biz_dt = '2025-07-02'
+AND brh_org_status IN ('T', 'D')
+GROUP BY mem_name
+ORDER BY total_non_normal DESC;

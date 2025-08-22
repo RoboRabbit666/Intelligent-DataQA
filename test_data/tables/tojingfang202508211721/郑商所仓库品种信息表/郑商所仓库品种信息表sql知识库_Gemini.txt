@@ -1,0 +1,144 @@
+问题：查询哪个省份（PROV_DESC）拥有的交割仓库数量最多？
+SELECT PROV_DESC, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY PROV_DESC
+ORDER BY warehouse_count DESC
+LIMIT 1;
+
+问题：统计每个仓库（WH_ABBR）能够支持多少个不同品种的交割？
+SELECT WH_ABBR, COUNT(DISTINCT CLAS_CODE) AS supported_products_count
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY WH_ABBR
+ORDER BY supported_products_count DESC;
+
+问题：找出那些同时支持“棉花”（CF）和“白糖”（SR）交割的仓库有哪些？
+SELECT WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE IN ('CF', 'SR') AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY WH_ABBR
+HAVING COUNT(DISTINCT CLAS_CODE) = 2;
+
+问题：按省份统计，计算各省份的总核定库容（APRD_WH_CPY）和总生产能力（PROD_CPY）。
+SELECT PROV_DESC, SUM(APRD_WH_CPY) AS total_approved_capacity, SUM(PROD_CPY) AS total_production_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY PROV_DESC
+ORDER BY total_approved_capacity DESC;
+
+问题：查询所有仓库中，生产能力（PROD_CPY）与其核定库容（APRD_WH_CPY）比率最高的仓库是哪个？
+SELECT WH_ABBR, CLAS_NAME, (PROD_CPY / APRD_WH_CPY) AS capacity_ratio
+FROM dataqa.wh_clas_info_tab
+WHERE APRD_WH_CPY > 0 AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+ORDER BY capacity_ratio DESC
+LIMIT 1;
+
+问题：查询哪些品种只在唯一的省份有交割仓库？
+WITH ProvinceCounts AS (
+    SELECT CLAS_NAME, COUNT(DISTINCT PROV_DESC) as province_count
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+    GROUP BY CLAS_NAME
+)
+SELECT CLAS_NAME, province_count
+FROM ProvinceCounts
+WHERE province_count = 1;
+
+问题：列出所有基准仓库（WH_TYPE = '基准仓库'）及其支持的品种列表。
+SELECT WH_ABBR, STRING_AGG(CLAS_ABBR, ', ') AS supported_products
+FROM dataqa.wh_clas_info_tab
+WHERE WH_TYPE = '基准仓库' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY WH_ABBR;
+
+问题：查询“河南省”的所有仓库中，核定库容排名前三的仓库是哪些？
+SELECT WH_ABBR, SUM(APRD_WH_CPY) AS total_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE PROV_DESC = '河南省' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY WH_ABBR
+ORDER BY total_approved_capacity DESC
+LIMIT 3;
+
+问题：统计支持交割预报（IS_DLV_RCPT_FCS = 'Y'）和不支持（IS_DLV_RCPT_FCS = 'N'）的仓库各有多少个？
+SELECT IS_DLV_RCPT_FCS, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY IS_DLV_RCPT_FCS;
+
+问题：查询“玻璃”（FG）品种在全国所有仓库的核定库容总和。
+SELECT CLAS_NAME, SUM(APRD_WH_CPY) AS total_glass_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'FG' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY CLAS_NAME;
+
+问题：找出那些没有任何生产能力数据（PROD_CPY 为空或0）的仓库和品种组合。
+SELECT WH_ABBR, CLAS_NAME
+FROM dataqa.wh_clas_info_tab
+WHERE (PROD_CPY IS NULL OR PROD_CPY = 0)
+AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab);
+
+问题：按城市（CITY_DESC）分组，统计每个城市的仓库总数和支持的品种总数。
+SELECT CITY_DESC, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count, COUNT(DISTINCT CLAS_CODE) AS distinct_products
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY CITY_DESC
+ORDER BY warehouse_count DESC;
+
+问题：查询是否有仓库的完整名称（WH_NAME）和其简称（WH_ABBR）是完全相同的？
+SELECT WH_NAME, WH_ABBR
+FROM dataqa.wh_clas_info_tab
+WHERE WH_NAME = WH_ABBR AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab);
+
+问题：列出支持品种数量最多的前5个仓库，并显示它们支持的具体品种简称。
+WITH RankedWarehouses AS (
+    SELECT WH_ABBR, COUNT(DISTINCT CLAS_CODE) AS product_count
+    FROM dataqa.wh_clas_info_tab
+    WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+    GROUP BY WH_ABBR
+    ORDER BY product_count DESC
+    LIMIT 5
+)
+SELECT rw.WH_ABBR, rw.product_count, STRING_AGG(t.CLAS_ABBR, ', ') AS supported_products
+FROM RankedWarehouses rw
+JOIN dataqa.wh_clas_info_tab t ON rw.WH_ABBR = t.WH_ABBR
+WHERE t.stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY rw.WH_ABBR, rw.product_count;
+
+问题：查询“新疆维吾尔自治区”的仓库主要支持哪些品种的交割？
+SELECT CLAS_NAME, COUNT(DISTINCT DLV_WH_CODE) AS warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE PROV_DESC = '新疆维吾尔自治区' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY CLAS_NAME
+ORDER BY warehouse_count DESC;
+
+问题：统计不同仓库类型（WH_TYPE）的平均核定库容。
+SELECT WH_TYPE, AVG(APRD_WH_CPY) AS avg_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY WH_TYPE;
+
+问题：查询“甲醇”（MA）品种的仓库地理分布情况，按省份列出仓库数量。
+SELECT PROV_DESC, COUNT(DISTINCT DLV_WH_CODE) AS methanol_warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE CLAS_CODE = 'MA' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY PROV_DESC
+ORDER BY methanol_warehouse_count DESC;
+
+问题：找出所有仓库地址中包含“保税”字样的仓库。
+SELECT WH_ABBR, WH_ADDR
+FROM dataqa.wh_clas_info_tab
+WHERE WH_ADDR LIKE '%保税%' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab);
+
+问题：查询哪个品种被最多的非基准仓库（WH_TYPE = '非基准仓库'）支持？
+SELECT CLAS_NAME, COUNT(DISTINCT DLV_WH_CODE) AS non_benchmark_warehouse_count
+FROM dataqa.wh_clas_info_tab
+WHERE WH_TYPE = '非基准仓库' AND stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY CLAS_NAME
+ORDER BY non_benchmark_warehouse_count DESC
+LIMIT 1;
+
+问题：查询每个品种的最小核定库容和最大核定库容分别是多少？
+SELECT CLAS_NAME, MIN(APRD_WH_CPY) AS min_approved_capacity, MAX(APRD_WH_CPY) AS max_approved_capacity
+FROM dataqa.wh_clas_info_tab
+WHERE stas_DT = (SELECT MAX(stas_DT) FROM dataqa.wh_clas_info_tab)
+GROUP BY CLAS_NAME;
