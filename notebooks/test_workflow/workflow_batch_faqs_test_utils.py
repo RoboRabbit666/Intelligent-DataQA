@@ -7,6 +7,7 @@ import re
 import json
 from pathlib import Path
 from typing import List, Dict, Tuple
+from app.core.data.workflow_JINGFANG import DataQaWorkflow
 
 
 def load_252_questions():
@@ -37,10 +38,17 @@ def load_252_questions():
             matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
             
             for question_text, sql_text in matches:
+
+                question_text = question_text.strip()
+                sql_text = sql_text.strip()
+
+                # 对FAQ问题进行实体识别增强
+                enhanced_question_text = DataQaWorkflow.entity_recognition(self=None, query=question_text)
+
                 questions.append({
                     'id': question_id,
-                    'question': question_text.strip(),
-                    'expected_sql': sql_text.strip(),
+                    'question': enhanced_question_text,
+                    'expected_sql': sql_text,
                     'table_name': table_dir.name
                 })
                 question_id += 1
