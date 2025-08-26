@@ -11,5 +11,6 @@ class WorkflowStepType(str, Enum):
     ENTITY_RECOGNITION = "entity_recognition"
     SEMANTIC_SEARCH_FAQ = "semantic_search_faq"
     LOCATE_TABLE = "locate_table"
+    LOCATE_API = "locate_api"
     # GENERATE_PROMPT = "generate_single_table_prompt"
     GENERATE_SQL = "generate_sql"
