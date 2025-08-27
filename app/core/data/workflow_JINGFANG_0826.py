@@ -70,6 +70,7 @@ class WorkflowConfig:
     collection: Optional[str] = "hybrid_sql"
     domain_collection: Optional[str] = 'domain_kl' #新增领域知识
     api_collection: Optional[str] = 'api_kl' #新增API知识
+    sql_schema_collection: Optional[str] = "sql_kl" #新增SQL知识
     max_table_results: int = 3
     enable_entity_recognition: bool = True
     enable_reranker: bool = True
@@ -677,7 +678,7 @@ class DataQaWorkflow:
             #----------------------------------------------------------------------------------------
 
             # Step4: locate table
-            located_table = self.locate_table(entity_enriched_query, knowledge_base_ids)
+            located_table = self.locate_table(entity_enriched_query, request, knowledge_base_ids)
             step4 = self._create_step(WorkflowStepType.LOCATE_TABLE, 4, located_table)
 
             #-----------------------新增:如果有相关的FAQ(即0.7 =< 相似度 < 0.9),可添加参考---------------------------------
