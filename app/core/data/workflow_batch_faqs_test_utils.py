@@ -10,9 +10,9 @@ from typing import List, Dict, Tuple
 from app.core.data.workflow_JINGFANG import DataQaWorkflow
 
 
-def load_252_questions():
-    """加载252个问题"""
-    print("加载252个测试问题...")
+def load_faq_questions():
+    """加载faq问题"""
+    print("加载faq测试问题...")
     
     tables_dir = Path("../test_data/tables")
     if not tables_dir.exists():
@@ -158,7 +158,7 @@ def compare_sql(expected: str, actual: str) -> Tuple[bool, str, float]:
     return False, "no_match", sim_score
 
 
-def save_results(results: List[Dict], filename: str = "test_results_252.json"):
+def save_results(results: List[Dict], filename: str = "test_results.json"):
     """保存简化的测试结果"""
     simple_results = []
     for r in results:
@@ -215,110 +215,3 @@ def print_statistics(results: List[Dict]):
         full_matched = sum(1 for r in full_results if r['is_match'])
         print(f"   完整流程准确率: {full_matched/len(full_results)*100:.2f}%")
 
-
-"""
-# 在test_e2e_workflow.ipynb 中添加导入
-from tqdm import tqdm
-from batch_test_utils import (
-    load_252_questions, 
-    extract_sql, 
-    compare_sql, 
-    save_results,
-    print_statistics
-)
-
-def test_e2e_high_similarity():
-    """
-    端到端测试：252个问题的批量测试
-    """
-    print("=" * 60)
-    print("端到端测试：252个问题批量测试")
-    print("=" * 60)
-    
-    # 加载252个问题
-    try:
-        questions = load_252_questions()
-    except Exception as e:
-        print(f"加载问题失败: {e}")
-        return None
-    
-    # 存储结果
-    results = []
-    
-    # 使用tqdm显示进度
-    for question_data in tqdm(questions, desc="测试进度"):
-        user_query = question_data['question']
-        
-        # ===== 保持原有的核心结构 =====
-        messages = [ChatMessage(role="user", content=user_query)]
-        request = DataQACompletionRequest(
-            messages=messages,
-            model="test",
-            created=int(datetime.now().timestamp()),
-            follow_up_num=0,
-            knowledge_base_ids=["3cc33ed2-21fb-4452-9e10-528867bd5f99"],
-            use_reranker=True
-        )
-        
-        try:
-            # 执行工作流
-            response = workflow.do_generate(
-                request=request,
-                enable_follow_up=False,
-                thinking=False
-            )
-            
-            # 提取生成的SQL
-            generated_sql = ""
-            if response.choices:
-                content = response.choices[0].message.content
-                generated_sql = extract_sql(content)
-            
-            # 检查FAQ快速路径
-            is_faq_path = (len(response.steps) == 3 and response.model == "faq")
-            
-            # 混合策略比较
-            is_match, match_type, match_score = compare_sql(
-                question_data['expected_sql'], 
-                generated_sql
-            )
-            
-            # 记录结果
-            result = {
-                'question_id': question_data['id'],
-                'original_question': question_data['question'],
-                'expected_sql': question_data['expected_sql'],
-                'generated_sql': generated_sql,
-                'is_match': is_match,
-                'match_type': match_type,
-                'match_score': match_score,
-                'is_faq_path': is_faq_path
-            }
-            results.append(result)
-            
-        except Exception as e:
-            # 记录错误
-            error_result = {
-                'question_id': question_data['id'],
-                'original_question': question_data['question'],
-                'expected_sql': question_data['expected_sql'],
-                'generated_sql': "",
-                'is_match': False,
-                'match_type': "error",
-                'match_score': 0.0,
-                'is_faq_path': False
-            }
-            results.append(error_result)
-    
-    # 保存结果
-    save_results(results)
-    
-    # 打印统计
-    print_statistics(results)
-    
-    return results
-
-# 执行测试
-batch_test_results = test_e2e_high_similarity()
-
-"""
