@@ -430,6 +430,7 @@ class DataQaWorkflow:
                     "chunk_uuid": table.chunk_id,
                     "table_name": table.data.table_name,
                     "table_info": table.data.table_info,
+                    "table_schema": table.data.table_schema,
                     "score": table.reranking_score,
                 }
                 for table in ranked_tables
@@ -688,9 +689,8 @@ class DataQaWorkflow:
 
             if faq_results and len(faq_results) > 0 and faq_results[0]['similarity'] >= 0.7:
                 # step5: generate_sql (有FAQ参考)
-                table_schema = located_table[0]['table_info'] if located_table else ""
                 response = self.generate_sql(
-                    table_schema=table_schema,
+                    table_schema=located_table[0] if located_table else "",
                     input_messages=enhanced_input_messages,  # 使用增强后的消息
                     faq_results=faq_results,  # 添加FAQ结果
                     faq_score=faq_results[0]['similarity'],  # FAQ最高相似度分数
@@ -699,15 +699,14 @@ class DataQaWorkflow:
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
             else:
                 # step5: generate_sql (相似度 < 0.7或者没有FAQ参考，继续走原流程)
-                table_schema = located_table[0]['table_info'] if located_table else ""
                 response = self.generate_sql(
-                    table_schema=table_schema,
+                    table_schema=located_table[0] if located_table else "",
                     input_messages=enhanced_input_messages,  # 使用增强后的消息
                     faq_results=None,  # 无FAQ参考
                     faq_score=0.0,
                     thinking=thinking,
                 )
-                logger.info(f"Print table schema: {table_schema}")
+                logger.info(f"Print table schema: {located_table[0]}")
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
                 
             #---------------------------------------------------------------------------------------------------------
