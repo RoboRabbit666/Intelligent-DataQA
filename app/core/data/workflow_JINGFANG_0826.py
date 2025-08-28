@@ -696,6 +696,8 @@ class DataQaWorkflow:
                     faq_score=faq_results[0]['similarity'],  # FAQ最高相似度分数
                     thinking=thinking,
                 )
+                logger.info(f"Path 2: Found FAQ with similarity >= 0.7, using FAQ reference")
+                logger.info(f"Print table schema: {located_table[0]}")
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
             else:
                 # step5: generate_sql (相似度 < 0.7或者没有FAQ参考，继续走原流程)
@@ -706,6 +708,7 @@ class DataQaWorkflow:
                     faq_score=0.0,
                     thinking=thinking,
                 )
+                logger.info(f"Path 3: No FAQ or low similarity (<0.7), continue original flow")
                 logger.info(f"Print table schema: {located_table[0]}")
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
                 
