@@ -70,7 +70,7 @@ class WorkflowConfig:
     collection: Optional[str] = "hybrid_sql"
     domain_collection: Optional[str] = 'domain_kl' #新增领域知识
     api_collection: Optional[str] = 'api_kl' #新增API知识
-    sql_schema_collection: Optional[str] = "sql_kl" #新增SQL知识
+    sql_schema_collection: Optional[str] = "hybrid_sql" #新增SQL知识
     max_table_results: int = 3
     enable_entity_recognition: bool = True
     enable_reranker: bool = True
@@ -707,6 +707,7 @@ class DataQaWorkflow:
                     faq_score=0.0,
                     thinking=thinking,
                 )
+                logger.info(f"Print table schema: {table_schema}")
                 step5 = self._create_step(WorkflowStepType.GENERATE_SQL, 5, response)
                 
             #---------------------------------------------------------------------------------------------------------
