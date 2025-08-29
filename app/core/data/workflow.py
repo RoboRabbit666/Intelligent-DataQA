@@ -633,6 +633,7 @@ class DataQaWorkflow:
             step3 = self._create_step(
                 WorkflowStepType.SEMANTIC_SEARCH_FAQ,3,"已找到高相似度(>=0.9)FAQ"
             )
+            logger.info("Path 1: Found FAQ with high similarity (>=0.9), using FAQ directly")
             # FAQ直接命中,快速构造响应
             best_faq = faq_results[0]
             response_content = f"""以下是问题分析和sql参考示例:
