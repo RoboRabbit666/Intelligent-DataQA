@@ -141,7 +141,7 @@ class DataQaWorkflow:
                 if message.role == "user":
                     last_user_msg = message
                     last_index = index
-            optimized_query = self.query_optimizer.generate(
+            optimized_query = self.query_optimizer.generate_optimized_query(
                 query=last_user_msg.content,
                 chat_history=input_messages_copy[: last_index + 1],
                 optimization_type=optimization_type,
