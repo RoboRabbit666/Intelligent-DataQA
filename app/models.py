@@ -63,7 +63,7 @@ class ChatCompletionRequest(BaseModel):
     #是否开启深度思考
     thinking: Optional[bool] = True
 
-class KnogCompletionRequest(ChatCompletionRequest):
+class KnoqCompletionRequest(ChatCompletionRequest):
     """知识问答请求"""
     knowledge_base_ids: List[str]
     use_reranker: bool = False
