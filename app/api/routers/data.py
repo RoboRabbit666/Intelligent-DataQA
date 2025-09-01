@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from app.config import settings
-from app.core.components import gwen3_1lm, gwen3_thinking_llm
+from app.core.components import qwen3_llm, qwen3_thinking_llm
 from app.core.data.workflow import DataQaWorkflow
 from app.models import DataQAChatCompletionResponse, DataQACompletionRequest, RerankerInfo
 from app.utils.log import logger
@@ -13,9 +13,9 @@ from app.utils.log import logger
 router = APIRouter(prefix=settings.dataqa_workflow.router_prefix)
 
 dataqa = DataQaWorkflow(
-    ans_llm=qwen3_1lm,
+    ans_llm=qwen3_llm,
     ans_thinking_llm=qwen3_thinking_llm,
-    query_llm=qwen3_1lm,
+    query_llm=qwen3_llm,
     reranking_threshold=settings.dataqa_workflow.reranking_threshold,
     collection=settings.dataqa_workflow.milvus_collection,
 )
