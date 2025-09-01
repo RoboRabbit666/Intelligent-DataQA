@@ -1,0 +1,431 @@
+{
+  "sm_full": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型完整配置 (46MB)",
+    "excluded_components": [],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "parser",
+      "attribute_ruler",
+      "ner"
+    ],
+    "load_time": 0.6602110862731934,
+    "total_processing_time": 0.2327282428741455,
+    "avg_time_per_text": 0.0034224741599139046,
+    "median_time_per_text": 0.0026481151580810547,
+    "p95_time_per_text": 0.005156040191650391,
+    "texts_per_second": 292.18628199231046,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.0017919540405273438,
+      "max_time": 0.028538942337036133,
+      "std_time": 0.0034729073452318838
+    }
+  },
+  "sm_ner_pos": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型NER+词性 (46MB)",
+    "excluded_components": [
+      "parser",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "ner"
+    ],
+    "load_time": 0.5366928577423096,
+    "total_processing_time": 0.19588303565979004,
+    "avg_time_per_text": 0.0028806328773498535,
+    "median_time_per_text": 0.0025129318237304688,
+    "p95_time_per_text": 0.0049440860748291016,
+    "texts_per_second": 347.1459372219578,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.0016591548919677734,
+      "max_time": 0.009444713592529297,
+      "std_time": 0.0015175990055703297
+    }
+  },
+  "sm_ner_only": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型仅NER (46MB)",
+    "excluded_components": [
+      "parser",
+      "tagger",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "ner"
+    ],
+    "load_time": 0.5139989852905273,
+    "total_processing_time": 0.19183683395385742,
+    "avg_time_per_text": 0.0028211299110861387,
+    "median_time_per_text": 0.0022187232971191406,
+    "p95_time_per_text": 0.008711099624633789,
+    "texts_per_second": 354.46790169794014,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.001569986343383789,
+      "max_time": 0.017747163772583008,
+      "std_time": 0.0023263449729168
+    }
+  },
+  "md_full": {
+    "model": "zh_core_web_md",
+    "description": "中型模型完整配置 (74MB)",
+    "excluded_components": [],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "parser",
+      "attribute_ruler",
+      "ner"
+    ],
+    "load_time": 0.7374427318572998,
+    "total_processing_time": 0.22008705139160156,
+    "avg_time_per_text": 0.0032365742851706114,
+    "median_time_per_text": 0.002682209014892578,
+    "p95_time_per_text": 0.005329132080078125,
+    "texts_per_second": 308.9686538578201,
+    "total_entities_found": 128,
+    "avg_entities_per_text": 1.8823529411764706,
+    "entity_type_counts": {
+      "FAC": 1,
+      "ORG": 52,
+      "MONEY": 9,
+      "DATE": 24,
+      "CARDINAL": 22,
+      "GPE": 9,
+      "WORK_OF_ART": 2,
+      "PERCENT": 2,
+      "PERSON": 2,
+      "TIME": 3,
+      "QUANTITY": 1,
+      "NORP": 1
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 19,
+      "FUTURES_COMPANY": 14,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 6,
+      "TIME": 12,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.0018990039825439453,
+      "max_time": 0.011710882186889648,
+      "std_time": 0.0019056043096044048
+    }
+  },
+  "md_ner_pos": {
+    "model": "zh_core_web_md",
+    "description": "中型模型NER+词性 (74MB)",
+    "excluded_components": [
+      "parser",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "tagger",
+      "ner"
+    ],
+    "load_time": 0.6998510360717773,
+    "total_processing_time": 0.22172212600708008,
+    "avg_time_per_text": 0.003260619500104119,
+    "median_time_per_text": 0.0023736953735351562,
+    "p95_time_per_text": 0.009630918502807617,
+    "texts_per_second": 306.6901857049152,
+    "total_entities_found": 128,
+    "avg_entities_per_text": 1.8823529411764706,
+    "entity_type_counts": {
+      "FAC": 1,
+      "ORG": 52,
+      "MONEY": 9,
+      "DATE": 24,
+      "CARDINAL": 22,
+      "GPE": 9,
+      "WORK_OF_ART": 2,
+      "PERCENT": 2,
+      "PERSON": 2,
+      "TIME": 3,
+      "QUANTITY": 1,
+      "NORP": 1
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 19,
+      "FUTURES_COMPANY": 14,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 6,
+      "TIME": 12,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.001772165298461914,
+      "max_time": 0.018219947814941406,
+      "std_time": 0.002824431615516708
+    }
+  },
+  "md_ner_only": {
+    "model": "zh_core_web_md",
+    "description": "中型模型仅NER (74MB)",
+    "excluded_components": [
+      "parser",
+      "tagger",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "ner"
+    ],
+    "load_time": 0.6754250526428223,
+    "total_processing_time": 0.2014923095703125,
+    "avg_time_per_text": 0.002963122199563419,
+    "median_time_per_text": 0.0023038387298583984,
+    "p95_time_per_text": 0.009650230407714844,
+    "texts_per_second": 337.4818629307081,
+    "total_entities_found": 128,
+    "avg_entities_per_text": 1.8823529411764706,
+    "entity_type_counts": {
+      "FAC": 1,
+      "ORG": 52,
+      "MONEY": 9,
+      "DATE": 24,
+      "CARDINAL": 22,
+      "GPE": 9,
+      "WORK_OF_ART": 2,
+      "PERCENT": 2,
+      "PERSON": 2,
+      "TIME": 3,
+      "QUANTITY": 1,
+      "NORP": 1
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 19,
+      "FUTURES_COMPANY": 14,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 6,
+      "TIME": 12,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.0017001628875732422,
+      "max_time": 0.015565156936645508,
+      "std_time": 0.002230142582746104
+    }
+  },
+  "trf_full": {
+    "model": "zh_core_web_trf",
+    "description": "Transformer模型完整配置 (396MB)",
+    "excluded_components": [],
+    "active_pipes": [
+      "transformer",
+      "tagger",
+      "parser",
+      "attribute_ruler",
+      "ner"
+    ],
+    "load_time": 1.168370246887207,
+    "total_processing_time": 1.8714807033538818,
+    "avg_time_per_text": 0.02752177504932179,
+    "median_time_per_text": 0.02638983726501465,
+    "p95_time_per_text": 0.03761887550354004,
+    "texts_per_second": 36.334865691180866,
+    "total_entities_found": 141,
+    "avg_entities_per_text": 2.073529411764706,
+    "entity_type_counts": {
+      "ORG": 55,
+      "PERSON": 5,
+      "MONEY": 10,
+      "CARDINAL": 23,
+      "DATE": 17,
+      "PRODUCT": 11,
+      "QUANTITY": 1,
+      "EVENT": 1,
+      "PERCENT": 6,
+      "GPE": 9,
+      "TIME": 3
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 20,
+      "FUTURES_COMPANY": 19,
+      "COMMODITY": 2,
+      "CONTRACT_CODE": 2,
+      "PRICE_VALUE": 6,
+      "TIME": 14,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.021608352661132812,
+      "max_time": 0.08767509460449219,
+      "std_time": 0.009060171106878139
+    }
+  },
+  "trf_ner_pos": {
+    "model": "zh_core_web_trf",
+    "description": "Transformer模型NER+词性 (396MB)",
+    "excluded_components": [
+      "parser",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "transformer",
+      "tagger",
+      "ner"
+    ],
+    "load_time": 1.1400039196014404,
+    "total_processing_time": 1.9126107692718506,
+    "avg_time_per_text": 0.028126628959880155,
+    "median_time_per_text": 0.026163101196289062,
+    "p95_time_per_text": 0.03331923484802246,
+    "texts_per_second": 35.55349634776356,
+    "total_entities_found": 141,
+    "avg_entities_per_text": 2.073529411764706,
+    "entity_type_counts": {
+      "ORG": 55,
+      "PERSON": 5,
+      "MONEY": 10,
+      "CARDINAL": 23,
+      "DATE": 17,
+      "PRODUCT": 11,
+      "QUANTITY": 1,
+      "EVENT": 1,
+      "PERCENT": 6,
+      "GPE": 9,
+      "TIME": 3
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 20,
+      "FUTURES_COMPANY": 19,
+      "COMMODITY": 2,
+      "CONTRACT_CODE": 2,
+      "PRICE_VALUE": 6,
+      "TIME": 14,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.02126312255859375,
+      "max_time": 0.0972280502319336,
+      "std_time": 0.010227410569485926
+    }
+  },
+  "trf_ner_only": {
+    "model": "zh_core_web_trf",
+    "description": "Transformer模型仅NER (396MB)",
+    "excluded_components": [
+      "parser",
+      "tagger",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "transformer",
+      "ner"
+    ],
+    "load_time": 1.1536650657653809,
+    "total_processing_time": 1.8616101741790771,
+    "avg_time_per_text": 0.02737662020851584,
+    "median_time_per_text": 0.026422977447509766,
+    "p95_time_per_text": 0.03692483901977539,
+    "texts_per_second": 36.52751845857647,
+    "total_entities_found": 141,
+    "avg_entities_per_text": 2.073529411764706,
+    "entity_type_counts": {
+      "ORG": 55,
+      "PERSON": 5,
+      "MONEY": 10,
+      "CARDINAL": 23,
+      "DATE": 17,
+      "PRODUCT": 11,
+      "QUANTITY": 1,
+      "EVENT": 1,
+      "PERCENT": 6,
+      "GPE": 9,
+      "TIME": 3
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 20,
+      "FUTURES_COMPANY": 19,
+      "COMMODITY": 2,
+      "CONTRACT_CODE": 2,
+      "PRICE_VALUE": 6,
+      "TIME": 14,
+      "RESEARCH_ORG": 4
+    },
+    "performance_stats": {
+      "min_time": 0.018908977508544922,
+      "max_time": 0.09733080863952637,
+      "std_time": 0.010116836375648645
+    }
+  }
+}
