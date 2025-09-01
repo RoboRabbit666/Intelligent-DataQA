@@ -4,7 +4,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.config import settings
+from app.config.config import settings
 from app.core.components import qwen3_llm, qwen3_thinking_llm
 from app.core.data.workflow import DataQaWorkflow
 from app.models import DataQAChatCompletionResponse, DataQACompletionRequest, RerankerInfo
