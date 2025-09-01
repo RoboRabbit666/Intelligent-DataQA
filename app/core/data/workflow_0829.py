@@ -243,6 +243,7 @@ class DataQaWorkflow:
                     "chunk_uuid": table.chunk_id,
                     "table_name": table.data.table_name,
                     "table_info": table.data.table_info,
+                    "table_schema": table.data.table_schema,
                     "score": table.reranking_score,
                 }
                 for table in ranked_tables
