@@ -505,12 +505,13 @@ class DataQaWorkflow:
             
             response_content = f"""找到匹配的API接口：
 
+API ID: {api_info['api_id']}
 API名称: {api_info['api_name']}
 API描述: {api_info['api_description']}
 请求参数: {api_info['api_request']}
 响应参数: {api_info['api_response']}
 
-使用此API可以获取所需数据。"""
+使用此API即可获取所需数据。"""
             
             choices = [
                 ChatCompletionChoice(
