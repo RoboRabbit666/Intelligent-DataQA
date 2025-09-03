@@ -5,12 +5,12 @@ import re
 import traceback
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, AsyncIterator
+from typing import Any, Dict, List, Optional, Tuple
 
 from app.config.config import settings
 from app.core.components import (
     business_info_kb,
-    document_kb,
+    document_kb,  # 保持不变：用于API搜索
     qa_pair_kb,
     sql_kb,
     tokenizer,
@@ -41,7 +41,7 @@ from .prompt import dataqa_prompt
 @dataclass
 class WorkflowConfig:
     """工作流配置类-统一管理参数、魔法数字等"""
-
+    # 保持不变的配置
     history_round: int = 3
     follow_up_round: int = 1
     reranking_threshold: float = 0.2
@@ -52,13 +52,16 @@ class WorkflowConfig:
     max_table_results: int = 3
     enable_entity_recognition: bool = True
     enable_reranker: bool = True
-    # FQA相关设置
-    enable_fqa_answer: bool = True  # 是否启用FQA作为SQL
-    fqa_answer_threshold: float = 0.9  # FQA分数作为结果的阈值
-    fqa_reference_threshold: float = 0.7  # FQA作为参考示例的阈值
-    fqa_sample_num: int = 3  # fqa SQL 样例个数
-    # API相关设置
-    enable_api_search: bool = False  # 是否启用API搜索
+    
+    # 修改：调整FAQ阈值策略
+    enable_fqa_answer: bool = True
+    fqa_answer_threshold: float = 0.9  # FAQ直接返回阈值
+    fqa_reference_threshold: float = 0.7  # FAQ作为参考阈值
+    fqa_sample_num: int = 3
+    
+    # 新增：API相关配置
+    enable_api_search: bool = True  # 启用API搜索
+    api_threshold: float = 0.8  # API返回阈值
 
     def __post_init__(self):
         if self.history_round < self.follow_up_round:
@@ -76,15 +79,15 @@ class DataQaWorkflow:
         ans_thinking_llm: LLMModel,
         query_llm: LLMModel,
         config: Optional[WorkflowConfig] = None,
-        collection: Optional[str] = None,  # 添加collection参数以匹配routers/data.py
-        reranking_threshold: Optional[float] = None,  # 添加reranking_threshold参数
+        collection: Optional[str] = None,
+        reranking_threshold: Optional[float] = None,
     ):
+        # 保持不变：初始化
         self.ans_client = ans_llm
         self.ans_thinking_client = ans_thinking_llm
         self.query_optimizer = QueryOptimizer(query_llm)
         self.config = config or WorkflowConfig()
         
-        # 如果传入了collection和reranking_threshold，更新配置
         if collection:
             self.config.sql_schema_collection = collection
         if reranking_threshold is not None:
@@ -93,7 +96,7 @@ class DataQaWorkflow:
     def _create_step(
         self, step_type: WorkflowStepType, number: int, prompt: Any
     ) -> ChatStep:
-        """创建工作流步骤"""
+        """创建工作流步骤 - 保持不变"""
         step_names = {
             WorkflowStepType.FOLLOW_UP: "问题追问",
             WorkflowStepType.MODIFY_QUERY: "问题改写",
@@ -102,8 +105,9 @@ class DataQaWorkflow:
             WorkflowStepType.SEARCH_FAQ: "语义搜索FAQ",
             WorkflowStepType.LOCATE_TABLE: "表格定位",
             WorkflowStepType.GENERATE_SQL: "SQL生成",
+            WorkflowStepType.BUSINESS_INFO: "业务知识搜索",  # 新增
         }
-        # 转换prompt为字符串
+        
         if not isinstance(prompt, str):
             if isinstance(prompt, list):
                 prompt = json.dumps(prompt, ensure_ascii=False, indent=2)
@@ -114,7 +118,7 @@ class DataQaWorkflow:
         
         return ChatStep(
             key=step_type.value,
-            name=step_names[step_type],
+            name=step_names.get(step_type, step_type.value),
             number=number,
             prompt=prompt,
             finished=True,
@@ -123,7 +127,7 @@ class DataQaWorkflow:
     def _extract_input_messages(
         self, request: DataQACompletionRequest
     ) -> List[ChatMessage]:
-        """提取输入信息列表"""
+        """提取输入信息列表 - 保持不变"""
         return request.messages[-self.config.history_round * 2 :]
 
     def modify_query(
@@ -131,13 +135,7 @@ class DataQaWorkflow:
         input_messages: List[ChatMessage],
         enable_follow_up: bool,
     ) -> DataQAOptimizedQuery:
-        """问题改写
-        Args:
-            input_messages: 输入的消息列表
-            enable_follow_up: 是否启用追问功能
-        Returns:
-            优化后的查询对象
-        """
+        """问题改写 - 保持不变"""
         try:
             input_messages_copy = copy.deepcopy(input_messages)
             optimization_type = (
@@ -146,7 +144,6 @@ class DataQaWorkflow:
                 else QueryOptimizationType.DATAQA
             )
             
-            # 获取最后一条用户消息
             last_user_msg = None
             last_index = None
             for index, message in enumerate(input_messages_copy):
@@ -155,7 +152,6 @@ class DataQaWorkflow:
                     last_index = index
             
             if not last_user_msg:
-                # 如果没有用户消息，返回默认查询
                 return DataQAOptimizedQuery(
                     original_query="",
                     rewritten_query="",
@@ -174,12 +170,7 @@ class DataQaWorkflow:
             raise e
 
     def entity_recognition(self, query: str) -> str:
-        """实体识别增强查询
-        Args:
-            query: 原始查询
-        Returns:
-            增强后的查询
-        """
+        """实体识别 - 保持不变"""
         if not self.config.enable_entity_recognition:
             return query
         
@@ -190,7 +181,6 @@ class DataQaWorkflow:
             for entity in entity_list:
                 if entity["id"] and entity["text"] in enhanced_query:
                     if entity["label"] == "合约":
-                        # 标准化合约代码
                         normalized_code = re.sub(
                             r"[-_\.\s/]+", "", entity["text"].upper()
                         )
@@ -205,18 +195,31 @@ class DataQaWorkflow:
             return enhanced_query
         except Exception as e:
             logger.error(f"实体识别失败: {e}")
-            return query  # 失败时返回原查询
+            return query
+
+    def business_info_search(
+        self, query: str, top_k: int = 2, knowledge_base_ids: Optional[List[str]] = None
+    ) -> List[Chunk]:
+        """搜索业务知识 - 保持不变"""
+        try:
+            ranked_qas = business_info_kb.search(
+                collection=self.config.domain_collection,
+                query=query,
+                search_type=SearchType.dense,
+                top_k=top_k,
+                use_reranker=False,
+                score_fusion=False,
+                knowledge_ids=knowledge_base_ids,
+            )
+            return ranked_qas
+        except Exception as e:
+            logger.error(f"Business info search Error: {e}")
+            return []
 
     def search_qa(
         self, query: str, knowledge_base_ids: Optional[List[str]] = None
     ) -> List[Chunk]:
-        """搜索FAQ知识库
-        Args:
-            query: 查询内容
-            knowledge_base_ids: 知识库ID列表
-        Returns:
-            FAQ结果列表
-        """
+        """搜索FAQ知识库 - 修正：返回类型和访问方式"""
         try:
             ranked_qas = qa_pair_kb.search(
                 collection=self.config.qa_collection,
@@ -231,22 +234,35 @@ class DataQaWorkflow:
             logger.error(f"QA Search Error: {e}")
             return []
 
+    def locate_api(
+        self, query: str, knowledge_base_ids: Optional[List[str]] = None
+    ) -> List[Chunk]:
+        """定位数据API - 修改：改为返回Chunk列表而非字典"""
+        if not self.config.enable_api_search:
+            return []
+        
+        try:
+            # 新增：使用api_collection搜索API
+            ranked_apis = document_kb.search(
+                collection=self.config.api_collection,
+                query=query,
+                knowledge_ids=knowledge_base_ids,
+                top_k=self.config.max_table_results,
+                use_reranker=self.config.enable_reranker,
+            )
+            return ranked_apis
+        except Exception as e:
+            logger.error(f"Locate API Error: {e}")
+            return []
+
     def locate_table(
         self,
         query: str,
         request: DataQACompletionRequest,
         knowledge_base_ids: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
-        """定位数据表
-        Args:
-            query: 查询内容
-            request: 请求对象
-            knowledge_base_ids: 知识库ID列表
-        Returns:
-            表格信息列表
-        """
+        """定位表格 - 保持不变"""
         input_messages = self._extract_input_messages(request)
-        # 构建搜索内容，包含历史对话上下文
         search_content = (
             "\n".join([f"{msg.role}: {msg.content}" for msg in input_messages])
             + "\nUser: "
@@ -278,72 +294,45 @@ class DataQaWorkflow:
             logger.error(f"Locate table Error: {e}")
             return []
 
-    def locate_api(
-        self, query: str, knowledge_base_ids: Optional[List[str]] = None
-    ) -> List[Dict[str, Any]]:
-        """定位数据API
-        Args:
-            query: 查询内容
-            knowledge_base_ids: 查询的知识库ID
-        Returns:
-            API列表
-        """
-        if not self.config.enable_api_search:
-            return []
-        
-        try:
-            ranked_apis = document_kb.search(
-                collection=self.config.api_collection,
-                query=query,
-                knowledge_ids=knowledge_base_ids,
-                top_k=self.config.max_table_results,
-                use_reranker=self.config.enable_reranker,
-            )
-            
-            api_list = [
-                {
-                    "chunk_uuid": api.chunk_id,
-                    "api_name": api.data.api_name if hasattr(api.data, 'api_name') else api.data.content,
-                    "api_description": api.data.api_description if hasattr(api.data, 'api_description') else "",
-                    "score": api.reranking_score,
-                }
-                for api in ranked_apis
-            ]
-            return api_list
-        except Exception as e:
-            logger.error(f"Locate API Error: {e}")
-            return []
-
     def generate_sql(
         self,
         table_schema: str,
         input_messages: List[ChatMessage],
-        faq_results: Optional[List[Dict[str, Any]]] = None,
+        faq_results: Optional[List[Chunk]] = None,  # 修正：类型为List[Chunk]
+        business_context: Optional[List[Chunk]] = None,  # 新增：业务上下文
         thinking: bool = False,
     ):
-        """生成SQL
-        Args:
-            table_schema: 表结构信息
-            input_messages: 输入消息列表
-            faq_results: FAQ参考结果
-            thinking: 是否开启深度思考
-        Returns:
-            LLM响应
-        """
+        """生成SQL - 修改：修正FAQ处理和增加业务上下文"""
         query = input_messages[-1].content
         
-        # 格式化FAQ结果
+        # 修正：正确处理FAQ结果
         faq_text = ""
         faq_score = 0.0
         if faq_results:
             faq_examples = []
             for faq in faq_results[:self.config.fqa_sample_num]:
-                faq_examples.append(f"问题: {faq['question']}\nSQL: {faq['answer']}")
+                # 修正：使用正确的Chunk属性访问方式
+                faq_examples.append(
+                    f"问题: {faq.data.question}\nSQL: {faq.data.answer}"
+                )
             faq_text = "\n---\n".join(faq_examples)
-            faq_score = faq_results[0]['score'] if faq_results else 0.0
+            faq_score = faq_results[0].reranking_score if faq_results else 0.0
         
+        # 新增：构建业务上下文
+        business_text = ""
+        if business_context:
+            business_info = []
+            for info in business_context[:2]:  # 最多使用2条业务知识
+                if hasattr(info.data, 'business_desc'):
+                    business_info.append(info.data.business_desc)
+                elif hasattr(info.data, 'content'):
+                    business_info.append(info.data.content)
+            if business_info:
+                business_text = "\n业务背景知识：\n" + "\n".join(business_info)
+        
+        # 修改：在prompt中增加业务上下文
         content = dataqa_prompt.format(
-            table_schema=table_schema,
+            table_schema=table_schema + business_text,  # 添加业务上下文
             question=query,
             faq_results=faq_text,
             faq_score=faq_score,
@@ -363,18 +352,11 @@ class DataQaWorkflow:
         optimized_query: DataQAOptimizedQuery,
         request: DataQACompletionRequest,
     ) -> Tuple[Optional[DataQAChatCompletionResponse], DataQAOptimizedQuery]:
-        """处理追问逻辑
-        Args:
-            optimized_query: 优化后的查询对象
-            request: 请求对象
-        Returns:
-            (追问响应, 更新后的查询对象)
-        """
+        """处理追问逻辑 - 保持不变"""
         follow_up_num = (
             request.follow_up_num + 1 if not optimized_query.is_sufficient else 0
         )
         
-        # 需要追问且未超过最大追问轮数
         if (
             not optimized_query.is_sufficient
             and follow_up_num <= self.config.follow_up_round
@@ -404,8 +386,8 @@ class DataQaWorkflow:
                     created=int(datetime.now().timestamp()),
                     choices=choices,
                     usage=ChatUsage(
-                        prompt_tokens=0, 
-                        completion_tokens=0, 
+                        prompt_tokens=0,
+                        completion_tokens=0,
                         total_tokens=0
                     ),
                     steps=[step],
@@ -414,7 +396,6 @@ class DataQaWorkflow:
                 optimized_query,
             )
         
-        # 超过追问轮数，使用合并的查询内容
         elif follow_up_num > self.config.follow_up_round:
             input_messages = self._extract_input_messages(request)
             recent_messages = input_messages[-self.config.follow_up_round * 2 :]
@@ -428,7 +409,6 @@ class DataQaWorkflow:
                 is_sufficient=True,
             )
         
-        # 不需要追问
         return None, optimized_query
 
     def do_generate(
@@ -439,17 +419,9 @@ class DataQaWorkflow:
         knowledge_base_ids: Optional[List[str]] = None,
         thinking: bool = False,
     ) -> DataQaChatCompletionResponse:
-        """生成数据问答响应（完善版本）
-        Args:
-            input_messages: 输入消息列表
-            use_reranker: 是否使用重排序
-            reranker_info: 重排序配置
-            knowledge_base_ids: 知识库ID列表
-            thinking: 是否开启深度思考
-        Returns:
-            数据问答响应
-        """
-        # 构造请求对象（为了兼容现有的辅助函数）
+        """生成数据问答响应 - 重大修改：实现新工作流"""
+        
+        # 构造请求对象
         request = DataQACompletionRequest(
             messages=input_messages,
             knowledge_base_ids=knowledge_base_ids or [],
@@ -459,24 +431,21 @@ class DataQaWorkflow:
             thinking=thinking,
         )
         
-        # 更新配置中的重排序设置
         if reranker_info:
             self.config.enable_reranker = use_reranker
             self.config.reranking_threshold = reranker_info.threshold
         
-        # 提取输入信息
         extracted_messages = self._extract_input_messages(request)
         logger.info(f"输入消息: {extracted_messages}")
         
-        # Step 1: 问题改写
+        # Step 1: 问题改写 - 保持不变
         optimized_query = self.modify_query(
             input_messages=extracted_messages,
             enable_follow_up=True,
         )
         
-        # 处理追问逻辑
         follow_up_response, optimized_query = self._handle_follow_up(
-            optimized_query=optimized_query, 
+            optimized_query=optimized_query,
             request=request
         )
         if follow_up_response:
@@ -486,126 +455,172 @@ class DataQaWorkflow:
             WorkflowStepType.MODIFY_QUERY, 1, optimized_query.rewritten_query
         )
         
-        # Step 2: 实体识别
+        # Step 2: 实体识别 - 保持不变
         query = optimized_query.rewritten_query
         entity_enriched_query = self.entity_recognition(query)
         step2 = self._create_step(
             WorkflowStepType.ENTITY_RECOGNITION, 2, entity_enriched_query
         )
         
-        # Step 3: 搜索FAQ
+        # Step 3: 业务知识搜索 - 新增
+        business_context = self.business_info_search(
+            entity_enriched_query, 
+            top_k=2, 
+            knowledge_base_ids=knowledge_base_ids
+        )
+        step3 = self._create_step(
+            WorkflowStepType.BUSINESS_INFO, 
+            3, 
+            f"找到{len(business_context)}条业务知识"
+        )
+        
+        # Step 4: 并行快速路径检查 - 重大修改
+        # 4a: FAQ搜索
         faq_results = self.search_qa(entity_enriched_query, knowledge_base_ids)
-        faq_formatted = []  # 格式化FAQ结果
+        faq_score = faq_results[0].reranking_score if faq_results else 0.0
         
-        if faq_results and len(faq_results) > 0:
-            # 格式化FAQ结果为字典列表
-            for faq in faq_results:
-                faq_formatted.append({
-                    'question': faq.data.question if hasattr(faq.data, 'question') else "",
-                    'answer': faq.data.answer if hasattr(faq.data, 'answer') else "",
-                    'score': faq.reranking_score
-                })
-            
-            # 检查是否直接使用FAQ答案
-            if faq_formatted[0]['score'] >= self.config.fqa_answer_threshold:
-                step3 = self._create_step(
-                    WorkflowStepType.SEARCH_FAQ,
-                    3,
-                    f"命中常用查询（相似度: {faq_formatted[0]['score']:.2f}）: {faq_formatted[0]['question']}",
-                )
-                
-                # 直接返回FAQ答案
-                response_content = faq_formatted[0]['answer']
-                choices = [
-                    ChatCompletionChoice(
-                        finish_reason="stop",
-                        index=0,
-                        message=ChatMessage(
-                            role="assistant",
-                            content=response_content,
-                            reasoning_content=None,
-                            is_follow_up=False,
-                        ),
-                    )
-                ]
-                
-                return DataQaChatCompletionResponse(
-                    model="faq",
-                    created=int(datetime.now().timestamp()),
-                    choices=choices,
-                    usage=ChatUsage(
-                        prompt_tokens=0, 
-                        completion_tokens=0, 
-                        total_tokens=0
-                    ),
-                    steps=[step1, step2, step3],
-                )
-            else:
-                step3 = self._create_step(
-                    WorkflowStepType.SEARCH_FAQ,
-                    3,
-                    f"找到相关FAQ（相似度: {faq_formatted[0]['score']:.2f}），作为参考示例",
-                )
-        else:
-            step3 = self._create_step(
-                WorkflowStepType.SEARCH_FAQ, 3, "没有找到相关FAQ"
+        # 4b: API定位
+        api_results = self.locate_api(entity_enriched_query, knowledge_base_ids)
+        api_score = api_results[0].reranking_score if api_results else 0.0
+        
+        # 新增：判断快速路径
+        # API优先级高于FAQ
+        if api_results and api_score >= self.config.api_threshold:
+            # API快速路径
+            step4 = self._create_step(
+                WorkflowStepType.LOCATE_API,
+                4,
+                f"命中API（相似度: {api_score:.2f}）"
             )
-            faq_formatted = []
+            
+            # 构造API响应
+            api_data = api_results[0].data
+            api_info = {
+                "api_id": api_data.api_id if hasattr(api_data, 'api_id') else "",
+                "api_name": api_data.api_name if hasattr(api_data, 'api_name') else "",
+                "api_description": api_data.api_description if hasattr(api_data, 'api_description') else "",
+                "api_request": api_data.api_request if hasattr(api_data, 'api_request') else "",
+                "api_response": api_data.api_response if hasattr(api_data, 'api_response') else "",
+            }
+            
+            response_content = f"""找到匹配的API接口：
+
+API名称: {api_info['api_name']}
+API描述: {api_info['api_description']}
+请求参数: {api_info['api_request']}
+响应参数: {api_info['api_response']}
+
+使用此API可以获取所需数据。"""
+            
+            choices = [
+                ChatCompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=ChatMessage(
+                        role="assistant",
+                        content=response_content,
+                        reasoning_content=None,
+                        is_follow_up=False,
+                    ),
+                )
+            ]
+            
+            return DataQaChatCompletionResponse(
+                model="api_call",
+                created=int(datetime.now().timestamp()),
+                choices=choices,
+                usage=ChatUsage(
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    total_tokens=0
+                ),
+                steps=[step1, step2, step3, step4],
+            )
         
-        # Step 4: 定位表格
+        elif faq_results and faq_score >= self.config.fqa_answer_threshold:
+            # FAQ快速路径
+            step4 = self._create_step(
+                WorkflowStepType.SEARCH_FAQ,
+                4,
+                f"命中常用查询（相似度: {faq_score:.2f}）"
+            )
+            
+            # 修正：使用正确的属性访问
+            response_content = faq_results[0].data.answer
+            
+            choices = [
+                ChatCompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=ChatMessage(
+                        role="assistant",
+                        content=response_content,
+                        reasoning_content=None,
+                        is_follow_up=False,
+                    ),
+                )
+            ]
+            
+            return DataQaChatCompletionResponse(
+                model="faq_sql",
+                created=int(datetime.now().timestamp()),
+                choices=choices,
+                usage=ChatUsage(
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    total_tokens=0
+                ),
+                steps=[step1, step2, step3, step4],
+            )
+        
+        # 没有快速路径，继续完整流程
+        if faq_results and faq_score >= self.config.fqa_reference_threshold:
+            step4 = self._create_step(
+                WorkflowStepType.SEARCH_FAQ,
+                4,
+                f"找到相关FAQ（相似度: {faq_score:.2f}），作为参考"
+            )
+        else:
+            step4 = self._create_step(
+                WorkflowStepType.SEARCH_FAQ, 4, "没有找到相关FAQ"
+            )
+            faq_results = None  # 分数太低，不使用
+        
+        # Step 5: 表格定位 - 保持不变
         located_tables = self.locate_table(
             entity_enriched_query, request, knowledge_base_ids
         )
-        step4 = self._create_step(
-            WorkflowStepType.LOCATE_TABLE, 
-            4, 
+        step5 = self._create_step(
+            WorkflowStepType.LOCATE_TABLE,
+            5,
             [{"table_name": t["table_name"], "score": t["score"]} for t in located_tables]
         )
         
-        # Step 5: API定位（可选）
-        steps = [step1, step2, step3, step4]
-        if self.config.enable_api_search:
-            located_apis = self.locate_api(entity_enriched_query, knowledge_base_ids)
-            step_api = self._create_step(
-                WorkflowStepType.LOCATE_API,
-                5,
-                [{"api_name": a["api_name"], "score": a["score"]} for a in located_apis]
-            )
-            steps.append(step_api)
-        
-        # Step 6: 生成SQL
+        # Step 6: SQL生成 - 修改：集成所有上下文
         enhanced_input_messages = copy.deepcopy(extracted_messages)
         enhanced_input_messages[-1].content = entity_enriched_query
         
-        # 获取表结构信息
+        # 修正：获取table_schema字符串
         table_schema = ""
         if located_tables:
-            # 组合多个表的schema信息
             schemas = []
-            for table in located_tables[:2]:  # 最多使用前2个表
+            for table in located_tables[:2]:
                 schemas.append(f"表名: {table['table_name']}\n{table['table_schema']}")
             table_schema = "\n\n".join(schemas)
-        
-        # 决定是否使用FAQ作为参考
-        faq_for_generation = None
-        if faq_formatted and faq_formatted[0]['score'] >= self.config.fqa_reference_threshold:
-            faq_for_generation = faq_formatted[:self.config.fqa_sample_num]
         
         response = self.generate_sql(
             table_schema=table_schema,
             input_messages=enhanced_input_messages,
-            faq_results=faq_for_generation,
+            faq_results=faq_results,  # 已经是Chunk列表或None
+            business_context=business_context,  # 新增
             thinking=thinking,
         )
         
-        step_sql = self._create_step(
-            WorkflowStepType.GENERATE_SQL, 
-            len(steps) + 1, 
-            "SQL生成完成"
+        step6 = self._create_step(
+            WorkflowStepType.GENERATE_SQL, 6, "SQL生成完成"
         )
-        steps.append(step_sql)
         
-        # 构造最终响应
+        # 构造最终响应 - 保持不变
         usage = ChatUsage(
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
@@ -632,7 +647,7 @@ class DataQaWorkflow:
             created=response.created,
             choices=choices,
             usage=usage,
-            steps=steps,
+            steps=[step1, step2, step3, step4, step5, step6],
         )
 
     async def do_stream(
@@ -642,19 +657,10 @@ class DataQaWorkflow:
         reranker_info: Optional[RerankerInfo] = None,
         knowledge_base_ids: Optional[List[str]] = None,
         thinking: bool = False,
-    ) -> AsyncIterator[str]:
-        """流式生成数据问答响应
-        Args:
-            input_messages: 输入消息列表
-            use_reranker: 是否使用重排序
-            reranker_info: 重排序配置
-            knowledge_base_ids: 知识库ID列表
-            thinking: 是否开启深度思考
-        Yields:
-            SSE格式的响应数据
-        """
+    ):
+        """流式生成 - 简化版实现"""
         try:
-            # 执行完整的工作流获取结果（非流式部分）
+            # 执行完整工作流
             response = self.do_generate(
                 input_messages=input_messages,
                 use_reranker=use_reranker,
@@ -663,17 +669,17 @@ class DataQaWorkflow:
                 thinking=thinking,
             )
             
-            # 如果是追问响应，直接返回
+            # 如果是追问，直接返回
             if response.follow_up_num > 0:
                 yield f"data: {response.model_dump_json()}\n\n"
                 yield "data: [DONE]\n\n"
                 return
             
-            # 流式输出最终的SQL生成结果
+            # 流式输出结果
             if response.choices and response.choices[0].message.content:
                 content = response.choices[0].message.content
-                # 分块输出内容
-                chunk_size = 50  # 每次输出的字符数
+                # 分块输出
+                chunk_size = 50
                 for i in range(0, len(content), chunk_size):
                     chunk_content = content[i:i+chunk_size]
                     chunk_response = {
@@ -689,7 +695,7 @@ class DataQaWorkflow:
                     }
                     yield f"data: {json.dumps(chunk_response, ensure_ascii=False)}\n\n"
                 
-                # 发送结束信号
+                # 发送完成信号
                 final_chunk = {
                     "id": response.id,
                     "object": "chat.completion.chunk",
