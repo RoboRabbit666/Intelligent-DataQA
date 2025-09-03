@@ -3,7 +3,7 @@ import sys
 sys.path.append(str(Path.cwd()))
 from openai import OpenAI as OpenAIClient
 
-from app.core.data.workflow import DataWorkflow
+from app.core.data.workflow_faq import DataWorkflow
 from czce_ai.llm.message import Message as ChatMessage
 from app.config.config import settings
 from app.core.components import qwen3_llm, qwen3_thinking_llm

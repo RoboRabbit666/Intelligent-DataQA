@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 
 from app.config.config import settings
 from app.core.components import qwen3_llm, qwen3_thinking_llm
-from app.core.data.workflow import DataQaWorkflow
+from app.core.data.workflow_faq import DataQaWorkflow
 from app.models import DataQAChatCompletionResponse, DataQACompletionRequest, RerankerInfo
 from app.utils.log import logger
 
