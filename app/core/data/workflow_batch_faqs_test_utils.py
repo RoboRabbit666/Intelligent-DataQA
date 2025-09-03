@@ -5,9 +5,11 @@
 
 import re
 import json
+import numpy as np  # 新增导入
 from pathlib import Path
 from typing import List, Dict, Tuple
 from app.core.data.workflow_JINGFANG import DataQaWorkflow
+from app.core.components import embedder  # 新增导入
 
 
 def load_faq_questions():
@@ -85,77 +87,56 @@ def extract_sql(content: str) -> str:
     return content.strip()
 
 
+def cosine_similarity(a, b):
+    """计算余弦相似度"""
+    dot_product = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    return dot_product / (norm_a * norm_b)
+
+
 def compare_sql(expected: str, actual: str) -> Tuple[bool, str, float]:
     """
-    混合策略SQL比较
-    返回: (是否匹配, 匹配类型, 分数)
+    基于语义搜索的SQL比较 - 使用BgeM3Embedder + 余弦相似度
+    返回: (是否匹配, 匹配类型, 相似度分数)
     """
     if not expected or not actual:
         return False, "empty", 0.0
     
-    # 标准化
-    def normalize(sql):
-        sql = re.sub(r'--.*?\n', '\n', sql)  # 移除注释
-        sql = re.sub(r'\s+', ' ', sql.strip().upper())  # 标准化空白和大小写
-        return sql.rstrip(';')
-    
-    norm_expected = normalize(expected)
-    norm_actual = normalize(actual)
-    
-    # 策略1: 完全匹配
-    if norm_expected == norm_actual:
+    # 快速完全匹配检查
+    if expected.strip() == actual.strip():
         return True, "exact_match", 1.0
     
-    # 策略2: 语义匹配（改进多行SQL处理）
-    def get_components(sql):
-        comp = {}
-        # SELECT字段（处理多行格式）
-        select_match = re.search(r'SELECT\s+([\s\S]*?)\s+FROM', sql, re.IGNORECASE)
-        if select_match:
-            fields_text = select_match.group(1)
-            # 清理并分割字段，移除AS别名以便比较
-            fields = []
-            for field in fields_text.split(','):
-                field = field.strip()
-                # 移除AS别名，只保留核心字段名
-                field = re.sub(r'\s+AS\s+\w+', '', field, flags=re.IGNORECASE)
-                if field:
-                    fields.append(field)
-            comp['select'] = sorted(fields)
+    try:
+        # 标准化SQL语句
+        def normalize_sql(sql):
+            sql = re.sub(r'--.*?\n', '\n', sql)  # 移除注释
+            sql = re.sub(r'\s+', ' ', sql.strip().upper())  # 标准化空白和大小写
+            return sql.rstrip(';')
         
-        # FROM表
-        from_match = re.search(r'FROM\s+([^\s\(]+)', sql, re.IGNORECASE)
-        if from_match:
-            comp['from'] = from_match.group(1)
+        norm_expected = normalize_sql(expected)
+        norm_actual = normalize_sql(actual)
         
-        # WHERE条件
-        where_match = re.search(r'WHERE\s+([\s\S]*?)(?:\s+GROUP|\s+ORDER|\s+LIMIT|$)', sql, re.IGNORECASE)
-        if where_match:
-            comp['where'] = re.sub(r'\s+', ' ', where_match.group(1).strip())
+        # 标准化后的完全匹配
+        if norm_expected == norm_actual:
+            return True, "exact_match", 1.0
         
-        return comp
-    
-    exp_comp = get_components(norm_expected)
-    act_comp = get_components(norm_actual)
-    
-    if exp_comp and act_comp:
-        matches = sum(1 for k, v in exp_comp.items() if k in act_comp and act_comp[k] == v)
-        score = matches / len(exp_comp) if exp_comp else 0
-        if score >= 0.8:
-            return True, "semantic_match", score
-    
-    # 策略3: 高相似度
-    def similarity(s1, s2):
-        if not s1 or not s2:
-            return 0.0
-        common = sum(1 for c1, c2 in zip(s1, s2) if c1 == c2)
-        return common / max(len(s1), len(s2))
-    
-    sim_score = similarity(norm_expected, norm_actual)
-    if sim_score >= 0.95:
-        return True, "high_similarity", sim_score
-    
-    return False, "no_match", sim_score
+        # 使用BgeM3Embedder生成向量表示
+        expected_embedding = np.array(embedder.get_embedding(norm_expected))
+        actual_embedding = np.array(embedder.get_embedding(norm_actual))
+        
+        # 计算余弦相似度
+        similarity_score = cosine_similarity(expected_embedding, actual_embedding)
+        
+        # 使用0.85阈值判断匹配
+        if similarity_score >= 0.85:
+            return True, "semantic_match", similarity_score
+        else:
+            return False, "semantic_nomatch", similarity_score
+            
+    except Exception as e:
+        # 如果语义比较失败，返回低分数
+        return False, "error", 0.0
 
 
 def save_results(results: List[Dict], filename: str = "test_results.json"):
@@ -203,6 +184,12 @@ def print_statistics(results: List[Dict]):
         for mt, count in match_types.items():
             print(f"     {mt}: {count}")
     
+    # 语义相似度统计（新增）
+    semantic_scores = [r['match_score'] for r in results if r['match_type'] in ['exact_match', 'semantic_match', 'semantic_nomatch']]
+    if semantic_scores:
+        avg_similarity = sum(semantic_scores) / len(semantic_scores)
+        print(f"   平均语义相似度: {avg_similarity:.3f}")
+    
     # FAQ vs 完整流程
     faq_results = [r for r in results if r['is_faq_path']]
     full_results = [r for r in results if not r['is_faq_path']]
@@ -214,4 +201,3 @@ def print_statistics(results: List[Dict]):
     if full_results:
         full_matched = sum(1 for r in full_results if r['is_match'])
         print(f"   完整流程准确率: {full_matched/len(full_results)*100:.2f}%")
-
