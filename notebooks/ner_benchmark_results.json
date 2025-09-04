@@ -10,12 +10,12 @@
       "attribute_ruler",
       "ner"
     ],
-    "load_time": 0.5488018989562988,
-    "total_processing_time": 0.22384381294250488,
-    "avg_time_per_text": 0.0032918207785662484,
-    "median_time_per_text": 0.0025300979614257812,
-    "p95_time_per_text": 0.010611772537231445,
-    "texts_per_second": 303.7832455859124,
+    "load_time": 0.5058650970458984,
+    "total_processing_time": 0.21760988235473633,
+    "avg_time_per_text": 0.0032001453287461225,
+    "median_time_per_text": 0.002524137496948242,
+    "p95_time_per_text": 0.005113840103149414,
+    "texts_per_second": 312.485808384152,
     "total_entities_found": 116,
     "avg_entities_per_text": 1.7058823529411764,
     "entity_type_counts": {
@@ -38,9 +38,9 @@
       "RESEARCH_ORG": 3
     },
     "performance_stats": {
-      "min_time": 0.0018076896667480469,
-      "max_time": 0.018220186233520508,
-      "std_time": 0.0026147260721887254
+      "min_time": 0.0017688274383544922,
+      "max_time": 0.024740934371948242,
+      "std_time": 0.0030392412049637827
     }
   },
   "sm_ner_pos": {
@@ -56,58 +56,12 @@
       "tagger",
       "ner"
     ],
-    "load_time": 0.5102517604827881,
-    "total_processing_time": 0.19112706184387207,
-    "avg_time_per_text": 0.0028106920859392952,
-    "median_time_per_text": 0.002235889434814453,
-    "p95_time_per_text": 0.00864100456237793,
-    "texts_per_second": 355.7842586182163,
-    "total_entities_found": 116,
-    "avg_entities_per_text": 1.7058823529411764,
-    "entity_type_counts": {
-      "ORG": 29,
-      "GPE": 14,
-      "PERSON": 14,
-      "MONEY": 9,
-      "CARDINAL": 28,
-      "DATE": 19,
-      "ORDINAL": 1,
-      "PRODUCT": 2
-    },
-    "entity_type_performance": {
-      "EXCHANGE": 11,
-      "FUTURES_COMPANY": 6,
-      "COMMODITY": 0,
-      "CONTRACT_CODE": 1,
-      "PRICE_VALUE": 1,
-      "TIME": 13,
-      "RESEARCH_ORG": 3
-    },
-    "performance_stats": {
-      "min_time": 0.0015821456909179688,
-      "max_time": 0.01724696159362793,
-      "std_time": 0.0022754704678072954
-    }
-  },
-  "sm_ner_only": {
-    "model": "zh_core_web_sm",
-    "description": "小型模型仅NER (46MB)",
-    "excluded_components": [
-      "parser",
-      "tagger",
-      "lemmatizer",
-      "attribute_ruler"
-    ],
-    "active_pipes": [
-      "tok2vec",
-      "ner"
-    ],
-    "load_time": 0.5377037525177002,
-    "total_processing_time": 0.1932060718536377,
-    "avg_time_per_text": 0.0028412657625534955,
-    "median_time_per_text": 0.0022139549255371094,
-    "p95_time_per_text": 0.008638143539428711,
-    "texts_per_second": 351.9558125042419,
+    "load_time": 0.490405797958374,
+    "total_processing_time": 0.18127894401550293,
+    "avg_time_per_text": 0.002665866823757396,
+    "median_time_per_text": 0.002238035202026367,
+    "p95_time_per_text": 0.004307270050048828,
+    "texts_per_second": 375.11251165598503,
     "total_entities_found": 116,
     "avg_entities_per_text": 1.7058823529411764,
     "entity_type_counts": {
@@ -131,8 +85,54 @@
     },
     "performance_stats": {
       "min_time": 0.001628875732421875,
-      "max_time": 0.017987966537475586,
-      "std_time": 0.0023547505808506567
+      "max_time": 0.009788990020751953,
+      "std_time": 0.0014986588315429395
+    }
+  },
+  "sm_ner_only": {
+    "model": "zh_core_web_sm",
+    "description": "小型模型仅NER (46MB)",
+    "excluded_components": [
+      "parser",
+      "tagger",
+      "lemmatizer",
+      "attribute_ruler"
+    ],
+    "active_pipes": [
+      "tok2vec",
+      "ner"
+    ],
+    "load_time": 0.5787649154663086,
+    "total_processing_time": 0.211503267288208,
+    "avg_time_per_text": 0.003110342166003059,
+    "median_time_per_text": 0.0024361610412597656,
+    "p95_time_per_text": 0.009635210037231445,
+    "texts_per_second": 321.50803565289044,
+    "total_entities_found": 116,
+    "avg_entities_per_text": 1.7058823529411764,
+    "entity_type_counts": {
+      "ORG": 29,
+      "GPE": 14,
+      "PERSON": 14,
+      "MONEY": 9,
+      "CARDINAL": 28,
+      "DATE": 19,
+      "ORDINAL": 1,
+      "PRODUCT": 2
+    },
+    "entity_type_performance": {
+      "EXCHANGE": 11,
+      "FUTURES_COMPANY": 6,
+      "COMMODITY": 0,
+      "CONTRACT_CODE": 1,
+      "PRICE_VALUE": 1,
+      "TIME": 13,
+      "RESEARCH_ORG": 3
+    },
+    "performance_stats": {
+      "min_time": 0.0016388893127441406,
+      "max_time": 0.017806053161621094,
+      "std_time": 0.0024220262125817164
     }
   },
   "md_full": {
@@ -146,12 +146,12 @@
       "attribute_ruler",
       "ner"
     ],
-    "load_time": 0.7895140647888184,
-    "total_processing_time": 0.23486328125,
-    "avg_time_per_text": 0.003453871783088235,
-    "median_time_per_text": 0.0026929378509521484,
-    "p95_time_per_text": 0.011235952377319336,
-    "texts_per_second": 289.53014553014555,
+    "load_time": 0.8711371421813965,
+    "total_processing_time": 0.2544980049133301,
+    "avg_time_per_text": 0.003742617719313678,
+    "median_time_per_text": 0.003225088119506836,
+    "p95_time_per_text": 0.006641864776611328,
+    "texts_per_second": 267.1926643321136,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -178,9 +178,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.001965045928955078,
-      "max_time": 0.019269227981567383,
-      "std_time": 0.0027137158888699965
+      "min_time": 0.001961231231689453,
+      "max_time": 0.013486623764038086,
+      "std_time": 0.0022326740944960837
     }
   },
   "md_ner_pos": {
@@ -196,12 +196,12 @@
       "tagger",
       "ner"
     ],
-    "load_time": 0.6944220066070557,
-    "total_processing_time": 0.20483994483947754,
-    "avg_time_per_text": 0.0030123521299923166,
-    "median_time_per_text": 0.0024352073669433594,
-    "p95_time_per_text": 0.009232044219970703,
-    "texts_per_second": 331.96650220389427,
+    "load_time": 0.8333098888397217,
+    "total_processing_time": 0.20951294898986816,
+    "avg_time_per_text": 0.003081072779262767,
+    "median_time_per_text": 0.002444028854370117,
+    "p95_time_per_text": 0.009862899780273438,
+    "texts_per_second": 324.5622780255382,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -228,9 +228,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.0017249584197998047,
-      "max_time": 0.014733076095581055,
-      "std_time": 0.00210413871015976
+      "min_time": 0.0017406940460205078,
+      "max_time": 0.014926910400390625,
+      "std_time": 0.0021949848812875816
     }
   },
   "md_ner_only": {
@@ -246,12 +246,12 @@
       "tok2vec",
       "ner"
     ],
-    "load_time": 0.701361894607544,
-    "total_processing_time": 0.20815825462341309,
-    "avg_time_per_text": 0.0030611508032854866,
-    "median_time_per_text": 0.0024008750915527344,
-    "p95_time_per_text": 0.009309768676757812,
-    "texts_per_second": 326.67453002534705,
+    "load_time": 0.746596097946167,
+    "total_processing_time": 0.23163223266601562,
+    "avg_time_per_text": 0.003406356362735524,
+    "median_time_per_text": 0.0027441978454589844,
+    "p95_time_per_text": 0.011069297790527344,
+    "texts_per_second": 293.56881474284023,
     "total_entities_found": 128,
     "avg_entities_per_text": 1.8823529411764706,
     "entity_type_counts": {
@@ -278,9 +278,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.0017490386962890625,
-      "max_time": 0.016344785690307617,
-      "std_time": 0.0022979799835620204
+      "min_time": 0.001834869384765625,
+      "max_time": 0.015833139419555664,
+      "std_time": 0.002393712208644286
     }
   },
   "trf_full": {
@@ -294,12 +294,12 @@
       "attribute_ruler",
       "ner"
     ],
-    "load_time": 1.0863780975341797,
-    "total_processing_time": 2.0707240104675293,
-    "avg_time_per_text": 0.030451823683346018,
-    "median_time_per_text": 0.028276920318603516,
-    "p95_time_per_text": 0.0398709774017334,
-    "texts_per_second": 32.83875574739046,
+    "load_time": 1.3280627727508545,
+    "total_processing_time": 1.8401782512664795,
+    "avg_time_per_text": 0.027061444871565875,
+    "median_time_per_text": 0.02552485466003418,
+    "p95_time_per_text": 0.043421030044555664,
+    "texts_per_second": 36.95294189744926,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -325,9 +325,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.021226882934570312,
-      "max_time": 0.10072803497314453,
-      "std_time": 0.011918383442694554
+      "min_time": 0.021146774291992188,
+      "max_time": 0.0848388671875,
+      "std_time": 0.00883390894948833
     }
   },
   "trf_ner_pos": {
@@ -343,12 +343,12 @@
       "tagger",
       "ner"
     ],
-    "load_time": 1.0812101364135742,
-    "total_processing_time": 1.8621611595153809,
-    "avg_time_per_text": 0.02738472293404972,
-    "median_time_per_text": 0.024942874908447266,
-    "p95_time_per_text": 0.03131508827209473,
-    "texts_per_second": 36.51671051806101,
+    "load_time": 1.0374491214752197,
+    "total_processing_time": 1.6315929889678955,
+    "avg_time_per_text": 0.023994014543645522,
+    "median_time_per_text": 0.02296900749206543,
+    "p95_time_per_text": 0.037854909896850586,
+    "texts_per_second": 41.6770606761525,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -374,9 +374,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.020598888397216797,
-      "max_time": 0.08551692962646484,
-      "std_time": 0.008900983982371283
+      "min_time": 0.01899576187133789,
+      "max_time": 0.07999110221862793,
+      "std_time": 0.008521237044533825
     }
   },
   "trf_ner_only": {
@@ -392,12 +392,12 @@
       "transformer",
       "ner"
     ],
-    "load_time": 1.0181350708007812,
-    "total_processing_time": 1.7502598762512207,
-    "avg_time_per_text": 0.025739115827223834,
-    "median_time_per_text": 0.023532867431640625,
-    "p95_time_per_text": 0.04253411293029785,
-    "texts_per_second": 38.851373400414815,
+    "load_time": 1.0150580406188965,
+    "total_processing_time": 1.562593936920166,
+    "avg_time_per_text": 0.022979322601767146,
+    "median_time_per_text": 0.020600080490112305,
+    "p95_time_per_text": 0.03694796562194824,
+    "texts_per_second": 43.51738375103792,
     "total_entities_found": 141,
     "avg_entities_per_text": 2.073529411764706,
     "entity_type_counts": {
@@ -423,9 +423,9 @@
       "RESEARCH_ORG": 4
     },
     "performance_stats": {
-      "min_time": 0.021159887313842773,
-      "max_time": 0.08107900619506836,
-      "std_time": 0.00849060673853401
+      "min_time": 0.018095731735229492,
+      "max_time": 0.07812690734863281,
+      "std_time": 0.008535205949858458
     }
   }
 }
