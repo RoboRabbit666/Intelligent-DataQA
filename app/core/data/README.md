@@ -15,7 +15,7 @@
    - FAQ < 0.7：不使用 FAQ
 
 ### Fast-path decision table
-| API ≥ 0.8 | FAQ ≥ 0.9 | 结果 |
+| API ≥ 0.85 | FAQ ≥ 0.9 | 结果 |
 |---|---|---|
 | 是 | 是 | 返回 API（**API 优先**） |
 | 是 | 否 | 返回 API |
