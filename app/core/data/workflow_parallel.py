@@ -608,19 +608,21 @@ API描述: {api_info['api_description']}
         step5 = self._create_step(
             WorkflowStepType.LOCATE_TABLE,
             5,
-            [{"table_name": t["table_name"], "score": t["score"]} for t in located_tables]
+            [{"table_name": t["table_name"], "score": t["score"]} for t in located_tables] # 创建表格定位步骤，显示表名和分数用于调试
         )
         
         # Step 6: SQL生成 - 保持不变
         enhanced_input_messages = copy.deepcopy(extracted_messages)
         enhanced_input_messages[-1].content = entity_enriched_query
         
+        # 构建表结构字符串
         table_schema = ""
         if located_tables:
             schemas = []
+            # 只取前两张表，避免过长
             for table in located_tables[:2]:
-                schemas.append(f"表名: {table['table_name']}\n{table['table_schema']}")
-            table_schema = "\n\n".join(schemas)
+                schemas.append(f"表名: {table['table_name']}\n{table['table_schema']}") # 提取表名和表结构，用于生成SQL
+            table_schema = "\n\n".join(schemas) # 多表之间用双换行分隔
         
         response = self.generate_sql(
             table_schema=table_schema,

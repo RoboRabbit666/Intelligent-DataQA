@@ -12,7 +12,7 @@ from typing import List, Dict, Tuple, Optional
 from datetime import datetime
 
 # 导入新的工作流
-from app.core.data.workflow_0901_parallel import DataQaWorkflow, WorkflowConfig
+from app.core.data.workflow_parallel import DataQaWorkflow, WorkflowConfig
 from app.core.components import qwen3_llm, qwen3_thinking_llm, embedder
 from czce_ai.llm.message import Message as ChatMessage
 import numpy as np
