@@ -1,7 +1,7 @@
 # CZCE AI 应用
 
 ### Report
-[View the summary report (PDF)](report/Jingfang_Gu_2025_CZCE_Summer_AI_Internship_Report.pdf)
+[View the summary report (PDF) here](report/Jingfang_Gu_2025_CZCE_Summer_AI_Internship_Report.pdf)
 
 ### 项目结构说明
 
