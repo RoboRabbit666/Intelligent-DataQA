@@ -500,7 +500,7 @@
         "api_id": "A90539",
         "api_name": "大户报告-客户",
         "api_description": "查询大户报告客户维度数据",
-       0 "api_request": "查询日期",
+        "api_request": "查询日期",
         "api_response": "客户号,合约编码, 会员简称, 会员号"
     },
     {
